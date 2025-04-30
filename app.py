@@ -15,83 +15,68 @@ def load_google_sheet(sheet_url, worksheet_name):
     data = worksheet.get_all_records()
     return pd.DataFrame(data)
 
-# --------- QoH Score Calculation ---------
-def calculate_qoh(row):
-    try:
-        return round((
-            row['Interview Score'] * 0.20 +
-            row['Reference Score'] * 0.15 +
-            row['Performance Review Avg'] * 0.25 +
-            row['Promotion'] * 0.15
-        ), 1)
-    except:
-        return None
-
-def generate_decision(row):
-    try:
-        if pd.isna(row['Interview Score']):
-            return "🟡 Pending Scores"
-        elif row['Interview Score'] <= 3.4:
-            return "❌ Auto-Reject"
-        elif row['Interview Score'] >= 3.5:
-            return "✅ HM Discussion"
-        return "⚠️ Needs Review"
-    except:
-        return "Error"
-
 # --------- Load Data ---------
 sheet_url = "https://docs.google.com/spreadsheets/d/1_hypJt1kwUNZE6Xck1VVjrPeYiIJpTDXSAwi4dgXXko"
 worksheet_name = "Mixed Raw Candidate Data"
 df = load_google_sheet(sheet_url, worksheet_name)
 
 # --------- Data Cleanup ---------
-numeric_cols = ['Interview Score', 'Reference Score', 'Performance Review Avg', 'Promotion']
-for col in numeric_cols:
-    if col in df.columns:
-        df[col] = pd.to_numeric(df[col], errors='coerce')
-    else:
-        st.warning(f"⚠️ Column not found in sheet: {col}")
+df['Interview Score'] = pd.to_numeric(df['Interview Score'], errors='coerce')
+df['Scorecard submitted'] = df['Scorecard submitted'].str.strip().str.lower()
 
-df['QoH Score'] = df.apply(calculate_qoh, axis=1)
-df['Scorecard Submitted?'] = df['Interview Score'].apply(lambda x: "✅" if pd.notnull(x) else "❌")
-df['Decision Recommendation'] = df.apply(generate_decision, axis=1)
+# --------- Grouped Candidate Summary ---------
+grouped = df.groupby('Candidate Name').agg(
+    Avg_Interview_Score=('Interview Score', 'mean'),
+    Scorecards_Submitted=('Scorecard submitted', lambda x: sum(x == 'yes')),
+    Total_Interviews=('Interview Score', 'count'),
+    Department=('Department', 'first'),
+    Veteran_Status=('Veteran Status', 'first'),
+    Disability_Status=('Disability Status', 'first'),
+    Gender=('Gender Identity', 'first')
+).reset_index()
+
+def make_decision(row):
+    if row['Scorecards_Submitted'] < 4:
+        return "🟡 Waiting for Interviews"
+    elif row['Avg_Interview_Score'] <= 3.4:
+        return "❌ Auto-Reject"
+    elif row['Avg_Interview_Score'] >= 3.5:
+        return "✅ HM Review"
+    return "⚠️ Needs Discussion"
+
+grouped['Decision'] = grouped.apply(make_decision, axis=1)
 
 # --------- Streamlit UI ---------
-st.set_page_config(page_title="Candidate Scorecard Dashboard", layout="wide")
-st.title("🎯 Candidate Scorecard + Quality of Hire Dashboard")
-st.caption("Built to enable faster, data-driven hiring decisions — powered by real-time Google Sheets.")
+st.set_page_config(page_title="Interview Score Summary", layout="wide")
+st.title("🎯 Candidate Interview Score Summary")
+st.caption("Automatically summarizes 4 interviewer scores into an average, submission tracker, and decision guide.")
 
-# Sidebar Filter
-selected_names = st.sidebar.multiselect("Compare Candidates:", df['Candidate Name'].unique().tolist(),
-                                        default=df['Candidate Name'].unique().tolist())
+# Sidebar
+selected_names = st.sidebar.multiselect("Select Candidates", grouped['Candidate Name'].unique(),
+                                        default=grouped['Candidate Name'].unique())
 
-filtered_df = df[df['Candidate Name'].isin(selected_names)]
+filtered = grouped[grouped['Candidate Name'].isin(selected_names)]
 
-# Decision Table
-st.subheader("✅ Scorecard Submission + Decision Logic")
-st.dataframe(
-    filtered_df[['Candidate Name', 'Interview Score', 'Scorecard Submitted?', 'Decision Recommendation']],
-    use_container_width=True
-)
+# Summary Table
+st.subheader("📋 Candidate Interview Summary")
+st.dataframe(filtered[['Candidate Name', 'Avg_Interview_Score', 'Scorecards_Submitted', 'Decision']],
+             use_container_width=True)
 
-# Charts
-st.subheader("📊 Score Comparisons")
-score_metrics = ['QoH Score', 'Interview Score', 'Reference Score']
-for metric in score_metrics:
-    if metric in filtered_df.columns and filtered_df[metric].notnull().any():
-        fig = px.bar(filtered_df, x='Candidate Name', y=metric, text_auto=True,
-                     color='Candidate Name', title=f"{metric} Comparison")
-        fig.update_layout(showlegend=False, height=400)
-        st.plotly_chart(fig, use_container_width=True)
+# Bar Chart
+st.subheader("📊 Average Interview Scores")
+fig = px.bar(filtered, x="Candidate Name", y="Avg_Interview_Score", color="Candidate Name",
+             text_auto=True, title="Avg Interview Score per Candidate")
+fig.update_layout(showlegend=False)
+st.plotly_chart(fig, use_container_width=True)
 
-# Candidate Insights
-st.subheader("🧠 Candidate Insight Cards")
-for _, row in filtered_df.iterrows():
+# Details
+st.subheader("🧠 Candidate Info")
+for _, row in filtered.iterrows():
     with st.expander(f"🧾 {row['Candidate Name']}"):
-        st.markdown(f"**Internal Interviewer:** {row.get('Internal Interviewer', 'N/A')}")
-        st.markdown(f"**Veteran Status:** {row.get('Veteran Status', 'Unknown')}")
-        st.markdown(f"**Promotion:** {row.get('Promotion', 'None')}")
-        st.progress(
-            int(row['QoH Score']) if pd.notnull(row['QoH Score']) else 0,
-            text=f"QoH Score: {row['QoH Score']}%" if pd.notnull(row['QoH Score']) else "QoH Score: N/A"
-        )
+        st.markdown(f"**Department:** {row['Department']}")
+        st.markdown(f"**Veteran Status:** {row['Veteran_Status']}")
+        st.markdown(f"**Disability Status:** {row['Disability_Status']}")
+        st.markdown(f"**Gender Identity:** {row['Gender']}")
+        st.markdown(f"**Interview Count:** {row['Total_Interviews']} / 4")
+        st.markdown(f"**Scorecards Submitted:** {row['Scorecards_Submitted']} / 4")
+        st.markdown(f"**Decision:** {row['Decision']}")
