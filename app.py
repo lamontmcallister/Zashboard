@@ -228,20 +228,20 @@ st.subheader("👥 Internal Interviewer Stats")
 st.caption("Track interviewers' submission behavior and scoring trends.")
 
 interviewer_summary = df.groupby('Internal Interviewer').agg(
-    Interviews_Conducted=('Interview', 'count'),
-    Scorecards_Submitted=('Scorecard Complete', 'sum'),
-    Avg_Interview_Score=('Interview Score', 'mean')
+Interviews_Conducted=('Interview', 'count'),
+Scorecards_Submitted=('Scorecard Complete', 'sum'),
+Avg_Interview_Score=('Interview Score', 'mean')
 ).reset_index()
 
 search_term = st.text_input("🔎 Search Interviewer")
 filtered_summary = interviewer_summary[
-    interviewer_summary['Internal Interviewer'].str.contains(search_term, case=False)
+interviewer_summary['Internal Interviewer'].str.contains(search_term, case=False)
 ] if search_term else interviewer_summary
 
 styled_interviewers = filtered_summary.style.format({
-    'Avg_Interview_Score': '{:.2f}'
+'Avg_Interview_Score': '{:.2f}'
 }).set_properties(**{'text-align': 'center'}).set_table_styles([
-    {'selector': 'th', 'props': [('font-weight', 'bold'), ('background-color', '#f0f8ff')]}
+{'selector': 'th', 'props': [('font-weight', 'bold'), ('background-color', '#f0f8ff')]}
 ])
 
 st.dataframe(styled_interviewers, use_container_width=True)
@@ -250,55 +250,55 @@ st.dataframe(styled_interviewers, use_container_width=True)
 st.subheader("👥 Internal Interviewer Stats")
 st.caption("Track interviewers' submission behavior and scoring trends.")
 
-    interviewer_summary = df.groupby('Internal Interviewer').agg(
-        Interviews_Conducted=('Interview', 'count'),
-        Scorecards_Submitted=('Scorecard Complete', 'sum'),
-        Avg_Interview_Score=('Interview Score', 'mean')
-    ).reset_index()
+interviewer_summary = df.groupby('Internal Interviewer').agg(
+Interviews_Conducted=('Interview', 'count'),
+Scorecards_Submitted=('Scorecard Complete', 'sum'),
+Avg_Interview_Score=('Interview Score', 'mean')
+).reset_index()
 
-    search_term = st.text_input("🔎 Search Interviewer")
-    if search_term:
-        filtered_summary = interviewer_summary[interviewer_summary['Internal Interviewer'].str.contains(search_term, case=False)]
-    else:
-        filtered_summary = interviewer_summary
+search_term = st.text_input("🔎 Search Interviewer")
+if search_term:
+filtered_summary = interviewer_summary[interviewer_summary['Internal Interviewer'].str.contains(search_term, case=False)]
+else:
+filtered_summary = interviewer_summary
 
-    styled_interviewers = filtered_summary.style.format({
-        'Avg_Interview_Score': '{:.2f}'
-    }).set_properties(**{'text-align': 'center'})       .set_table_styles([
-          {'selector': 'th', 'props': [('font-weight', 'bold'), ('background-color', '#f0f8ff')]}
-      ])
-    st.dataframe(styled_interviewers, use_container_width=True)
-
-st.caption("Track interviewers' submission behavior and scoring trends.")
-
-    interviewer_summary = df.groupby('Internal Interviewer').agg(
-        Interviews_Conducted=('Interview', 'count'),
-        Scorecards_Submitted=('Scorecard Complete', 'sum'),
-        Avg_Interview_Score=('Interview Score', 'mean')
-    ).reset_index()
-
-    all_interviewers = interviewer_summary['Internal Interviewer'].dropna().unique().tolist()
-    selected_interviewers = st.multiselect("Filter Interviewers", all_interviewers, default=all_interviewers)
-    filtered_summary = interviewer_summary[interviewer_summary['Internal Interviewer'].isin(selected_interviewers)]
-
-    styled_interviewers = filtered_summary.style.format({
-        'Avg_Interview_Score': '{:.2f}'
-    }).set_properties(**{'text-align': 'center'})       .set_table_styles([
-          {'selector': 'th', 'props': [('font-weight', 'bold'), ('background-color', '#f0f8ff')]}
-      ])
-    st.dataframe(styled_interviewers, use_container_width=True)
+styled_interviewers = filtered_summary.style.format({
+'Avg_Interview_Score': '{:.2f}'
+}).set_properties(**{'text-align': 'center'})       .set_table_styles([
+{'selector': 'th', 'props': [('font-weight', 'bold'), ('background-color', '#f0f8ff')]}
+])
+st.dataframe(styled_interviewers, use_container_width=True)
 
 st.caption("Track interviewers' submission behavior and scoring trends.")
-    interviewer_summary = df.groupby('Internal Interviewer').agg(
-        Interviews_Conducted=('Interview', 'count'),
-        Scorecards_Submitted=('Scorecard Complete', 'sum'),
-        Avg_Interview_Score=('Interview Score', 'mean')
-    ).reset_index()
 
-    styled_interviewers = interviewer_summary.style.format({
-        'Avg_Interview_Score': '{:.2f}'
-    }).set_properties(**{'text-align': 'center'})       .set_table_styles([
-          {'selector': 'th', 'props': [('font-weight', 'bold'), ('background-color', '#f0f8ff')]}
-      ])
+interviewer_summary = df.groupby('Internal Interviewer').agg(
+Interviews_Conducted=('Interview', 'count'),
+Scorecards_Submitted=('Scorecard Complete', 'sum'),
+Avg_Interview_Score=('Interview Score', 'mean')
+).reset_index()
 
-    st.dataframe(styled_interviewers, use_container_width=True)
+all_interviewers = interviewer_summary['Internal Interviewer'].dropna().unique().tolist()
+selected_interviewers = st.multiselect("Filter Interviewers", all_interviewers, default=all_interviewers)
+filtered_summary = interviewer_summary[interviewer_summary['Internal Interviewer'].isin(selected_interviewers)]
+
+styled_interviewers = filtered_summary.style.format({
+'Avg_Interview_Score': '{:.2f}'
+}).set_properties(**{'text-align': 'center'})       .set_table_styles([
+{'selector': 'th', 'props': [('font-weight', 'bold'), ('background-color', '#f0f8ff')]}
+])
+st.dataframe(styled_interviewers, use_container_width=True)
+
+st.caption("Track interviewers' submission behavior and scoring trends.")
+interviewer_summary = df.groupby('Internal Interviewer').agg(
+Interviews_Conducted=('Interview', 'count'),
+Scorecards_Submitted=('Scorecard Complete', 'sum'),
+Avg_Interview_Score=('Interview Score', 'mean')
+).reset_index()
+
+styled_interviewers = interviewer_summary.style.format({
+'Avg_Interview_Score': '{:.2f}'
+}).set_properties(**{'text-align': 'center'})       .set_table_styles([
+{'selector': 'th', 'props': [('font-weight', 'bold'), ('background-color', '#f0f8ff')]}
+])
+
+st.dataframe(styled_interviewers, use_container_width=True)
