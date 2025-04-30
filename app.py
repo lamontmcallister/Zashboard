@@ -142,7 +142,8 @@ elif page == "🎯 Recruiter Dashboard":
                     st.markdown(f"{line}: ✅ {score}")
                 else:
                     st.markdown(f"{line}: ❌ Not Submitted")
-                    st.button(f"📩 Send Reminder to {r['Internal Interviewer']}", key=f"{r['Candidate Name']}-{r['Internal Interviewer']}")
+                    st.button(f"📩 Send Reminder to {r['Internal Interviewer']}",
+            key=f"reminder-{r['Candidate Name'].replace(' ', '_')}-{r['Internal Interviewer'].replace(' ', '_')}-{r['Interview'].replace(' ', '_')}")
 
     for _, row in grouped.iterrows():
         with st.expander(f"{row['Candidate Name']} — {row['Decision']}"):
@@ -159,7 +160,8 @@ elif page == "🎯 Recruiter Dashboard":
                     st.markdown(f"{line}: ✅ {score}")
                 else:
                     st.markdown(f"{line}: ❌ Not Submitted")
-                    st.button(f"📩 Send Reminder to {r['Internal Interviewer']}", key=f"{r['Candidate Name']}-{r['Internal Interviewer']}")
+                    st.button(f"📩 Send Reminder to {r['Internal Interviewer']}",
+            key=f"reminder-{r['Candidate Name'].replace(' ', '_')}-{r['Internal Interviewer'].replace(' ', '_')}-{r['Interview'].replace(' ', '_')}")
 
 # --------- Department Analytics ---------
 elif page == "📊 Department Analytics":
@@ -187,7 +189,27 @@ elif page == "📊 Department Analytics":
     st.subheader("✅ Scorecard Submission Rate by Department")
     st.dataframe(styled_dept, use_container_width=True)
 
+    
     st.subheader("👥 Internal Interviewer Stats")
+    st.caption("Track interviewers' submission behavior and scoring trends.")
+
+    interviewer_summary = df.groupby('Internal Interviewer').agg(
+        Interviews_Conducted=('Interview', 'count'),
+        Scorecards_Submitted=('Scorecard Complete', 'sum'),
+        Avg_Interview_Score=('Interview Score', 'mean')
+    ).reset_index()
+
+    all_interviewers = interviewer_summary['Internal Interviewer'].dropna().unique().tolist()
+    selected_interviewers = st.multiselect("Filter Interviewers", all_interviewers, default=all_interviewers)
+    filtered_summary = interviewer_summary[interviewer_summary['Internal Interviewer'].isin(selected_interviewers)]
+
+    styled_interviewers = filtered_summary.style.format({
+        'Avg_Interview_Score': '{:.2f}'
+    }).set_properties(**{'text-align': 'center'})       .set_table_styles([
+          {'selector': 'th', 'props': [('font-weight', 'bold'), ('background-color', '#f0f8ff')]}
+      ])
+    st.dataframe(styled_interviewers, use_container_width=True)
+
     st.caption("Track interviewers' submission behavior and scoring trends.")
     interviewer_summary = df.groupby('Internal Interviewer').agg(
         Interviews_Conducted=('Interview', 'count'),
