@@ -1,3 +1,4 @@
+import hashlib
 import streamlit as st
 import pandas as pd
 import gspread
@@ -141,6 +142,8 @@ elif page == "🎯 Recruiter Dashboard":
             st.markdown("### Interviewer Scores")
             candidate_rows = df[df['Candidate Name'] == row['Candidate Name']]
             for _, r in candidate_rows.iterrows():
+    row_id = f"{r['Candidate Name']}-{r['Internal Interviewer']}-{r['Interview']}"
+                row_hash = hashlib.md5(row_id.encode()).hexdigest()
                 score = r['Interview Score']
                 status = r['Scorecard submitted']
                 line = f"- **{r['Internal Interviewer']}** ({r['Interview']})"
@@ -148,7 +151,7 @@ elif page == "🎯 Recruiter Dashboard":
                     st.markdown(f"{line}: ✅ {score}")
                 else:
                     st.markdown(f"{line}: ❌ Not Submitted")
-                    st.button(f"📩 Send Reminder to {r['Internal Interviewer']}",
+                                st.button(f"📩 Send Reminder to {r['Internal Interviewer']}", key=f"reminder-{row_hash}")
             key=f"reminder-{r['Candidate Name'].replace(' ', '_')}-{r['Internal Interviewer'].replace(' ', '_')}-{r['Interview'].replace(' ', '_')}")
 
     for _, row in grouped.iterrows():
@@ -166,7 +169,7 @@ elif page == "🎯 Recruiter Dashboard":
                     st.markdown(f"{line}: ✅ {score}")
                 else:
                     st.markdown(f"{line}: ❌ Not Submitted")
-                    st.button(f"📩 Send Reminder to {r['Internal Interviewer']}",
+                                st.button(f"📩 Send Reminder to {r['Internal Interviewer']}", key=f"reminder-{row_hash}")
             key=f"reminder-{r['Candidate Name'].replace(' ', '_')}-{r['Internal Interviewer'].replace(' ', '_')}-{r['Interview'].replace(' ', '_')}")
 
 # --------- Department Analytics ---------
