@@ -40,6 +40,17 @@ st.markdown(
             background-color: #ffffff;
             color: #1e90ff;
         }
+        th {
+            font-weight: bold;
+            background-color: #f0f8ff;
+        }
+        td {
+            text-align: center !important;
+        }
+        .dataframe {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
     </style>
     ''',
     unsafe_allow_html=True
@@ -52,6 +63,8 @@ if page == "Recruiter Dashboard":
     st.title("🎯 Recruiter Interview Dashboard")
     recruiters = sorted(df['Recruiter'].dropna().unique().tolist())
     selected_recruiter = st.sidebar.selectbox("👤 Choose Recruiter", recruiters)
+    departments = sorted(df['Department'].dropna().unique().tolist())
+    selected_depts = st.sidebar.multiselect("🏢 Filter by Department", departments, default=departments)
     toggle_status = st.sidebar.radio("📋 Show Candidates With:", ["All", "Complete Scorecards", "Pending Scorecards"])
 
     grouped = df.groupby('Candidate Name').agg(
@@ -72,7 +85,10 @@ if page == "Recruiter Dashboard":
         return "⚠️ Needs Discussion"
 
     grouped['Decision'] = grouped.apply(make_decision, axis=1)
-    grouped = grouped[grouped['Recruiter'] == selected_recruiter]
+    grouped = grouped[
+        (grouped['Recruiter'] == selected_recruiter) &
+        (grouped['Department'].isin(selected_depts))
+    ]
 
     if toggle_status == "Complete Scorecards":
         grouped = grouped[grouped['Scorecards_Submitted'] == 4]
