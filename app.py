@@ -45,30 +45,20 @@ def make_decision(row):
 grouped['Decision'] = grouped.apply(make_decision, axis=1)
 
 # --------- Streamlit UI ---------
-st.set_page_config(page_title="Interview Score Summary", layout="wide")
-st.title("🎯 Candidate Interview Score Summary")
-st.caption("Summarizes 4 interviewer scores into an average, tracks scorecard submissions, and recruiter decision flow.")
+st.set_page_config(page_title="Recruiter Interview Dashboard", layout="wide")
+st.title("🧭 Recruiter Interview Dashboard")
+st.caption("Filter by recruiter to view candidate pipeline, scorecards, and interview outcomes.")
 
-# --------- Sidebar Filters ---------
-departments = grouped['Department'].dropna().unique().tolist()
-recruiters = grouped['Recruiter'].dropna().unique().tolist()
+# --------- Recruiter Landing Page Toggle ---------
+recruiters = sorted(grouped['Recruiter'].dropna().unique().tolist())
+selected_recruiter = st.sidebar.selectbox("👤 Choose Recruiter", recruiters)
 
-selected_depts = st.sidebar.multiselect("Filter by Department", departments, default=departments)
-selected_recruiters = st.sidebar.multiselect("Filter by Recruiter", recruiters, default=recruiters)
-only_full_submissions = st.sidebar.checkbox("✅ Only show candidates with all 4 scorecards", value=False)
-
-# Apply filters
-filtered = grouped[
-    (grouped['Department'].isin(selected_depts)) &
-    (grouped['Recruiter'].isin(selected_recruiters))
-]
-
-if only_full_submissions:
-    filtered = filtered[filtered['Scorecards_Submitted'] == 4]
+# Filter by recruiter
+filtered = grouped[grouped['Recruiter'] == selected_recruiter]
 
 # --------- Display Tables & Charts ---------
-st.subheader("📋 Candidate Interview Summary")
-st.dataframe(filtered[['Candidate Name', 'Department', 'Recruiter', 'Avg_Interview_Score', 'Scorecards_Submitted', 'Decision']],
+st.subheader(f"📋 Candidate Summary for {selected_recruiter}")
+st.dataframe(filtered[['Candidate Name', 'Department', 'Avg_Interview_Score', 'Scorecards_Submitted', 'Decision']],
              use_container_width=True)
 
 # Bar Chart
@@ -78,12 +68,11 @@ fig = px.bar(filtered, x="Candidate Name", y="Avg_Interview_Score", color="Candi
 fig.update_layout(showlegend=False)
 st.plotly_chart(fig, use_container_width=True)
 
-# Candidate Detail Expander with per-interviewer breakdown
-st.subheader("🧠 Candidate Info")
+# Candidate Detail Expander with Decision in the header
+st.subheader("🧠 Candidate Details")
 for _, row in filtered.iterrows():
-    with st.expander(f"🧾 {row['Candidate Name']}"):
+    with st.expander(f"{row['Candidate Name']} — {row['Decision']}"):
         st.markdown(f"**Department:** {row['Department']}")
-        st.markdown(f"**Recruiter:** {row['Recruiter']}")
         st.markdown(f"**Interview Count:** {row['Total_Interviews']} / 4")
         st.markdown(f"**Scorecards Submitted:** {row['Scorecards_Submitted']} / 4")
         st.markdown(f"**Decision:** {row['Decision']}")
