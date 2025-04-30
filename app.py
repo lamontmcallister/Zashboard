@@ -19,50 +19,140 @@ sheet_url = "https://docs.google.com/spreadsheets/d/1_hypJt1kwUNZE6Xck1VVjrPeYiI
 worksheet_name = "Mixed Raw Candidate Data"
 df = load_google_sheet(sheet_url, worksheet_name)
 
-# --------- Cleanup ---------
+# --------- Prep ---------
 df['Interview Score'] = pd.to_numeric(df['Interview Score'], errors='coerce')
 df['Scorecard submitted'] = df['Scorecard submitted'].str.strip().str.lower()
 df['Scorecard Complete'] = df['Scorecard submitted'] == 'yes'
 
 # --------- Streamlit Setup ---------
-st.set_page_config(page_title="Department Analytics", layout="wide")
-st.title("📊 Department Scorecard Analytics")
+st.set_page_config(page_title="Recruiter Platform", layout="wide")
 
-# --------- Department Table ---------
-dept_summary = df.groupby('Department').agg(
-    Total_Interviews=('Interview Score', 'count'),
-    Completed=('Scorecard Complete', 'sum'),
-    Avg_Score=('Interview Score', 'mean')
-).reset_index()
-dept_summary['Completion Rate (%)'] = round(100 * dept_summary['Completed'] / dept_summary['Total_Interviews'], 1)
+st.markdown(
+    '''
+    <style>
+        body {
+            background-color: #ffffff;
+            color: #1a1a1a;
+        }
+        .stButton button {
+            border: 1px solid #1e90ff;
+            background-color: #ffffff;
+            color: #1e90ff;
+        }
+        th {
+            font-weight: bold;
+            background-color: #f0f8ff;
+        }
+        td {
+            text-align: center !important;
+        }
+        .dataframe {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+    ''',
+    unsafe_allow_html=True
+)
 
-# --------- Apply Conditional Formatting ---------
-def highlight_completion(val):
-    color = 'green' if val >= 90 else 'red'
-    return f'color: {color}; font-weight: bold'
+# --------- Navigation ---------
+page = st.sidebar.selectbox("🔍 Navigate", ["Recruiter Dashboard", "Department Analytics"])
 
-styled_dept = dept_summary.style.format({
-    'Avg_Score': '{:.2f}',
-    'Completion Rate (%)': '{:.1f}%'
-}).applymap(highlight_completion, subset=['Completion Rate (%)'])   .set_properties(**{'text-align': 'center'})   .set_table_styles([
-      {'selector': 'th', 'props': [('font-weight', 'bold'), ('background-color', '#f0f8ff')]}
-  ])
+# --------- Recruiter Dashboard ---------
+if page == "Recruiter Dashboard":
+    st.title("🎯 Recruiter Interview Dashboard")
+    recruiters = sorted(df['Recruiter'].dropna().unique().tolist())
+    selected_recruiter = st.sidebar.selectbox("👤 Choose Recruiter", recruiters)
+    departments = sorted(df['Department'].dropna().unique().tolist())
+    selected_depts = st.sidebar.multiselect("🏢 Filter by Department", departments, default=departments)
+    toggle_status = st.sidebar.radio("📋 Show Candidates With:", ["All", "Complete Scorecards", "Pending Scorecards"])
 
-st.subheader("✅ Scorecard Submission Rate by Department")
-st.dataframe(styled_dept, use_container_width=True)
+    grouped = df.groupby('Candidate Name').agg(
+        Avg_Interview_Score=('Interview Score', 'mean'),
+        Scorecards_Submitted=('Scorecard submitted', lambda x: sum(x == 'yes')),
+        Total_Interviews=('Interview Score', 'count'),
+        Department=('Department', 'first'),
+        Recruiter=('Recruiter', 'first')
+    ).reset_index()
 
-# --------- Interviewer Table ---------
-st.subheader("👥 Internal Interviewer Stats")
-interviewer_summary = df.groupby('Internal Interviewer').agg(
-    Interviews_Conducted=('Interview', 'count'),
-    Scorecards_Submitted=('Scorecard Complete', 'sum'),
-    Avg_Interview_Score=('Interview Score', 'mean')
-).reset_index()
+    def make_decision(row):
+        if row['Scorecards_Submitted'] < 4:
+            return "🟡 Waiting for Interviews"
+        elif row['Avg_Interview_Score'] <= 3.4:
+            return "❌ Auto-Reject"
+        elif row['Avg_Interview_Score'] >= 3.5:
+            return "✅ HM Review"
+        return "⚠️ Needs Discussion"
 
-styled_interviewers = interviewer_summary.style.format({
-    'Avg_Interview_Score': '{:.2f}'
-}).set_properties(**{'text-align': 'center'})   .set_table_styles([
-      {'selector': 'th', 'props': [('font-weight', 'bold'), ('background-color', '#f0f8ff')]}
-  ])
+    grouped['Decision'] = grouped.apply(make_decision, axis=1)
+    grouped = grouped[
+        (grouped['Recruiter'] == selected_recruiter) &
+        (grouped['Department'].isin(selected_depts))
+    ]
 
-st.dataframe(styled_interviewers, use_container_width=True)
+    if toggle_status == "Complete Scorecards":
+        grouped = grouped[grouped['Scorecards_Submitted'] == 4]
+    elif toggle_status == "Pending Scorecards":
+        grouped = grouped[grouped['Scorecards_Submitted'] < 4]
+
+    st.subheader(f"📋 Candidate Summary for {selected_recruiter}")
+    st.dataframe(grouped[['Candidate Name', 'Department', 'Avg_Interview_Score', 'Scorecards_Submitted', 'Decision']],
+                 use_container_width=True)
+
+    st.subheader("🧠 Candidate Details")
+    for _, row in grouped.iterrows():
+        with st.expander(f"{row['Candidate Name']} — {row['Decision']}"):
+            st.markdown(f"**Department:** {row['Department']}")
+            st.markdown(f"**Scorecards Submitted:** {row['Scorecards_Submitted']} / 4")
+            st.markdown("---")
+            st.markdown("### Interviewer Scores")
+            candidate_rows = df[df['Candidate Name'] == row['Candidate Name']]
+            for _, r in candidate_rows.iterrows():
+                score = r['Interview Score']
+                status = r['Scorecard submitted']
+                line = f"- **{r['Internal Interviewer']}** ({r['Interview']})"
+                if status == 'yes':
+                    st.markdown(f"{line}: ✅ {score}")
+                else:
+                    st.markdown(f"{line}: ❌ Not Submitted")
+                    st.button(f"📩 Send Reminder to {r['Internal Interviewer']}", key=f"{r['Candidate Name']}-{r['Internal Interviewer']}")
+
+# --------- Department Analytics ---------
+elif page == "Department Analytics":
+    st.title("📊 Department Scorecard Analytics")
+
+    dept_summary = df.groupby('Department').agg(
+        Total_Interviews=('Interview Score', 'count'),
+        Completed=('Scorecard Complete', 'sum'),
+        Avg_Score=('Interview Score', 'mean')
+    ).reset_index()
+    dept_summary['Completion Rate (%)'] = round(100 * dept_summary['Completed'] / dept_summary['Total_Interviews'], 1)
+
+    def highlight_completion(val):
+        color = 'green' if val >= 90 else 'red'
+        return f'color: {color}; font-weight: bold'
+
+    styled_dept = dept_summary.style.format({
+        'Avg_Score': '{:.2f}',
+        'Completion Rate (%)': '{:.1f}%'
+    }).applymap(highlight_completion, subset=['Completion Rate (%)'])       .set_properties(**{'text-align': 'center'})       .set_table_styles([
+          {'selector': 'th', 'props': [('font-weight', 'bold'), ('background-color', '#f0f8ff')]}
+      ])
+
+    st.subheader("✅ Scorecard Submission Rate by Department")
+    st.dataframe(styled_dept, use_container_width=True)
+
+    st.subheader("👥 Internal Interviewer Stats")
+    interviewer_summary = df.groupby('Internal Interviewer').agg(
+        Interviews_Conducted=('Interview', 'count'),
+        Scorecards_Submitted=('Scorecard Complete', 'sum'),
+        Avg_Interview_Score=('Interview Score', 'mean')
+    ).reset_index()
+
+    styled_interviewers = interviewer_summary.style.format({
+        'Avg_Interview_Score': '{:.2f}'
+    }).set_properties(**{'text-align': 'center'})       .set_table_styles([
+          {'selector': 'th', 'props': [('font-weight', 'bold'), ('background-color', '#f0f8ff')]}
+      ])
+
+    st.dataframe(styled_interviewers, use_container_width=True)
