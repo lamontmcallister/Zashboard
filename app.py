@@ -22,9 +22,7 @@ def calculate_qoh(row):
             row['Interview Score'] * 0.20 +
             row['Reference Score'] * 0.15 +
             row['Performance Review Avg'] * 0.25 +
-            row['Promotion Score'] * 0.15 +
-            row['Education Score'] * 0.10 +
-            row['EQ Score'] * 0.10
+            row['Promotion'] * 0.15
         ), 1)
     except:
         return None
@@ -47,10 +45,12 @@ worksheet_name = "Mixed Raw Candidate Data"
 df = load_google_sheet(sheet_url, worksheet_name)
 
 # --------- Data Cleanup ---------
-numeric_cols = ['Interview Score', 'Reference Score', 'Performance Review Avg',
-                'Promotion Score', 'Education Score', 'EQ Score', 'JD Match %']
+numeric_cols = ['Interview Score', 'Reference Score', 'Performance Review Avg', 'Promotion']
 for col in numeric_cols:
-    df[col] = pd.to_numeric(df[col], errors='coerce')
+    if col in df.columns:
+        df[col] = pd.to_numeric(df[col], errors='coerce')
+    else:
+        st.warning(f"⚠️ Column not found in sheet: {col}")
 
 df['QoH Score'] = df.apply(calculate_qoh, axis=1)
 df['Scorecard Submitted?'] = df['Interview Score'].apply(lambda x: "✅" if pd.notnull(x) else "❌")
@@ -76,7 +76,7 @@ st.dataframe(
 
 # Charts
 st.subheader("📊 Score Comparisons")
-score_metrics = ['QoH Score', 'JD Match %', 'Interview Score', 'Reference Score', 'EQ Score']
+score_metrics = ['QoH Score', 'Interview Score', 'Reference Score']
 for metric in score_metrics:
     if metric in filtered_df.columns and filtered_df[metric].notnull().any():
         fig = px.bar(filtered_df, x='Candidate Name', y=metric, text_auto=True,
@@ -88,9 +88,9 @@ for metric in score_metrics:
 st.subheader("🧠 Candidate Insight Cards")
 for _, row in filtered_df.iterrows():
     with st.expander(f"🧾 {row['Candidate Name']}"):
-        st.markdown(f"**Personality Type:** {row.get('Personality Type', 'N/A')}")
-        st.markdown(f"**Reference Status:** {row.get('Reference Status', 'Unknown')}")
-        st.markdown(f"**Skill Gaps:** {row.get('Skill Gaps', 'None')}")
+        st.markdown(f"**Internal Interviewer:** {row.get('Internal Interviewer', 'N/A')}")
+        st.markdown(f"**Veteran Status:** {row.get('Veteran Status', 'Unknown')}")
+        st.markdown(f"**Promotion:** {row.get('Promotion', 'None')}")
         st.progress(
             int(row['QoH Score']) if pd.notnull(row['QoH Score']) else 0,
             text=f"QoH Score: {row['QoH Score']}%" if pd.notnull(row['QoH Score']) else "QoH Score: N/A"
