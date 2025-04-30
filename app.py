@@ -5,7 +5,6 @@ from oauth2client.service_account import ServiceAccountCredentials
 
 # --------- Google Sheets Setup ---------
 def load_google_sheet(sheet_url, worksheet_name):
-    pass
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
     creds_dict = st.secrets["google"]
     creds = ServiceAccountCredentials.from_json_keyfile_dict(dict(creds_dict), scope)
@@ -61,7 +60,6 @@ page = st.sidebar.selectbox("🔍 Navigate", ["🔰 Landing Page", "🎯 Scoreca
 
 # --------- Landing Page ---------
 if page == "🔰 Landing Page":
-    pass
     st.title("Welcome to the Recruiter Decision Dashboard")
     st.markdown("This platform helps you evaluate candidates based on interviewer feedback, scorecard submissions, and department-level analytics — all in one view.")
 
@@ -87,7 +85,6 @@ if page == "🔰 Landing Page":
 
 # --------- Scorecard Dashboard ---------
 elif page == "🎯 Scorecard Dashboard":
-    pass
     st.title("🎯 Recruiter Interview Dashboard")
     st.caption("Filter by recruiter and department. View candidate scorecards and send reminders.")
 
@@ -107,15 +104,11 @@ departments = sorted(df['Department'].dropna().unique().tolist())
     ).reset_index()
 
     def make_decision(row):
-    pass
         if row['Scorecards_Submitted'] < 4:
-    pass
             return "🟡 Waiting for Interviews"
         elif row['Avg_Interview_Score'] <= 3.4:
-    pass
             return "❌ Auto-Reject"
         elif row['Avg_Interview_Score'] >= 3.5:
-    pass
             return "✅ HM Review"
         return "⚠️ Needs Discussion"
 
@@ -126,10 +119,8 @@ departments = sorted(df['Department'].dropna().unique().tolist())
     ]
 
     if toggle_status == "Complete Scorecards":
-    pass
         grouped = grouped[grouped['Scorecards_Submitted'] == 4]
     elif toggle_status == "Pending Scorecards":
-    pass
         grouped = grouped[grouped['Scorecards_Submitted'] < 4]
 
     st.subheader(f"📋 Candidate Summary for {selected_recruiter}")
@@ -139,30 +130,25 @@ departments = sorted(df['Department'].dropna().unique().tolist())
 
     st.subheader("🧠 Candidate Details")
     for _, row in grouped.iterrows():
-    pass
         with st.expander(f"{row['Candidate Name']} — {row['Decision']}"):
-    pass
             st.markdown(f"**Department:** {row['Department']}")
             st.markdown(f"**Scorecards Submitted:** {row['Scorecards_Submitted']} / 4")
             st.markdown("---")
             st.markdown("### Interviewer Scores")
             candidate_rows = df[df['Candidate Name'] == row['Candidate Name']]
             for _, r in candidate_rows.iterrows():
-    pass
                 score = r['Interview Score']
                 status = r['Scorecard submitted']
                 line = f"- **{r['Internal Interviewer']}** ({r['Interview']})"
                 if status == 'yes':
-    pass
                     st.markdown(f"{line}: ✅ {score}")
                 else:
-    pass
                     st.markdown(f"{line}: ❌ Not Submitted")
                     st.button(f"📩 Send Reminder to {r['Internal Interviewer']}", key=f"{r['Candidate Name']}-{r['Internal Interviewer']}")
 
 # --------- Department Analytics ---------
 elif page == "📊 Department Analytics":
-    pass
+    if not df.empty:
     st.title("📊 Department Scorecard Analytics")
     st.caption("This view shows how well departments and interviewers are keeping up with scorecard submissions.")
 
@@ -174,7 +160,6 @@ elif page == "📊 Department Analytics":
     dept_summary['Completion Rate (%)'] = round(100 * dept_summary['Completed'] / dept_summary['Total_Interviews'], 1)
 
     def highlight_completion(val):
-    pass
         color = 'green' if val >= 90 else 'red'
         return f'color: {color}; font-weight: bold'
 
@@ -204,10 +189,8 @@ search_term = st.text_input("🔎 Search Interviewer")
 
 filtered_summary = interviewer_summary.copy()
 if selected_dept != "All":
-    pass
     filtered_summary = filtered_summary[filtered_summary['Department'] == selected_dept]
 if search_term:
-    pass
     filtered_summary = filtered_summary[filtered_summary['Internal Interviewer'].str.contains(search_term, case=False)]
 
 styled_interviewers = filtered_summary.style.format({
