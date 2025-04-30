@@ -65,16 +65,16 @@ if page == "🔰 Landing Page":
 
     st.subheader("✨ Why This Matters")
     st.markdown("""
-- Ensure fair, consistent hiring decisions  
-- Track scorecard submission and identify bottlenecks  
+- Ensure fair, consistent hiring decisions
+- Track scorecard submission and identify bottlenecks
 - Empower recruiters with structured decision support
 """)
 
     st.subheader("🧭 How to Use This Tool")
     st.markdown("""
-1. Head to the **Scorecard Dashboard** tab  
-2. Select a recruiter and optionally filter by department or scorecard status  
-3. Review candidate decisions and send reminder nudges  
+1. Head to the **Scorecard Dashboard** tab
+2. Select a recruiter and optionally filter by department or scorecard status
+3. Review candidate decisions and send reminder nudges
 4. Use **Department Analytics** to track overall submission and scoring health
 """)
 
@@ -126,7 +126,7 @@ departments = sorted(df['Department'].dropna().unique().tolist())
     st.subheader(f"📋 Candidate Summary for {selected_recruiter}")
     st.markdown("Use this table to track where each candidate stands based on scorecard completion and average interview scores.")
     st.dataframe(grouped[['Candidate Name', 'Department', 'Avg_Interview_Score', 'Scorecards_Submitted', 'Decision']],
-                 use_container_width=True)
+                use_container_width=True)
 
     st.subheader("🧠 Candidate Details")
     for _, row in grouped.iterrows():
@@ -166,13 +166,13 @@ elif page == "📊 Department Analytics":
         'Avg_Score': '{:.2f}',
         'Completion Rate (%)': '{:.1f}%'
     }).applymap(highlight_completion, subset=['Completion Rate (%)'])       .set_properties(**{'text-align': 'center'})       .set_table_styles([
-          {'selector': 'th', 'props': [('font-weight', 'bold'), ('background-color', '#f0f8ff')]}
-      ])
+        {'selector': 'th', 'props': [('font-weight', 'bold'), ('background-color', '#f0f8ff')]}
+    ])
 
     st.subheader("✅ Scorecard Submission Rate by Department")
     st.dataframe(styled_dept, use_container_width=True)
 
-    
+
 st.subheader("👥 Internal Interviewer Stats")
 st.caption("Track interviewers' submission behavior and scoring trends.")
 
