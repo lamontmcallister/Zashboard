@@ -45,39 +45,51 @@ def make_decision(row):
 grouped['Decision'] = grouped.apply(make_decision, axis=1)
 
 # --------- Streamlit UI ---------
-st.set_page_config(page_title="Recruiter Interview Dashboard", layout="wide")
-st.title("🧭 Recruiter Interview Dashboard")
-st.caption("Filter by recruiter to view candidate pipeline, scorecards, and interview outcomes.")
+st.set_page_config(page_title="Recruiter Dashboard", layout="wide")
+st.title("🎯 Recruiter Interview Dashboard")
+st.caption("Segment by recruiter, review scorecard status, and identify incomplete submissions.")
 
-# --------- Recruiter Landing Page Toggle ---------
+# --------- Sidebar Filters ---------
 recruiters = sorted(grouped['Recruiter'].dropna().unique().tolist())
 selected_recruiter = st.sidebar.selectbox("👤 Choose Recruiter", recruiters)
 
-# Filter by recruiter
+toggle_status = st.sidebar.radio("📋 Show Candidates With:", ["All", "Complete Scorecards", "Pending Scorecards"])
+
+# Filter by recruiter and scorecard status
 filtered = grouped[grouped['Recruiter'] == selected_recruiter]
 
-# --------- Display Tables & Charts ---------
+if toggle_status == "Complete Scorecards":
+    filtered = filtered[filtered['Scorecards_Submitted'] == 4]
+elif toggle_status == "Pending Scorecards":
+    filtered = filtered[filtered['Scorecards_Submitted'] < 4]
+
+# --------- Display Summary ---------
 st.subheader(f"📋 Candidate Summary for {selected_recruiter}")
 st.dataframe(filtered[['Candidate Name', 'Department', 'Avg_Interview_Score', 'Scorecards_Submitted', 'Decision']],
              use_container_width=True)
 
-# Bar Chart
+# --------- Chart ---------
 st.subheader("📊 Average Interview Scores")
 fig = px.bar(filtered, x="Candidate Name", y="Avg_Interview_Score", color="Candidate Name",
              text_auto=True, title="Avg Interview Score per Candidate")
 fig.update_layout(showlegend=False)
 st.plotly_chart(fig, use_container_width=True)
 
-# Candidate Detail Expander with Decision in the header
+# --------- Candidate Detail View ---------
 st.subheader("🧠 Candidate Details")
 for _, row in filtered.iterrows():
     with st.expander(f"{row['Candidate Name']} — {row['Decision']}"):
         st.markdown(f"**Department:** {row['Department']}")
-        st.markdown(f"**Interview Count:** {row['Total_Interviews']} / 4")
         st.markdown(f"**Scorecards Submitted:** {row['Scorecards_Submitted']} / 4")
-        st.markdown(f"**Decision:** {row['Decision']}")
         st.markdown("---")
         st.markdown("### Interviewer Scores")
         candidate_rows = df[df['Candidate Name'] == row['Candidate Name']]
         for _, r in candidate_rows.iterrows():
-            st.markdown(f"- **{r['Internal Interviewer']}** ({r['Interview']}): {r['Interview Score']}")
+            score = r['Interview Score']
+            status = r['Scorecard submitted']
+            line = f"- **{r['Internal Interviewer']}** ({r['Interview']})"
+            if status == 'yes':
+                st.markdown(f"{line}: ✅ {score}")
+            else:
+                st.markdown(f"{line}: ❌ Not Submitted")
+                st.button(f"📩 Send Reminder to {r['Internal Interviewer']}", key=f"{r['Candidate Name']}-{r['Internal Interviewer']}")
