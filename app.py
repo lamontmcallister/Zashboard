@@ -1,4 +1,3 @@
-import hashlib
 import streamlit as st
 import pandas as pd
 import gspread
@@ -130,7 +129,28 @@ elif page == "🎯 Recruiter Dashboard":
         grouped = grouped[grouped['Scorecards_Submitted'] < 4]
 
     
+    
     st.subheader(f"📋 Candidate Summary for {selected_recruiter}")
+    st.markdown("Below is a list of candidates. Click to expand and view their full scorecard detail.")
+
+    for i, row in grouped.iterrows():
+        with st.expander(f"{row['Candidate Name']} — {row['Decision']}"):
+            st.markdown(f"**Department:** {row['Department']}")
+            st.markdown(f"**Scorecards Submitted:** {row['Scorecards_Submitted']} / 4")
+            st.markdown(f"**Avg Interview Score:** {row['Avg_Interview_Score']}")
+            st.markdown("---")
+            st.markdown("### Interviewer Scores")
+            candidate_rows = df[df['Candidate Name'] == row['Candidate Name']]
+            for j, r in candidate_rows.iterrows():
+                score = r['Interview Score']
+                status = r['Scorecard submitted']
+                line = f"- **{r['Internal Interviewer']}** ({r['Interview']})"
+                if status == 'yes':
+                    st.markdown(f"{line}: ✅ {score}")
+                else:
+                    st.markdown(f"{line}: ❌ Not Submitted")
+                    st.button(f"📩 Send Reminder to {r['Internal Interviewer']}", key=f"reminder-{i}-{j}")
+
     st.markdown("Below is a list of candidates. Click to expand and view their full scorecard detail.")
 
     for _, row in grouped.iterrows():
@@ -142,8 +162,6 @@ elif page == "🎯 Recruiter Dashboard":
             st.markdown("### Interviewer Scores")
             candidate_rows = df[df['Candidate Name'] == row['Candidate Name']]
             for _, r in candidate_rows.iterrows():
-        row_id = f"{r['Candidate Name']}-{r['Internal Interviewer']}-{r['Interview']}"
-                        row_hash = hashlib.md5(row_id.encode()).hexdigest()
                 score = r['Interview Score']
                 status = r['Scorecard submitted']
                 line = f"- **{r['Internal Interviewer']}** ({r['Interview']})"
@@ -151,7 +169,7 @@ elif page == "🎯 Recruiter Dashboard":
                     st.markdown(f"{line}: ✅ {score}")
                 else:
                     st.markdown(f"{line}: ❌ Not Submitted")
-                                        st.button(f"📩 Send Reminder to {r['Internal Interviewer']}", key=f"reminder-{row_hash}")
+                    st.button(f"📩 Send Reminder to {r['Internal Interviewer']}",
             key=f"reminder-{r['Candidate Name'].replace(' ', '_')}-{r['Internal Interviewer'].replace(' ', '_')}-{r['Interview'].replace(' ', '_')}")
 
     for _, row in grouped.iterrows():
@@ -169,7 +187,7 @@ elif page == "🎯 Recruiter Dashboard":
                     st.markdown(f"{line}: ✅ {score}")
                 else:
                     st.markdown(f"{line}: ❌ Not Submitted")
-                                        st.button(f"📩 Send Reminder to {r['Internal Interviewer']}", key=f"reminder-{row_hash}")
+                    st.button(f"📩 Send Reminder to {r['Internal Interviewer']}",
             key=f"reminder-{r['Candidate Name'].replace(' ', '_')}-{r['Internal Interviewer'].replace(' ', '_')}-{r['Interview'].replace(' ', '_')}")
 
 # --------- Department Analytics ---------
