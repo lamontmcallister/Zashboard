@@ -56,7 +56,7 @@ st.markdown(
 )
 
 # --------- Navigation ---------
-page = st.sidebar.selectbox("🔍 Navigate", ["🔰 Landing Page", "🎯 Recruiter Dashboard", "📊 Department Analytics"])
+page = st.sidebar.selectbox("🔍 Navigate", ["🔰 Landing Page", "🎯 Scorecard Dashboard", "📊 Department Analytics"])
 
 # --------- Landing Page ---------
 if page == "🔰 Landing Page":
@@ -72,7 +72,7 @@ if page == "🔰 Landing Page":
 
     st.subheader("🧭 How to Use This Tool")
     st.markdown("""
-1. Head to the **Recruiter Dashboard** tab  
+1. Head to the **Scorecard Dashboard** tab  
 2. Select a recruiter and optionally filter by department or scorecard status  
 3. Review candidate decisions and send reminder nudges  
 4. Use **Department Analytics** to track overall submission and scoring health
@@ -80,18 +80,19 @@ if page == "🔰 Landing Page":
 
     st.success("Tip: Click any candidate name in the dashboard to view interview details!")
 
-# Remaining pages not included for brevity (Recruiter Dashboard, Analytics)...
+# Remaining pages not included for brevity (Scorecard Dashboard, Analytics)...
 
 
-# --------- Recruiter Dashboard ---------
-elif page == "🎯 Recruiter Dashboard":
+# --------- Scorecard Dashboard ---------
+elif page == "🎯 Scorecard Dashboard":
     st.title("🎯 Recruiter Interview Dashboard")
     st.caption("Filter by recruiter and department. View candidate scorecards and send reminders.")
 
     recruiters = sorted(df['Recruiter'].dropna().unique().tolist())
-    selected_recruiter = st.sidebar.selectbox("👤 Choose Recruiter", recruiters)
+    recruiters = sorted(df['Recruiter'].dropna().unique().tolist())
+selected_recruiter = st.sidebar.selectbox("👤 Choose Recruiter", recruiters)
     departments = sorted(df['Department'].dropna().unique().tolist())
-    selected_depts = st.sidebar.multiselect("🏢 Filter by Department", departments, default=departments)
+    selected_depts = st.sidebar.multiselect("🏢 Filter by Department", departments)
     toggle_status = st.sidebar.radio("📋 Show Candidates With:", ["All", "Complete Scorecards", "Pending Scorecards"])
 
     grouped = df.groupby('Candidate Name').agg(
@@ -171,18 +172,31 @@ elif page == "📊 Department Analytics":
     st.subheader("✅ Scorecard Submission Rate by Department")
     st.dataframe(styled_dept, use_container_width=True)
 
-    st.subheader("👥 Internal Interviewer Stats")
-    st.caption("Track interviewers' submission behavior and scoring trends.")
-    interviewer_summary = df.groupby('Internal Interviewer').agg(
-        Interviews_Conducted=('Interview', 'count'),
-        Scorecards_Submitted=('Scorecard Complete', 'sum'),
-        Avg_Interview_Score=('Interview Score', 'mean')
-    ).reset_index()
+    
+st.subheader("👥 Internal Interviewer Stats")
+st.caption("Track interviewers' submission behavior and scoring trends.")
 
-    styled_interviewers = interviewer_summary.style.format({
-        'Avg_Interview_Score': '{:.2f}'
-    }).set_properties(**{'text-align': 'center'})       .set_table_styles([
-          {'selector': 'th', 'props': [('font-weight', 'bold'), ('background-color', '#f0f8ff')]}
-      ])
+interviewer_summary = df.groupby(['Internal Interviewer', 'Department']).agg(
+    Interviews_Conducted=('Interview', 'count'),
+    Scorecards_Submitted=('Scorecard Complete', 'sum'),
+    Avg_Interview_Score=('Interview Score', 'mean')
+).reset_index()
 
-    st.dataframe(styled_interviewers, use_container_width=True)
+dept_options = interviewer_summary['Department'].dropna().unique().tolist()
+selected_dept = st.selectbox("🏢 Filter by Department", ["All"] + dept_options)
+search_term = st.text_input("🔎 Search Interviewer")
+
+filtered_summary = interviewer_summary.copy()
+if selected_dept != "All":
+    filtered_summary = filtered_summary[filtered_summary['Department'] == selected_dept]
+if search_term:
+    filtered_summary = filtered_summary[filtered_summary['Internal Interviewer'].str.contains(search_term, case=False)]
+
+styled_interviewers = filtered_summary.style.format({
+    'Avg_Interview_Score': '{:.2f}'
+}).set_properties(**{'text-align': 'center'}).set_table_styles([
+    {'selector': 'th', 'props': [('font-weight', 'bold'), ('background-color', '#f0f8ff')]}
+])
+
+st.dataframe(styled_interviewers, use_container_width=True)
+
