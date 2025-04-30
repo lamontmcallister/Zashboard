@@ -91,7 +91,7 @@ elif page == "🎯 Scorecard Dashboard":
     recruiters = sorted(df['Recruiter'].dropna().unique().tolist())
     recruiters = sorted(df['Recruiter'].dropna().unique().tolist())
 selected_recruiter = st.sidebar.selectbox("👤 Choose Recruiter", recruiters)
-    departments = sorted(df['Department'].dropna().unique().tolist())
+departments = sorted(df['Department'].dropna().unique().tolist())
     selected_depts = st.sidebar.multiselect("🏢 Filter by Department", departments)
     toggle_status = st.sidebar.radio("📋 Show Candidates With:", ["All", "Complete Scorecards", "Pending Scorecards"])
 
@@ -199,4 +199,3 @@ styled_interviewers = filtered_summary.style.format({
 ])
 
 st.dataframe(styled_interviewers, use_container_width=True)
-
