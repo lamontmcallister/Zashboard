@@ -30,7 +30,7 @@ grouped = df.groupby('Candidate Name').agg(
     Scorecards_Submitted=('Scorecard submitted', lambda x: sum(x == 'yes')),
     Total_Interviews=('Interview Score', 'count'),
     Department=('Department', 'first'),
-    Recruiter=('Internal Interviewer', 'first')
+    Recruiter=('Recruiter', 'first')
 ).reset_index()
 
 def make_decision(row):
@@ -47,7 +47,7 @@ grouped['Decision'] = grouped.apply(make_decision, axis=1)
 # --------- Streamlit UI ---------
 st.set_page_config(page_title="Interview Score Summary", layout="wide")
 st.title("🎯 Candidate Interview Score Summary")
-st.caption("Automatically summarizes 4 interviewer scores into an average, submission tracker, and decision guide.")
+st.caption("Summarizes 4 interviewer scores into an average, tracks scorecard submissions, and recruiter decision flow.")
 
 # --------- Sidebar Filters ---------
 departments = grouped['Department'].dropna().unique().tolist()
