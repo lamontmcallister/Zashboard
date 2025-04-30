@@ -92,94 +92,94 @@ elif page == "🎯 Scorecard Dashboard":
     recruiters = sorted(df['Recruiter'].dropna().unique().tolist())
 selected_recruiter = st.sidebar.selectbox("👤 Choose Recruiter", recruiters)
 departments = sorted(df['Department'].dropna().unique().tolist())
-    selected_depts = st.sidebar.multiselect("🏢 Filter by Department", departments)
-    toggle_status = st.sidebar.radio("📋 Show Candidates With:", ["All", "Complete Scorecards", "Pending Scorecards"])
+selected_depts = st.sidebar.multiselect("🏢 Filter by Department", departments)
+toggle_status = st.sidebar.radio("📋 Show Candidates With:", ["All", "Complete Scorecards", "Pending Scorecards"])
 
-    grouped = df.groupby('Candidate Name').agg(
-        Avg_Interview_Score=('Interview Score', 'mean'),
-        Scorecards_Submitted=('Scorecard submitted', lambda x: sum(x == 'yes')),
-        Total_Interviews=('Interview Score', 'count'),
-        Department=('Department', 'first'),
-        Recruiter=('Recruiter', 'first')
-    ).reset_index()
+grouped = df.groupby('Candidate Name').agg(
+Avg_Interview_Score=('Interview Score', 'mean'),
+Scorecards_Submitted=('Scorecard submitted', lambda x: sum(x == 'yes')),
+Total_Interviews=('Interview Score', 'count'),
+Department=('Department', 'first'),
+Recruiter=('Recruiter', 'first')
+).reset_index()
 
-    def make_decision(row):
-        if row['Scorecards_Submitted'] < 4:
-            return "🟡 Waiting for Interviews"
-        elif row['Avg_Interview_Score'] <= 3.4:
-            return "❌ Auto-Reject"
-        elif row['Avg_Interview_Score'] >= 3.5:
-            return "✅ HM Review"
-        return "⚠️ Needs Discussion"
+def make_decision(row):
+if row['Scorecards_Submitted'] < 4:
+return "🟡 Waiting for Interviews"
+elif row['Avg_Interview_Score'] <= 3.4:
+return "❌ Auto-Reject"
+elif row['Avg_Interview_Score'] >= 3.5:
+return "✅ HM Review"
+return "⚠️ Needs Discussion"
 
-    grouped['Decision'] = grouped.apply(make_decision, axis=1)
-    grouped = grouped[
-        (grouped['Recruiter'] == selected_recruiter) &
-        (grouped['Department'].isin(selected_depts))
-    ]
+grouped['Decision'] = grouped.apply(make_decision, axis=1)
+grouped = grouped[
+(grouped['Recruiter'] == selected_recruiter) &
+(grouped['Department'].isin(selected_depts))
+]
 
-    if toggle_status == "Complete Scorecards":
-        grouped = grouped[grouped['Scorecards_Submitted'] == 4]
-    elif toggle_status == "Pending Scorecards":
-        grouped = grouped[grouped['Scorecards_Submitted'] < 4]
+if toggle_status == "Complete Scorecards":
+grouped = grouped[grouped['Scorecards_Submitted'] == 4]
+elif toggle_status == "Pending Scorecards":
+grouped = grouped[grouped['Scorecards_Submitted'] < 4]
 
-    st.subheader(f"📋 Candidate Summary for {selected_recruiter}")
-    st.markdown("Use this table to track where each candidate stands based on scorecard completion and average interview scores.")
-    st.dataframe(grouped[['Candidate Name', 'Department', 'Avg_Interview_Score', 'Scorecards_Submitted', 'Decision']],
-                use_container_width=True)
+st.subheader(f"📋 Candidate Summary for {selected_recruiter}")
+st.markdown("Use this table to track where each candidate stands based on scorecard completion and average interview scores.")
+st.dataframe(grouped[['Candidate Name', 'Department', 'Avg_Interview_Score', 'Scorecards_Submitted', 'Decision']],
+use_container_width=True)
 
-    st.subheader("🧠 Candidate Details")
-    for _, row in grouped.iterrows():
-        with st.expander(f"{row['Candidate Name']} — {row['Decision']}"):
-            st.markdown(f"**Department:** {row['Department']}")
-            st.markdown(f"**Scorecards Submitted:** {row['Scorecards_Submitted']} / 4")
-            st.markdown("---")
-            st.markdown("### Interviewer Scores")
-            candidate_rows = df[df['Candidate Name'] == row['Candidate Name']]
-            for _, r in candidate_rows.iterrows():
-                score = r['Interview Score']
-                status = r['Scorecard submitted']
-                line = f"- **{r['Internal Interviewer']}** ({r['Interview']})"
-                if status == 'yes':
-                    st.markdown(f"{line}: ✅ {score}")
-                else:
-                    st.markdown(f"{line}: ❌ Not Submitted")
-                    st.button(f"📩 Send Reminder to {r['Internal Interviewer']}", key=f"{r['Candidate Name']}-{r['Internal Interviewer']}")
+st.subheader("🧠 Candidate Details")
+for _, row in grouped.iterrows():
+with st.expander(f"{row['Candidate Name']} — {row['Decision']}"):
+st.markdown(f"**Department:** {row['Department']}")
+st.markdown(f"**Scorecards Submitted:** {row['Scorecards_Submitted']} / 4")
+st.markdown("---")
+st.markdown("### Interviewer Scores")
+candidate_rows = df[df['Candidate Name'] == row['Candidate Name']]
+for _, r in candidate_rows.iterrows():
+score = r['Interview Score']
+status = r['Scorecard submitted']
+line = f"- **{r['Internal Interviewer']}** ({r['Interview']})"
+if status == 'yes':
+st.markdown(f"{line}: ✅ {score}")
+else:
+st.markdown(f"{line}: ❌ Not Submitted")
+st.button(f"📩 Send Reminder to {r['Internal Interviewer']}", key=f"{r['Candidate Name']}-{r['Internal Interviewer']}")
 
 # --------- Department Analytics ---------
 elif page == "📊 Department Analytics":
-    st.title("📊 Department Scorecard Analytics")
-    st.caption("This view shows how well departments and interviewers are keeping up with scorecard submissions.")
+st.title("📊 Department Scorecard Analytics")
+st.caption("This view shows how well departments and interviewers are keeping up with scorecard submissions.")
 
-    dept_summary = df.groupby('Department').agg(
-        Total_Interviews=('Interview Score', 'count'),
-        Completed=('Scorecard Complete', 'sum'),
-        Avg_Score=('Interview Score', 'mean')
-    ).reset_index()
-    dept_summary['Completion Rate (%)'] = round(100 * dept_summary['Completed'] / dept_summary['Total_Interviews'], 1)
+dept_summary = df.groupby('Department').agg(
+Total_Interviews=('Interview Score', 'count'),
+Completed=('Scorecard Complete', 'sum'),
+Avg_Score=('Interview Score', 'mean')
+).reset_index()
+dept_summary['Completion Rate (%)'] = round(100 * dept_summary['Completed'] / dept_summary['Total_Interviews'], 1)
 
-    def highlight_completion(val):
-        color = 'green' if val >= 90 else 'red'
-        return f'color: {color}; font-weight: bold'
+def highlight_completion(val):
+color = 'green' if val >= 90 else 'red'
+return f'color: {color}; font-weight: bold'
 
-    styled_dept = dept_summary.style.format({
-        'Avg_Score': '{:.2f}',
-        'Completion Rate (%)': '{:.1f}%'
-    }).applymap(highlight_completion, subset=['Completion Rate (%)'])       .set_properties(**{'text-align': 'center'})       .set_table_styles([
-        {'selector': 'th', 'props': [('font-weight', 'bold'), ('background-color', '#f0f8ff')]}
-    ])
+styled_dept = dept_summary.style.format({
+'Avg_Score': '{:.2f}',
+'Completion Rate (%)': '{:.1f}%'
+}).applymap(highlight_completion, subset=['Completion Rate (%)'])       .set_properties(**{'text-align': 'center'})       .set_table_styles([
+{'selector': 'th', 'props': [('font-weight', 'bold'), ('background-color', '#f0f8ff')]}
+])
 
-    st.subheader("✅ Scorecard Submission Rate by Department")
-    st.dataframe(styled_dept, use_container_width=True)
+st.subheader("✅ Scorecard Submission Rate by Department")
+st.dataframe(styled_dept, use_container_width=True)
 
 
 st.subheader("👥 Internal Interviewer Stats")
 st.caption("Track interviewers' submission behavior and scoring trends.")
 
 interviewer_summary = df.groupby(['Internal Interviewer', 'Department']).agg(
-    Interviews_Conducted=('Interview', 'count'),
-    Scorecards_Submitted=('Scorecard Complete', 'sum'),
-    Avg_Interview_Score=('Interview Score', 'mean')
+Interviews_Conducted=('Interview', 'count'),
+Scorecards_Submitted=('Scorecard Complete', 'sum'),
+Avg_Interview_Score=('Interview Score', 'mean')
 ).reset_index()
 
 dept_options = interviewer_summary['Department'].dropna().unique().tolist()
@@ -188,14 +188,14 @@ search_term = st.text_input("🔎 Search Interviewer")
 
 filtered_summary = interviewer_summary.copy()
 if selected_dept != "All":
-    filtered_summary = filtered_summary[filtered_summary['Department'] == selected_dept]
+filtered_summary = filtered_summary[filtered_summary['Department'] == selected_dept]
 if search_term:
-    filtered_summary = filtered_summary[filtered_summary['Internal Interviewer'].str.contains(search_term, case=False)]
+filtered_summary = filtered_summary[filtered_summary['Internal Interviewer'].str.contains(search_term, case=False)]
 
 styled_interviewers = filtered_summary.style.format({
-    'Avg_Interview_Score': '{:.2f}'
+'Avg_Interview_Score': '{:.2f}'
 }).set_properties(**{'text-align': 'center'}).set_table_styles([
-    {'selector': 'th', 'props': [('font-weight', 'bold'), ('background-color', '#f0f8ff')]}
+{'selector': 'th', 'props': [('font-weight', 'bold'), ('background-color', '#f0f8ff')]}
 ])
 
 st.dataframe(styled_interviewers, use_container_width=True)
