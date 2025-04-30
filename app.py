@@ -15,81 +15,63 @@ def load_google_sheet(sheet_url, worksheet_name):
     data = worksheet.get_all_records()
     return pd.DataFrame(data)
 
-# --------- Load Data ---------
+# Load and preprocess
 sheet_url = "https://docs.google.com/spreadsheets/d/1_hypJt1kwUNZE6Xck1VVjrPeYiIJpTDXSAwi4dgXXko"
 worksheet_name = "Mixed Raw Candidate Data"
 df = load_google_sheet(sheet_url, worksheet_name)
-
-# --------- Data Cleanup ---------
 df['Interview Score'] = pd.to_numeric(df['Interview Score'], errors='coerce')
 df['Scorecard submitted'] = df['Scorecard submitted'].str.strip().str.lower()
 
-# --------- Grouped Candidate Summary ---------
-grouped = df.groupby('Candidate Name').agg(
-    Avg_Interview_Score=('Interview Score', 'mean'),
-    Scorecards_Submitted=('Scorecard submitted', lambda x: sum(x == 'yes')),
-    Total_Interviews=('Interview Score', 'count'),
-    Department=('Department', 'first'),
-    Recruiter=('Recruiter', 'first')
+# Decision logic by candidate
+decision_df = df.groupby("Candidate Name").agg(
+    Avg_Score=('Interview Score', 'mean'),
+    Submitted=('Scorecard submitted', lambda x: sum(x == "yes")),
+    Department=('Department', 'first')
 ).reset_index()
 
-def make_decision(row):
-    if row['Scorecards_Submitted'] < 4:
-        return "🟡 Waiting for Interviews"
-    elif row['Avg_Interview_Score'] <= 3.4:
-        return "❌ Auto-Reject"
-    elif row['Avg_Interview_Score'] >= 3.5:
-        return "✅ HM Review"
-    return "⚠️ Needs Discussion"
+def evaluate_status(score_count, avg_score):
+    if score_count < 4:
+        return "Pending"
+    elif avg_score <= 3.4:
+        return "Fail"
+    elif avg_score >= 3.5:
+        return "Pass"
+    return "Review"
 
-grouped['Decision'] = grouped.apply(make_decision, axis=1)
+decision_df["Result"] = decision_df.apply(lambda row: evaluate_status(row["Submitted"], row["Avg_Score"]), axis=1)
 
-# --------- Streamlit UI ---------
-st.set_page_config(page_title="Recruiter Dashboard", layout="wide")
-st.title("🎯 Recruiter Interview Dashboard")
-st.caption("Segment by recruiter, review scorecard status, and identify incomplete submissions.")
+# Interviewer-level summary
+interviewer_df = df.groupby("Internal Interviewer").agg(
+    Interviews_Completed=('Scorecard submitted', lambda x: sum(x == 'yes')),
+    Total_Interviews=('Scorecard submitted', 'count'),
+    Avg_Score=('Interview Score', 'mean')
+).reset_index()
 
-# --------- Sidebar Filters ---------
-recruiters = sorted(grouped['Recruiter'].dropna().unique().tolist())
-selected_recruiter = st.sidebar.selectbox("👤 Choose Recruiter", recruiters)
+# UI setup
+st.set_page_config(page_title="Interviewer Scorecard Analytics", layout="wide")
+st.title("🎯 Interviewer Performance Dashboard")
+st.caption("Track submission rates and score trends across all interviewers.")
+st.markdown(
+    "<style>body { background-color: white; color: #000; } div.stButton > button { color: white; background-color: #0066cc; }</style>",
+    unsafe_allow_html=True
+)
 
-toggle_status = st.sidebar.radio("📋 Show Candidates With:", ["All", "Complete Scorecards", "Pending Scorecards"])
+# Submission bar chart
+st.subheader("📈 Scorecard Submittal Rate by Interviewer")
+interviewer_df["Completion %"] = round((interviewer_df["Interviews_Completed"] / interviewer_df["Total_Interviews"]) * 100, 1)
+fig1 = px.bar(interviewer_df, x="Internal Interviewer", y="Completion %", text_auto=True, color="Completion %",
+              title="Interview Scorecard Submission Rates")
+fig1.update_layout(showlegend=False)
+st.plotly_chart(fig1, use_container_width=True)
 
-# Filter by recruiter and scorecard status
-filtered = grouped[grouped['Recruiter'] == selected_recruiter]
+# Avg scoring trends
+st.subheader("📊 Interviewer Average Scores")
+fig2 = px.bar(interviewer_df, x="Internal Interviewer", y="Avg_Score", color="Avg_Score", text_auto=True,
+              title="Average Interview Scores by Interviewer")
+fig2.update_layout(showlegend=False)
+st.plotly_chart(fig2, use_container_width=True)
 
-if toggle_status == "Complete Scorecards":
-    filtered = filtered[filtered['Scorecards_Submitted'] == 4]
-elif toggle_status == "Pending Scorecards":
-    filtered = filtered[filtered['Scorecards_Submitted'] < 4]
-
-# --------- Display Summary ---------
-st.subheader(f"📋 Candidate Summary for {selected_recruiter}")
-st.dataframe(filtered[['Candidate Name', 'Department', 'Avg_Interview_Score', 'Scorecards_Submitted', 'Decision']],
-             use_container_width=True)
-
-# --------- Chart ---------
-st.subheader("📊 Average Interview Scores")
-fig = px.bar(filtered, x="Candidate Name", y="Avg_Interview_Score", color="Candidate Name",
-             text_auto=True, title="Avg Interview Score per Candidate")
-fig.update_layout(showlegend=False)
-st.plotly_chart(fig, use_container_width=True)
-
-# --------- Candidate Detail View ---------
-st.subheader("🧠 Candidate Details")
-for _, row in filtered.iterrows():
-    with st.expander(f"{row['Candidate Name']} — {row['Decision']}"):
-        st.markdown(f"**Department:** {row['Department']}")
-        st.markdown(f"**Scorecards Submitted:** {row['Scorecards_Submitted']} / 4")
-        st.markdown("---")
-        st.markdown("### Interviewer Scores")
-        candidate_rows = df[df['Candidate Name'] == row['Candidate Name']]
-        for _, r in candidate_rows.iterrows():
-            score = r['Interview Score']
-            status = r['Scorecard submitted']
-            line = f"- **{r['Internal Interviewer']}** ({r['Interview']})"
-            if status == 'yes':
-                st.markdown(f"{line}: ✅ {score}")
-            else:
-                st.markdown(f"{line}: ❌ Not Submitted")
-                st.button(f"📩 Send Reminder to {r['Internal Interviewer']}", key=f"{r['Candidate Name']}-{r['Internal Interviewer']}")
+# Departmental pass/fail insight
+st.subheader("🏢 Departmental Candidate Outcomes")
+dept_summary = decision_df.groupby("Department")["Result"].value_counts().unstack().fillna(0).reset_index()
+st.dataframe(dept_summary, use_container_width=True)
