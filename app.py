@@ -112,70 +112,22 @@ elif page == "🎯 Recruiter Dashboard":
         return "⚠️ Needs Discussion"
 
     grouped['Decision'] = grouped.apply(make_decision, axis=1)
-
-    grouped = grouped.drop_duplicates(subset='Candidate Name', keep='first')
-    grouped = grouped.reset_index(drop=True)
-
     grouped = grouped[
         (grouped['Recruiter'] == selected_recruiter) &
         (grouped['Department'].isin(selected_depts))
     ]
-
-    if 'Time in Stage (Days)' in grouped.columns:
-        grouped = grouped.sort_values(by='Time in Stage (Days)', ascending=False)
-    else:
-        grouped = grouped.sort_values(by='Candidate Name')
-
 
     if toggle_status == "Complete Scorecards":
         grouped = grouped[grouped['Scorecards_Submitted'] == 4]
     elif toggle_status == "Pending Scorecards":
         grouped = grouped[grouped['Scorecards_Submitted'] < 4]
 
-    
-    
     st.subheader(f"📋 Candidate Summary for {selected_recruiter}")
-    st.markdown("Below is a list of candidates. Click to expand and view their full scorecard detail.")
+    st.markdown("Use this table to track where each candidate stands based on scorecard completion and average interview scores.")
+    st.dataframe(grouped[['Candidate Name', 'Department', 'Avg_Interview_Score', 'Scorecards_Submitted', 'Decision']],
+                 use_container_width=True)
 
-    for i, row in grouped.iterrows():
-        with st.expander(f"{row['Candidate Name']} — {row['Decision']}"):
-            st.markdown(f"**Department:** {row['Department']}")
-            st.markdown(f"**Scorecards Submitted:** {row['Scorecards_Submitted']} / 4")
-            st.markdown(f"**Avg Interview Score:** {row['Avg_Interview_Score']}")
-            st.markdown("---")
-            st.markdown("### Interviewer Scores")
-            candidate_rows = df[df['Candidate Name'] == row['Candidate Name']]
-            for j, r in candidate_rows.iterrows():
-                score = r['Interview Score']
-                status = r['Scorecard submitted']
-                line = f"- **{r['Internal Interviewer']}** ({r['Interview']})"
-                if status == 'yes':
-                    st.markdown(f"{line}: ✅ {score}")
-                else:
-                    st.markdown(f"{line}: ❌ Not Submitted")
-                    st.button(f"📩 Send Reminder to {r['Internal Interviewer']}", key=f"reminder-{i}-{j}")
-
-    st.markdown("Below is a list of candidates. Click to expand and view their full scorecard detail.")
-
-    for _, row in grouped.iterrows():
-        with st.expander(f"{row['Candidate Name']} — {row['Decision']}"):
-            st.markdown(f"**Department:** {row['Department']}")
-            st.markdown(f"**Scorecards Submitted:** {row['Scorecards_Submitted']} / 4")
-            st.markdown(f"**Avg Interview Score:** {row['Avg_Interview_Score']}")
-            st.markdown("---")
-            st.markdown("### Interviewer Scores")
-            candidate_rows = df[df['Candidate Name'] == row['Candidate Name']]
-            for _, r in candidate_rows.iterrows():
-                score = r['Interview Score']
-                status = r['Scorecard submitted']
-                line = f"- **{r['Internal Interviewer']}** ({r['Interview']})"
-                if status == 'yes':
-                    st.markdown(f"{line}: ✅ {score}")
-                else:
-                    st.markdown(f"{line}: ❌ Not Submitted")
-                    st.button(f"📩 Send Reminder to {r['Internal Interviewer']}",
-            key=f"reminder-{r['Candidate Name'].replace(' ', '_')}-{r['Internal Interviewer'].replace(' ', '_')}-{r['Interview'].replace(' ', '_')}")
-
+    st.subheader("🧠 Candidate Details")
     for _, row in grouped.iterrows():
         with st.expander(f"{row['Candidate Name']} — {row['Decision']}"):
             st.markdown(f"**Department:** {row['Department']}")
@@ -191,8 +143,7 @@ elif page == "🎯 Recruiter Dashboard":
                     st.markdown(f"{line}: ✅ {score}")
                 else:
                     st.markdown(f"{line}: ❌ Not Submitted")
-                    st.button(f"📩 Send Reminder to {r['Internal Interviewer']}",
-            key=f"reminder-{r['Candidate Name'].replace(' ', '_')}-{r['Internal Interviewer'].replace(' ', '_')}-{r['Interview'].replace(' ', '_')}")
+                    st.button(f"📩 Send Reminder to {r['Internal Interviewer']}", key=f"{r['Candidate Name']}-{r['Internal Interviewer']}")
 
 # --------- Department Analytics ---------
 elif page == "📊 Department Analytics":
@@ -220,8 +171,18 @@ elif page == "📊 Department Analytics":
     st.subheader("✅ Scorecard Submission Rate by Department")
     st.dataframe(styled_dept, use_container_width=True)
 
-    
-    
-    
-    
+    st.subheader("👥 Internal Interviewer Stats")
+    st.caption("Track interviewers' submission behavior and scoring trends.")
+    interviewer_summary = df.groupby('Internal Interviewer').agg(
+        Interviews_Conducted=('Interview', 'count'),
+        Scorecards_Submitted=('Scorecard Complete', 'sum'),
+        Avg_Interview_Score=('Interview Score', 'mean')
+    ).reset_index()
 
+    styled_interviewers = interviewer_summary.style.format({
+        'Avg_Interview_Score': '{:.2f}'
+    }).set_properties(**{'text-align': 'center'})       .set_table_styles([
+          {'selector': 'th', 'props': [('font-weight', 'bold'), ('background-color', '#f0f8ff')]}
+      ])
+
+    st.dataframe(styled_interviewers, use_container_width=True)
