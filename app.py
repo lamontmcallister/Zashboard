@@ -30,10 +30,7 @@ grouped = df.groupby('Candidate Name').agg(
     Scorecards_Submitted=('Scorecard submitted', lambda x: sum(x == 'yes')),
     Total_Interviews=('Interview Score', 'count'),
     Department=('Department', 'first'),
-    Recruiter=('Internal Interviewer', 'first'),
-    Veteran_Status=('Veteran Status', 'first'),
-    Disability_Status=('Disability Status', 'first'),
-    Gender=('Gender Identity', 'first')
+    Recruiter=('Internal Interviewer', 'first')
 ).reset_index()
 
 def make_decision(row):
@@ -81,15 +78,17 @@ fig = px.bar(filtered, x="Candidate Name", y="Avg_Interview_Score", color="Candi
 fig.update_layout(showlegend=False)
 st.plotly_chart(fig, use_container_width=True)
 
-# Candidate Detail Expander
+# Candidate Detail Expander with per-interviewer breakdown
 st.subheader("🧠 Candidate Info")
 for _, row in filtered.iterrows():
     with st.expander(f"🧾 {row['Candidate Name']}"):
         st.markdown(f"**Department:** {row['Department']}")
         st.markdown(f"**Recruiter:** {row['Recruiter']}")
-        st.markdown(f"**Veteran Status:** {row['Veteran_Status']}")
-        st.markdown(f"**Disability Status:** {row['Disability_Status']}")
-        st.markdown(f"**Gender Identity:** {row['Gender']}")
         st.markdown(f"**Interview Count:** {row['Total_Interviews']} / 4")
         st.markdown(f"**Scorecards Submitted:** {row['Scorecards_Submitted']} / 4")
         st.markdown(f"**Decision:** {row['Decision']}")
+        st.markdown("---")
+        st.markdown("### Interviewer Scores")
+        candidate_rows = df[df['Candidate Name'] == row['Candidate Name']]
+        for _, r in candidate_rows.iterrows():
+            st.markdown(f"- **{r['Internal Interviewer']}** ({r['Interview']}): {r['Interview Score']}")
