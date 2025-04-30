@@ -65,24 +65,24 @@ if page == "🔰 Landing Page":
 
     st.subheader("✨ Why This Matters")
     st.markdown(
-        "- Ensure fair, consistent hiring decisions
+        "- Ensure fair, consistent hiring decisions  
 "
-        "- Track scorecard submission and identify bottlenecks
+        "- Track scorecard submission and identify bottlenecks  
 "
         "- Empower recruiters with structured decision support"
     )
 
     st.subheader("🧭 How to Use This Tool")
     st.markdown(
-        "1. Head to the **Recruiter Dashboard** tab
+        "1. Head to the **Recruiter Dashboard** tab  
 "
-        "2. Select a recruiter and optionally filter by department or scorecard status
+        "2. Select a recruiter and optionally filter by department or scorecard status  
 "
-        "3. Review candidate decisions and send reminder nudges
+        "3. Review candidate decisions and send reminder nudges  
 "
         "4. Use **Department Analytics** to track overall submission and scoring health"
     )
 
     st.success("Tip: Click any candidate name in the dashboard to view interview details!")
 
-# [REMAINDER OF PREVIOUS CODE REMAINS UNCHANGED, OMITTED HERE FOR SPACE]
+# Additional tabs go here (Recruiter Dashboard, Department Analytics)...
