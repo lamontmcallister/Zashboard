@@ -30,6 +30,7 @@ grouped = df.groupby('Candidate Name').agg(
     Scorecards_Submitted=('Scorecard submitted', lambda x: sum(x == 'yes')),
     Total_Interviews=('Interview Score', 'count'),
     Department=('Department', 'first'),
+    Recruiter=('Internal Interviewer', 'first'),
     Veteran_Status=('Veteran Status', 'first'),
     Disability_Status=('Disability Status', 'first'),
     Gender=('Gender Identity', 'first')
@@ -51,15 +52,26 @@ st.set_page_config(page_title="Interview Score Summary", layout="wide")
 st.title("🎯 Candidate Interview Score Summary")
 st.caption("Automatically summarizes 4 interviewer scores into an average, submission tracker, and decision guide.")
 
-# Sidebar
-selected_names = st.sidebar.multiselect("Select Candidates", grouped['Candidate Name'].unique(),
-                                        default=grouped['Candidate Name'].unique())
+# --------- Sidebar Filters ---------
+departments = grouped['Department'].dropna().unique().tolist()
+recruiters = grouped['Recruiter'].dropna().unique().tolist()
 
-filtered = grouped[grouped['Candidate Name'].isin(selected_names)]
+selected_depts = st.sidebar.multiselect("Filter by Department", departments, default=departments)
+selected_recruiters = st.sidebar.multiselect("Filter by Recruiter", recruiters, default=recruiters)
+only_full_submissions = st.sidebar.checkbox("✅ Only show candidates with all 4 scorecards", value=False)
 
-# Summary Table
+# Apply filters
+filtered = grouped[
+    (grouped['Department'].isin(selected_depts)) &
+    (grouped['Recruiter'].isin(selected_recruiters))
+]
+
+if only_full_submissions:
+    filtered = filtered[filtered['Scorecards_Submitted'] == 4]
+
+# --------- Display Tables & Charts ---------
 st.subheader("📋 Candidate Interview Summary")
-st.dataframe(filtered[['Candidate Name', 'Avg_Interview_Score', 'Scorecards_Submitted', 'Decision']],
+st.dataframe(filtered[['Candidate Name', 'Department', 'Recruiter', 'Avg_Interview_Score', 'Scorecards_Submitted', 'Decision']],
              use_container_width=True)
 
 # Bar Chart
@@ -69,11 +81,12 @@ fig = px.bar(filtered, x="Candidate Name", y="Avg_Interview_Score", color="Candi
 fig.update_layout(showlegend=False)
 st.plotly_chart(fig, use_container_width=True)
 
-# Details
+# Candidate Detail Expander
 st.subheader("🧠 Candidate Info")
 for _, row in filtered.iterrows():
     with st.expander(f"🧾 {row['Candidate Name']}"):
         st.markdown(f"**Department:** {row['Department']}")
+        st.markdown(f"**Recruiter:** {row['Recruiter']}")
         st.markdown(f"**Veteran Status:** {row['Veteran_Status']}")
         st.markdown(f"**Disability Status:** {row['Disability_Status']}")
         st.markdown(f"**Gender Identity:** {row['Gender']}")
