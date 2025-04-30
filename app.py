@@ -28,19 +28,22 @@ df['Scorecard Complete'] = df['Scorecard submitted'] == 'yes'
 # --------- Streamlit UI ---------
 st.set_page_config(page_title="Recruiter Dashboard", layout="wide")
 
-st.markdown("""
-<style>
-    body {
-        background-color: #ffffff;
-        color: #1a1a1a;
-    }
-    .stButton button {
-        border: 1px solid #1e90ff;
-        background-color: #ffffff;
-        color: #1e90ff;
-    }
-</style>
-"", unsafe_allow_html=True)
+st.markdown(
+    '''
+    <style>
+        body {
+            background-color: #ffffff;
+            color: #1a1a1a;
+        }
+        .stButton button {
+            border: 1px solid #1e90ff;
+            background-color: #ffffff;
+            color: #1e90ff;
+        }
+    </style>
+    ''',
+    unsafe_allow_html=True
+)
 
 page = st.sidebar.selectbox("🔍 Navigate", ["Recruiter Dashboard", "Department Analytics"])
 
@@ -102,7 +105,6 @@ if page == "Recruiter Dashboard":
 elif page == "Department Analytics":
     st.title("📊 Department Scorecard Analytics")
 
-    # Department scorecard completion
     dept_summary = df.groupby('Department').agg(
         Total_Interviews=('Interview Score', 'count'),
         Completed=('Scorecard Complete', 'sum'),
