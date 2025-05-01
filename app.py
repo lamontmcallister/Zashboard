@@ -262,4 +262,5 @@ with tab4:
         | Interview Load per Interviewer | 6.3 interviews       | Balanced     |
         | Offer Acceptance Rate          | 84%                  | > 80%        |
 
+""")
         st.info("This is a demo view. You can bring these metrics to life as your data maturity grows.")
