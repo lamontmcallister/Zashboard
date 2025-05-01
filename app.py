@@ -78,6 +78,19 @@ if page == "🔰 Landing Page":
 
     st.subheader("✨ Why This Matters")
     st.markdown("""
+
+with st.container():
+    col1, col2 = st.columns([1, 3])
+    with col1:
+        st.markdown("### 📌 Assumptions")
+        st.markdown("""
+        - Scorecard rubric uses a standardized 5-point scale  
+        - Internal interviewers are trained on best practices  
+        - Communications have been distributed  
+        - Benchmarks are based on historical data  
+        - All expected scorecards are included  
+        """)
+
 - Ensure fair, consistent hiring decisions  
 - Track scorecard submission and identify bottlenecks  
 - Empower recruiters with structured decision support
@@ -191,7 +204,7 @@ elif page == "📊 Department Analytics":
     dept_options = df['Department'].dropna().unique().tolist()
     selected_depts = st.multiselect("Filter by Department", dept_options, default=dept_options)
 
-    name_query = name_query = st.text_input("Search by Interviewer Name").strip().lower()
+    name_query = st.text_input("Search by Interviewer Name").strip().lower()
 
     df['Submitted'] = df['Scorecard submitted'].str.lower() == 'yes'
     internal_df = df[df['Internal Interviewer'].notna()]
@@ -228,15 +241,13 @@ elif page == "📊 Department Analytics":
 
     st.caption("Track interviewers' submission behavior and scoring trends.")
     interviewer_summary = df.groupby('Internal Interviewer').agg(
-
         Interviews_Conducted=('Interview', 'count'),
         Scorecards_Submitted=('Scorecard Complete', 'sum'),
         Avg_Interview_Score=('Interview Score', 'mean')
     ).reset_index()
 
     styled_interviewers = interviewer_summary.style.format({
-        'Avg_Interview_Score': '{:.2f}',
-        'Completion Rate (%)': '{:.1f}%'
+        'Avg_Interview_Score': '{:.2f}'
     }).set_properties(**{'text-align': 'center'})       .set_table_styles([
           {'selector': 'th', 'props': [('font-weight', 'bold'), ('background-color', '#f0f8ff')]}
       ])
