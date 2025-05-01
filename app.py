@@ -228,6 +228,9 @@ elif page == "📊 Department Analytics":
 
     st.caption("Track interviewers' submission behavior and scoring trends.")
     interviewer_summary = df.groupby('Internal Interviewer').agg(
+interviewer_summary['Completion Rate (%)'] = round(
+    100 * interviewer_summary['Scorecards_Submitted'] / interviewer_summary['Interviews_Conducted'], 1
+)
 
 interviewer_summary['Completion Rate (%)'] = round(
     100 * interviewer_summary['Scorecards_Submitted'] / interviewer_summary['Interviews_Conducted'], 1
