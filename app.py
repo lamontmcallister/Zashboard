@@ -227,7 +227,7 @@ elif page == "📊 Department Analytics":
       ])
 
     
-for _, row in styled_interviewers.iterrows():
+for _, row in submission_rate_df.iterrows():
     rate = int(row['Completion Rate'].strip('%'))
     if rate < 50:
         color = 'red'
