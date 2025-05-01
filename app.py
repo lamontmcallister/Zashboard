@@ -172,20 +172,6 @@ elif page == "📊 Department Analytics":
     st.dataframe(styled_dept, use_container_width=True)
 
     st.subheader("👥 Internal Interviewer Stats")
-    # --- Internal Interviewer Submission Stats ---
-    df['Submitted'] = df['Scorecard submitted'].str.lower() == 'yes'
-    internal_df = df[df['Internal Interviewer'].notna()]
-
-    submission_stats = internal_df.groupby('Internal Interviewer').agg(
-        total_assigned=('Submitted', 'count'),
-        submitted=('Submitted', 'sum')
-    ).reset_index()
-
-    submission_stats['submission_rate'] = (submission_stats['submitted'] / submission_stats['total_assigned']) * 100
-    submission_stats = submission_stats.sort_values(by='submission_rate', ascending=True)
-
-    st.markdown("### 📊 Interviewer Submission Rates")
-    st.dataframe(submission_stats)
 
     # --- Filters for Internal Interviewer Stats ---
     dept_options = df['Department'].dropna().unique().tolist()
@@ -193,11 +179,22 @@ elif page == "📊 Department Analytics":
 
     name_query = st.text_input("Search by Interviewer Name").strip().lower()
 
+    
+    df['Submitted'] = df['Scorecard submitted'].str.lower() == 'yes'
     internal_df = df[df['Internal Interviewer'].notna()]
     internal_df = internal_df[internal_df['Department'].isin(selected_depts)]
 
     if name_query:
         internal_df = internal_df[internal_df['Internal Interviewer'].str.lower().str.contains(name_query)]
+
+    submission_rate_df = internal_df.groupby('Internal Interviewer').agg(
+        total_assigned=('Submitted', 'count'),
+        submitted=('Submitted', 'sum')
+    ).reset_index()
+    submission_rate_df['submission_rate'] = (submission_rate_df['submitted'] / submission_rate_df['total_assigned']) * 100
+
+    internal_df = pd.merge(internal_df, submission_rate_df[['Internal Interviewer', 'submission_rate']], on='Internal Interviewer', how='left')
+
 
     st.caption("Track interviewers' submission behavior and scoring trends.")
     interviewer_summary = df.groupby('Internal Interviewer').agg(
