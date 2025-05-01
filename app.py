@@ -92,7 +92,7 @@ if page == "🔰 Landing Page":
 
     st.success("Tip: Click any candidate name in the dashboard to view interview details!")
 
-    with st.container():
+with st.container():
     col1, _ = st.columns([1, 2])
     with col1:
         st.markdown("### 📌 Assumptions")
