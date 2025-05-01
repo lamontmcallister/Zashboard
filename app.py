@@ -104,7 +104,7 @@ if page == "🔰 Landing Page":
             - Interview data is assumed to be complete and accurate  
             """)
 elif page == "Scorecard Dashboard":
-    st.title("🎯 Recruiter Interview Dashboard")
+    st.title("🎯 Scorecard Dashboard")
     st.caption("Filter by recruiter and department. View candidate scorecards and send reminders.")
 
     recruiters = sorted(df['Recruiter'].dropna().unique().tolist())
@@ -191,58 +191,32 @@ elif page == "📊 Department Analytics":
     st.dataframe(styled_dept, use_container_width=True)
 
     st.subheader("👥 Internal Interviewer Stats")
+    st.subheader("👥 Internal Interviewer Stats")
 
-    
-    # --- Filters for Internal Interviewer Stats ---
-    dept_options = df['Department'].dropna().unique().tolist()
+    # Filters
+    dept_options = df["Department"].dropna().unique().tolist()
     selected_depts = st.multiselect("Filter by Department", dept_options, default=dept_options)
 
     name_query = st.text_input("Search by Interviewer Name").strip().lower()
 
-    df['Submitted'] = df['Scorecard submitted'].str.lower() == 'yes'
-    internal_df = df[df['Internal Interviewer'].notna()]
-    internal_df = internal_df[internal_df['Department'].isin(selected_depts)]
+    # Filtered internal interviewers only
+    interviewer_df = df[df["Internal Interviewer"].notna()]
+    interviewer_df = interviewer_df[interviewer_df["Department"].isin(selected_depts)]
 
     if name_query:
-        internal_df = internal_df[internal_df['Internal Interviewer'].str.lower().str.contains(name_query)]
+        interviewer_df = interviewer_df[interviewer_df["Internal Interviewer"].str.lower().str.contains(name_query)]
 
-    submission_rate_df = internal_df.groupby('Internal Interviewer').agg(
-        total_assigned=('Submitted', 'count'),
-        submitted=('Submitted', 'sum')
-    ).reset_index()
-    submission_rate_df['% Scorecards Submitted'] = ((submission_rate_df['submitted'] / submission_rate_df['total_assigned']) * 100).round().astype(int).astype(str) + '%'
-
-    internal_df = pd.merge(internal_df, submission_rate_df[['Internal Interviewer', '% Scorecards Submitted']], on='Internal Interviewer', how='left')
-
-    submission_rate_df = internal_df.groupby('Internal Interviewer').agg(
-        total_assigned=('Submitted', 'count'),
-        submitted=('Submitted', 'sum')
-    ).reset_index()
-    submission_rate_df['% Scorecards Submitted'] = ((submission_rate_df['submitted'] / submission_rate_df['total_assigned']) * 100).round().astype(int).astype(str) + '%'
-
-    internal_df = pd.merge(internal_df, submission_rate_df[['Internal Interviewer', '% Scorecards Submitted']], on='Internal Interviewer', how='left')
-
-
-    submission_rate_df = internal_df.groupby('Internal Interviewer').agg(
-        total_assigned=('Submitted', 'count'),
-        submitted=('Submitted', 'sum')
-    ).reset_index()
-    submission_rate_df['submission_rate'] = (submission_rate_df['submitted'] / submission_rate_df['total_assigned']) * 100
-
-    internal_df = pd.merge(internal_df, submission_rate_df[['Internal Interviewer', 'submission_rate']], on='Internal Interviewer', how='left')
-
-
-    st.caption("Track interviewers' submission behavior and scoring trends.")
-    interviewer_summary = df.groupby('Internal Interviewer').agg(
-        Interviews_Conducted=('Interview', 'count'),
-        Scorecards_Submitted=('Scorecard Complete', 'sum'),
-        Avg_Interview_Score=('Interview Score', 'mean')
+    # Summary by interviewer
+    interviewer_summary = interviewer_df.groupby("Internal Interviewer").agg(
+        Interviews_Conducted=("Interview", "count"),
+        Scorecards_Submitted=("Scorecard Complete", "sum"),
+        Avg_Interview_Score=("Interview Score", "mean")
     ).reset_index()
 
     styled_interviewers = interviewer_summary.style.format({
-        'Avg_Interview_Score': '{:.2f}'
-    }).set_properties(**{'text-align': 'center'})       .set_table_styles([
-          {'selector': 'th', 'props': [('font-weight', 'bold'), ('background-color', '#f0f8ff')]}
-      ])
+        "Avg_Interview_Score": "{:.2f}"
+    }).set_properties(**{"text-align": "center"}).set_table_styles([
+        {"selector": "th", "props": [("font-weight", "bold"), ("background-color", "#f0f8ff")]}
+    ])
 
     st.dataframe(styled_interviewers, use_container_width=True)
