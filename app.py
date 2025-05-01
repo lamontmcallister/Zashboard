@@ -164,7 +164,7 @@ with tab2:
 
         st.subheader("🧠 Candidate Details")
         for _, row in grouped.iterrows():
-            with st.expander(f"{row['Candidate Name']} — {row['Decision']}"):
+            with st.expander(f"{row['Candidate Name']} - {row['Decision']}"):
                 st.markdown(f"**Department:** {row['Department']}")
                 st.markdown(f"**Scorecards Submitted:** {row['Scorecards_Submitted']} / 4")
                 st.markdown("---")
@@ -253,7 +253,7 @@ with tab4:
         st.markdown("""
         | Metric                         | Example Value        | Target      |
         |--------------------------------|----------------------|-------------|
-        | Scorecard Completion Rate      | 92%                  | ≥ 90%       |
+        | Scorecard Completion Rate      | 92%                  | >= 90%       |
         | Avg Time-to-Hire               | 7.2 days             | < 10 days   |
         | % Resolved w/o Debrief         | 78%                  | > 70%       |
         | Interview Load per Interviewer | 6.3 interviews       | Balanced    |
