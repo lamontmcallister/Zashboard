@@ -3,6 +3,9 @@ import pandas as pd
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
+st.set_page_config(page_title="Recruiter Platform", layout="wide")
+
+
 st.title("📊 Candidate Selection Dashboard")
 
 st.markdown("""
@@ -37,7 +40,6 @@ df['Scorecard submitted'] = df['Scorecard submitted'].str.strip().str.lower()
 df['Scorecard Complete'] = df['Scorecard submitted'] == 'yes'
 
 # --------- Streamlit Setup ---------
-st.set_page_config(page_title="Recruiter Platform", layout="wide")
 
 st.markdown(
     '''
