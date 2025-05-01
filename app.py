@@ -240,3 +240,16 @@ elif page == "📊 Department Analytics":
       ])
 
     st.dataframe(styled_interviewers, use_container_width=True)
+
+
+with st.container():
+    col1, col2 = st.columns([1, 2])
+    with col1:
+        st.markdown("### 📌 Assumptions")
+        st.markdown("""
+        - Scorecard rubric uses a 5-point scale  
+        - Interviewers trained on best practices and scorecard execution  
+        - Communications have been distributed  
+        - Benchmarking is based on historical hiring data  
+        - Interview data is assumed to be complete and accurate  
+        """)
