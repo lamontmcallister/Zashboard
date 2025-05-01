@@ -6,9 +6,11 @@ from oauth2client.service_account import ServiceAccountCredentials
 st.set_page_config(page_title="Recruiter Platform", layout="wide")
 
 
-st.title("📊 Candidate Selection Dashboard")
+if page == 'Landing Page':
 
-st.markdown("""
+    st.title("📊 Candidate Selection Dashboard")
+    
+    st.markdown("""
 ### 🧭 Overview: Streamlining Candidate Selection
 
 We aim to accelerate time-to-hire and reduce bottlenecks in the candidate selection process by eliminating the need for traditional debrief meetings. Instead, we rely on historical interview data to establish objective hiring benchmarks.
