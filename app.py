@@ -61,7 +61,7 @@ st.markdown(
 )
 
 # --------- Navigation ---------
-page = st.sidebar.selectbox("🔍 Navigate", ["🔰 Landing Page", "Scorecard Dashboard", "📊 Department Analytics", "📈 Success Metrics Overview"])
+page = st.radio("📍 Navigate", ["🔰 Landing Page", "Scorecard Dashboard", "📊 Department Analytics", "📈 Success Metrics Overview"], horizontal=True)
 
 # --------- Landing Page ---------
 if page == "🔰 Landing Page":
@@ -108,7 +108,7 @@ elif page == "Scorecard Dashboard":
     st.caption("Filter by recruiter and department. View candidate scorecards and send reminders.")
 
     recruiters = sorted(df['Recruiter'].dropna().unique().tolist())
-    selected_recruiter = st.sidebar.selectbox("👤 Choose Recruiter", recruiters)
+page = st.radio("📍 Navigate", ["🔰 Landing Page", "Scorecard Dashboard", "📊 Department Analytics", "📈 Success Metrics Overview"], horizontal=True)
     departments = sorted(df['Department'].dropna().unique().tolist())
     selected_depts = st.sidebar.multiselect("🏢 Filter by Department", departments, default=departments)
     toggle_status = st.sidebar.radio("📋 Show Candidates With:", ["Complete Scorecards", "Pending Scorecards", "All"], index=0)
