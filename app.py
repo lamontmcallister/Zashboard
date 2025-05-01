@@ -71,11 +71,13 @@ with tab1:
         st.markdown('### 🧭 How to Use This Tool')
 
 
+        st.markdown("""
         We aim to accelerate time-to-hire and reduce bottlenecks in the candidate selection process by eliminating the need for traditional debrief meetings. Instead, we rely on historical interview data to establish objective hiring benchmarks.
-
+        
         Candidates falling below the benchmark are automatically rejected, while those exceeding it are routed for a targeted debrief between the recruiter and hiring manager.
         """)
-
+        
+        """)
         - Ensure fair, consistent hiring decisions  
         - Track scorecard submission and identify bottlenecks  
         - Empower recruiters with structured decision support
