@@ -98,16 +98,16 @@ with tab1:
         <p>Candidates falling below the benchmark are automatically rejected, while those exceeding it are routed for a targeted debrief between the recruiter and hiring manager.</p>
     </div>
     """, unsafe_allow_html=True)
-        st.title("📊 Candidate Selection Dashboard")
-        st.markdown("""
+    st.title("📊 Candidate Selection Dashboard")
+    st.markdown("""
     ### 🧭 Overview: Streamlining Candidate Selection
-        We aim to accelerate time-to-hire and reduce bottlenecks in the candidate selection process by eliminating the need for traditional debrief meetings.
-        Instead, we rely on historical interview data to establish objective hiring benchmarks.
-        Candidates falling below the benchmark are automatically rejected,
-        while those exceeding it are routed for a targeted debrief between the recruiter and hiring manager.
-        """)
-        st.subheader("✨ Why This Matters")
-        st.markdown("""
+    We aim to accelerate time-to-hire and reduce bottlenecks in the candidate selection process by eliminating the need for traditional debrief meetings.
+    Instead, we rely on historical interview data to establish objective hiring benchmarks.
+    Candidates falling below the benchmark are automatically rejected,
+    while those exceeding it are routed for a targeted debrief between the recruiter and hiring manager.
+    """)
+    st.subheader("✨ Why This Matters")
+    st.markdown("""
         - Ensure fair, consistent hiring decisions
         - Track scorecard submission and identify bottlenecks
         - Empower recruiters with structured decision support
