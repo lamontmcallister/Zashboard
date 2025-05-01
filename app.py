@@ -32,7 +32,6 @@ df['Scorecard Complete'] = df['Scorecard submitted'] == 'yes'
 
 # --------- Streamlit Setup ---------
 
-st.markdown(
 st.markdown("""
         body {
             background-color: #ffffff;
