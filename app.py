@@ -108,15 +108,15 @@ with tab1:
         """)
         st.subheader("✨ Why This Matters")
         st.markdown("""
-        - Ensure fair, consistent hiring decisions  
-        - Track scorecard submission and identify bottlenecks  
+        - Ensure fair, consistent hiring decisions
+        - Track scorecard submission and identify bottlenecks
         - Empower recruiters with structured decision support
         """)
         st.subheader("🧭 How to Use This Tool")
         st.markdown("""
-        1. Head to the **Recruiter Dashboard** tab  
-        2. Select a recruiter and optionally filter by department or scorecard status  
-        3. Review candidate decisions and send reminder nudges  
+        1. Head to the **Recruiter Dashboard** tab
+        2. Select a recruiter and optionally filter by department or scorecard status
+        3. Review candidate decisions and send reminder nudges
         4. Use **Department Analytics** to track overall submission and scoring health
         """)
         st.success("Tip: Click any candidate name in the dashboard to view interview details!")
@@ -125,9 +125,9 @@ with tab1:
             with col1:
                 st.markdown("### 📌 Assumptions")
                 st.markdown("""
-                - Scorecard rubric uses a 5-point scale  
-                - Interviewers trained on best practices and scorecard execution   
-                - Benchmarking is based on historical hiring data  
+                - Scorecard rubric uses a 5-point scale
+                - Interviewers trained on best practices and scorecard execution
+                - Benchmarking is based on historical hiring data
                 """)
 with tab2:
         st.title("🎯 Scorecard Dashboard")
