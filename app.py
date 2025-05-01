@@ -198,12 +198,6 @@ elif page == "📊 Department Analytics":
     time_saved_hours = total_candidates * 3  # 6 people x 30 mins = 3 hours per candidate
     st.metric(label=f"Estimated Time Saved in {selected_dept}", value=f"{time_saved_hours} hours")
 
-    st.subheader("⏱️ Estimated Time Saved from Debrief Removal")
-    total_candidates = df["Candidate Name"].nunique()
-    time_saved_hours = total_candidates * 3  # 6 people x 30 mins = 3 hours per candidate
-    st.metric(label="Total Hours Saved", value=f"{time_saved_hours} hours")
-
-    st.subheader("👥 Internal Interviewer Stats")
     st.subheader("👥 Internal Interviewer Stats")
 
     # Filters
