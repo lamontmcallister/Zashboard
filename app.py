@@ -61,7 +61,7 @@ st.markdown(
 )
 
 # --------- Navigation ---------
-page = st.sidebar.selectbox("🔍 Navigate", ["🔰 Landing Page", "Scorecard Dashboard", "📊 Department Analytics"])
+page = st.sidebar.selectbox("🔍 Navigate", ["🔰 Landing Page", "Scorecard Dashboard", "📊 Department Analytics", "📈 Success Metrics Overview"])
 
 # --------- Landing Page ---------
 if page == "🔰 Landing Page":
@@ -247,3 +247,20 @@ elif page == "📊 Department Analytics":
     ])
 
     st.dataframe(styled_interviewers, use_container_width=True)
+
+elif page == "📈 Success Metrics Overview":
+    st.title("📈 Success Metrics Overview")
+
+    st.markdown("### Previewing Metrics That Reflect Dashboard Impact")
+
+    st.markdown("""
+    | Metric                         | Example Value        | Target      |
+    |--------------------------------|----------------------|-------------|
+    | Scorecard Completion Rate      | 92%                  | ≥ 90%       |
+    | Avg Time-to-Hire               | 7.2 days             | < 10 days   |
+    | % Resolved w/o Debrief         | 78%                  | > 70%       |
+    | Interview Load per Interviewer | 6.3 interviews       | Balanced    |
+    | Offer Acceptance Rate          | 84%                  | > 80%       |
+    """, unsafe_allow_html=True)
+
+    st.info("This is a demo view. You can bring these metrics to life as your data maturity grows.")
