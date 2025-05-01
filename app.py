@@ -1,36 +1,29 @@
 
-import streamlit as st
-import pandas as pd
-import gspread
-from oauth2client.service_account import ServiceAccountCredentials
+# --------- Landing Page ---------
+if page == "🔰 Landing Page":
+    st.title("Welcome to the Scorecard Dashboard")
+    st.markdown("This tool helps recruiters and hiring teams make informed decisions by visualizing candidate interview scorecard data.")
+    
+    st.subheader("✨ Why Use This Dashboard?")
+    st.markdown("""
+    - Centralize candidate scorecard data
+    - Quickly identify who has completed their interviews
+    - Spot missing scorecards and nudge interviewers
+    - Analyze trends in department and interviewer performance
+    """)
 
-# --------- Google Sheets Setup ---------
-def load_google_sheet(sheet_url, worksheet_name):
-    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-    creds_dict = st.secrets["google"]
-    creds = ServiceAccountCredentials.from_json_keyfile_dict(dict(creds_dict), scope)
-    client = gspread.authorize(creds)
-    sheet = client.open_by_url(sheet_url)
-    worksheet = sheet.worksheet(worksheet_name)
-    data = worksheet.get_all_records()
-    return pd.DataFrame(data)
+    st.subheader("🧭 How to Use")
+    st.markdown("""
+    1. Navigate to **Scorecard Dashboard** to see candidates under your care
+    2. Use filters to narrow by recruiter, department, or scorecard status
+    3. Expand each candidate to review interview-level data and send reminders
+    4. Visit **Department Analytics** to review departmental scorecard submission trends
+    5. Use the **Internal Interviewer Stats** section to search for specific interviewers by name or department
+    """)
+    
+    st.success("You're just a click away from cleaner scorecard ops 🚀")
 
-# --------- Load Data ---------
-sheet_url = "https://docs.google.com/spreadsheets/d/1_hypJt1kwUNZE6Xck1VVjrPeYiIJpTDXSAwi4dgXXko"
-worksheet_name = "Mixed Raw Candidate Data"
-df = load_google_sheet(sheet_url, worksheet_name)
 
-# --------- Prep ---------
-df['Interview Score'] = pd.to_numeric(df['Interview Score'], errors='coerce')
-df['Scorecard submitted'] = df['Scorecard submitted'].str.strip().str.lower()
-df['Scorecard Complete'] = df['Scorecard submitted'] == 'yes'
-
-# --------- Streamlit Setup ---------
-st.set_page_config(page_title="Scorecard Dashboard", layout="wide")
-
-page = st.sidebar.selectbox("🔍 Navigate", ["🔰 Landing Page", "🎯 Scorecard Dashboard", "📊 Department Analytics"])
-
-# --------- Scorecard Dashboard ---------
 if page == "🎯 Scorecard Dashboard":
     st.title("🎯 Scorecard Dashboard")
     st.caption("Filter by recruiter and department. View candidate scorecards and send reminders.")
