@@ -226,4 +226,22 @@ elif page == "📊 Department Analytics":
           {'selector': 'th', 'props': [('font-weight', 'bold'), ('background-color', '#f0f8ff')]}
       ])
 
-    st.dataframe(styled_interviewers, use_container_width=True)
+    
+for _, row in styled_interviewers.iterrows():
+    rate = int(row['Completion Rate'].strip('%'))
+    if rate < 50:
+        color = 'red'
+    elif rate < 90:
+        color = 'orange'
+    else:
+        color = 'green'
+
+    st.markdown(
+        f"<div style='display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #eee'>"
+        f"<div><strong>{row['Internal Interviewer']}</strong> ({row['Department']})</div>"
+        f"<div>{row['Scorecards_Submitted']}/{row['Scorecards_Assigned']} submitted</div>"
+        f"<div style='color:{color}; font-weight:bold'>{row['Completion Rate']}</div>"
+        f"</div>",
+        unsafe_allow_html=True
+    )
+
