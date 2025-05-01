@@ -1,98 +1,37 @@
-import streamlit as st
-import pandas as pd
-import gspread
-from oauth2client.service_account import ServiceAccountCredentials
-
-# --------- Google Sheets Setup ---------
-def load_google_sheet(sheet_url, worksheet_name):
-    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-    creds_dict = st.secrets["google"]
-    creds = ServiceAccountCredentials.from_json_keyfile_dict(dict(creds_dict), scope)
-    client = gspread.authorize(creds)
-    sheet = client.open_by_url(sheet_url)
-    worksheet = sheet.worksheet(worksheet_name)
-    data = worksheet.get_all_records()
-    return pd.DataFrame(data)
-
-# --------- Load Data ---------
-sheet_url = "https://docs.google.com/spreadsheets/d/1_hypJt1kwUNZE6Xck1VVjrPeYiIJpTDXSAwi4dgXXko"
-worksheet_name = "Mixed Raw Candidate Data"
-df = load_google_sheet(sheet_url, worksheet_name)
-
-# --------- Prep ---------
-df['Interview Score'] = pd.to_numeric(df['Interview Score'], errors='coerce')
-df['Scorecard submitted'] = df['Scorecard submitted'].str.strip().str.lower()
-df['Scorecard Complete'] = df['Scorecard submitted'] == 'yes'
-
-# --------- Streamlit Setup ---------
-st.set_page_config(page_title="Recruiter Platform", layout="wide")
-
-st.markdown(
-    '''
-    <style>
-        body {
-            background-color: #ffffff;
-            color: #1a1a1a;
-        }
-        .stButton button {
-            border: 1px solid #1e90ff;
-            background-color: #ffffff;
-            color: #1e90ff;
-        }
-        th {
-            font-weight: bold;
-            background-color: #f0f8ff;
-        }
-        td {
-            text-align: center !important;
-        }
-        .dataframe {
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-    </style>
-    ''',
-    unsafe_allow_html=True
-)
-
-# --------- Navigation ---------
-page = st.sidebar.selectbox("🔍 Navigate", ["🔰 Landing Page", "🎯 Scorecard Dashboard", "📊 Department Analytics"])
 
 # --------- Landing Page ---------
 if page == "🔰 Landing Page":
-    st.title("Welcome to the Recruiter Decision Dashboard")
-    st.markdown("This platform helps you evaluate candidates based on interviewer feedback, scorecard submissions, and department-level analytics — all in one view.")
-
-    st.subheader("✨ Why This Matters")
+    st.title("Welcome to the Scorecard Dashboard")
+    st.markdown("This tool helps recruiters and hiring teams make informed decisions by visualizing candidate interview scorecard data.")
+    
+    st.subheader("✨ Why Use This Dashboard?")
     st.markdown("""
-- Ensure fair, consistent hiring decisions  
-- Track scorecard submission and identify bottlenecks  
-- Empower recruiters with structured decision support
-""")
+    - Centralize candidate scorecard data
+    - Quickly identify who has completed their interviews
+    - Spot missing scorecards and nudge interviewers
+    - Analyze trends in department and interviewer performance
+    """)
 
-    st.subheader("🧭 How to Use This Tool")
+    st.subheader("🧭 How to Use")
     st.markdown("""
-1. Head to the **Scorecard Dashboard** tab  
-2. Select a recruiter and optionally filter by department or scorecard status  
-3. Review candidate decisions and send reminder nudges  
-4. Use **Department Analytics** to track overall submission and scoring health
-""")
+    1. Navigate to **Scorecard Dashboard** to see candidates under your care
+    2. Use filters to narrow by recruiter, department, or scorecard status
+    3. Expand each candidate to review interview-level data and send reminders
+    4. Visit **Department Analytics** to review departmental scorecard submission trends
+    5. Use the **Internal Interviewer Stats** section to search for specific interviewers by name or department
+    """)
+    
+    st.success("You're just a click away from cleaner scorecard ops 🚀")
 
-    st.success("Tip: Click any candidate name in the dashboard to view interview details!")
 
-# Remaining pages not included for brevity (Scorecard Dashboard, Analytics)...
-
-
-# --------- Scorecard Dashboard ---------
-elif page == "🎯 Scorecard Dashboard":
-    st.title("🎯 Recruiter Interview Dashboard")
+if page == "🎯 Scorecard Dashboard":
+    st.title("🎯 Scorecard Dashboard")
     st.caption("Filter by recruiter and department. View candidate scorecards and send reminders.")
 
     recruiters = sorted(df['Recruiter'].dropna().unique().tolist())
-    recruiters = sorted(df['Recruiter'].dropna().unique().tolist())
-selected_recruiter = st.sidebar.selectbox("👤 Choose Recruiter", recruiters)
+    selected_recruiter = st.sidebar.selectbox("👤 Choose Recruiter", recruiters)
     departments = sorted(df['Department'].dropna().unique().tolist())
-    selected_depts = st.sidebar.multiselect("🏢 Filter by Department", departments)
+    selected_depts = st.sidebar.multiselect("🏢 Filter by Department", departments, default=departments)
     toggle_status = st.sidebar.radio("📋 Show Candidates With:", ["All", "Complete Scorecards", "Pending Scorecards"])
 
     grouped = df.groupby('Candidate Name').agg(
@@ -124,19 +63,18 @@ selected_recruiter = st.sidebar.selectbox("👤 Choose Recruiter", recruiters)
         grouped = grouped[grouped['Scorecards_Submitted'] < 4]
 
     st.subheader(f"📋 Candidate Summary for {selected_recruiter}")
-    st.markdown("Use this table to track where each candidate stands based on scorecard completion and average interview scores.")
-    st.dataframe(grouped[['Candidate Name', 'Department', 'Avg_Interview_Score', 'Scorecards_Submitted', 'Decision']],
-                 use_container_width=True)
+    st.dataframe(grouped[['Candidate Name', 'Department', 'Avg_Interview_Score', 'Scorecards_Submitted', 'Decision']], use_container_width=True)
 
     st.subheader("🧠 Candidate Details")
-    for _, row in grouped.iterrows():
+    for i, row in grouped.iterrows():
         with st.expander(f"{row['Candidate Name']} — {row['Decision']}"):
             st.markdown(f"**Department:** {row['Department']}")
             st.markdown(f"**Scorecards Submitted:** {row['Scorecards_Submitted']} / 4")
+            st.markdown(f"**Avg Interview Score:** {row['Avg_Interview_Score']}")
             st.markdown("---")
             st.markdown("### Interviewer Scores")
             candidate_rows = df[df['Candidate Name'] == row['Candidate Name']]
-            for _, r in candidate_rows.iterrows():
+            for j, r in candidate_rows.iterrows():
                 score = r['Interview Score']
                 status = r['Scorecard submitted']
                 line = f"- **{r['Internal Interviewer']}** ({r['Interview']})"
@@ -144,7 +82,7 @@ selected_recruiter = st.sidebar.selectbox("👤 Choose Recruiter", recruiters)
                     st.markdown(f"{line}: ✅ {score}")
                 else:
                     st.markdown(f"{line}: ❌ Not Submitted")
-                    st.button(f"📩 Send Reminder to {r['Internal Interviewer']}", key=f"{r['Candidate Name']}-{r['Internal Interviewer']}")
+                    st.button(f"📩 Send Reminder to {r['Internal Interviewer']}", key=f"reminder-{i}-{j}")
 
 # --------- Department Analytics ---------
 elif page == "📊 Department Analytics":
@@ -172,31 +110,34 @@ elif page == "📊 Department Analytics":
     st.subheader("✅ Scorecard Submission Rate by Department")
     st.dataframe(styled_dept, use_container_width=True)
 
-    
-st.subheader("👥 Internal Interviewer Stats")
-st.caption("Track interviewers' submission behavior and scoring trends.")
+    # Enhanced Internal Interviewer Stats
+    st.subheader("👥 Internal Interviewer Stats")
+    st.caption("Filter by department and search interviewer names to track submission and scoring trends.")
 
-interviewer_summary = df.groupby(['Internal Interviewer', 'Department']).agg(
-    Interviews_Conducted=('Interview', 'count'),
-    Scorecards_Submitted=('Scorecard Complete', 'sum'),
-    Avg_Interview_Score=('Interview Score', 'mean')
-).reset_index()
+    interviewer_summary = df.groupby(['Internal Interviewer', 'Department']).agg(
+        Interviews_Conducted=('Interview', 'count'),
+        Scorecards_Submitted=('Scorecard Complete', 'sum'),
+        Avg_Interview_Score=('Interview Score', 'mean')
+    ).reset_index()
 
-dept_options = interviewer_summary['Department'].dropna().unique().tolist()
-selected_dept = st.selectbox("🏢 Filter by Department", ["All"] + dept_options)
-search_term = st.text_input("🔎 Search Interviewer")
+    departments = sorted(df['Department'].dropna().unique())
+    selected_dept = st.selectbox("🏢 Filter by Department", ["All"] + departments)
 
-filtered_summary = interviewer_summary.copy()
-if selected_dept != "All":
-    filtered_summary = filtered_summary[filtered_summary['Department'] == selected_dept]
-if search_term:
-    filtered_summary = filtered_summary[filtered_summary['Internal Interviewer'].str.contains(search_term, case=False)]
+    filtered_summary = interviewer_summary
+    if selected_dept != "All":
+        filtered_summary = filtered_summary[filtered_summary['Department'] == selected_dept]
 
-styled_interviewers = filtered_summary.style.format({
-    'Avg_Interview_Score': '{:.2f}'
-}).set_properties(**{'text-align': 'center'}).set_table_styles([
-    {'selector': 'th', 'props': [('font-weight', 'bold'), ('background-color', '#f0f8ff')]}
-])
+    search_term = st.text_input("🔎 Search Interviewer")
+    if search_term:
+        filtered_summary = filtered_summary[
+            filtered_summary['Internal Interviewer'].str.contains(search_term, case=False)
+        ]
 
-st.dataframe(styled_interviewers, use_container_width=True)
+    styled_interviewers = filtered_summary.style.format({
+        'Avg_Interview_Score': '{:.2f}'
+    }).set_properties(**{'text-align': 'center'}).set_table_styles([
+        {'selector': 'th', 'props': [('font-weight', 'bold'), ('background-color', '#f0f8ff')]}
+    ])
+
+    st.dataframe(styled_interviewers, use_container_width=True)
 
