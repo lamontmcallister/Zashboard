@@ -101,7 +101,6 @@ with tab1:
                 - Scorecard rubric uses a 5-point scale  
                 - Interviewers trained on best practices and scorecard execution   
                 - Benchmarking is based on historical hiring data  
-                - Interview data is assumed to be complete and accurate  
                 """)
 
 with tab2:
