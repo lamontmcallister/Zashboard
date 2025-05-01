@@ -173,14 +173,13 @@ elif page == "📊 Department Analytics":
 
     st.subheader("👥 Internal Interviewer Stats")
 
+    
     # --- Filters for Internal Interviewer Stats ---
     dept_options = df['Department'].dropna().unique().tolist()
     selected_depts = st.multiselect("Filter by Department", dept_options, default=dept_options)
 
     name_query = st.text_input("Search by Interviewer Name").strip().lower()
 
-    
-    
     df['Submitted'] = df['Scorecard submitted'].str.lower() == 'yes'
     internal_df = df[df['Internal Interviewer'].notna()]
     internal_df = internal_df[internal_df['Department'].isin(selected_depts)]
@@ -192,7 +191,16 @@ elif page == "📊 Department Analytics":
         total_assigned=('Submitted', 'count'),
         submitted=('Submitted', 'sum')
     ).reset_index()
-    submission_rate_df['% Scorecards Submitted'] = (submission_rate_df['submitted'] / submission_rate_df['total_assigned']) * 100
+    submission_rate_df['% Scorecards Submitted'] = ((submission_rate_df['submitted'] / submission_rate_df['total_assigned']) * 100).round().astype(int).astype(str) + '%'
+
+    internal_df = pd.merge(internal_df, submission_rate_df[['Internal Interviewer', '% Scorecards Submitted']], on='Internal Interviewer', how='left')
+]
+
+    submission_rate_df = internal_df.groupby('Internal Interviewer').agg(
+        total_assigned=('Submitted', 'count'),
+        submitted=('Submitted', 'sum')
+    ).reset_index()
+    submission_rate_df['% Scorecards Submitted'] = ((submission_rate_df['submitted'] / submission_rate_df['total_assigned']) * 100).round().astype(int).astype(str) + '%'
 
     internal_df = pd.merge(internal_df, submission_rate_df[['Internal Interviewer', '% Scorecards Submitted']], on='Internal Interviewer', how='left')
 
