@@ -17,6 +17,7 @@ def load_google_sheet(sheet_url, worksheet_name):
 sheet_url = "https://docs.google.com/spreadsheets/d/1_hypJt1kwUNZE6Xck1VVjrPeYiIJpTDXSAwi4dgXXko"
 worksheet_name = "Mixed Raw Candidate Data"
 df = load_google_sheet(sheet_url, worksheet_name)
+departments = sorted(df['Department'].dropna().unique().tolist())
 # --------- Prep ---------
 df['Interview Score'] = pd.to_numeric(df['Interview Score'], errors='coerce')
 df['Scorecard submitted'] = df['Scorecard submitted'].str.strip().str.lower()
@@ -95,7 +96,6 @@ with tab2:
             selected_depts = st.multiselect("🏢 Filter by Department", departments, default=departments)
         with col3:
             toggle_status = st.radio("📋 Show Candidates With", ["Complete Scorecards", "Pending Scorecards", "All"], index=0)
-        departments = sorted(df['Department'].dropna().unique().tolist())
         grouped = df.groupby('Candidate Name').agg(
             Avg_Interview_Score=('Interview Score', 'mean'),
             Scorecards_Submitted=('Scorecard submitted', lambda x: sum(x == 'yes')),
