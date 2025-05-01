@@ -190,6 +190,11 @@ elif page == "📊 Department Analytics":
     st.subheader("✅ Scorecard Submission Rate by Department")
     st.dataframe(styled_dept, use_container_width=True)
 
+    st.subheader("⏱️ Estimated Time Saved from Debrief Removal")
+    total_candidates = df["Candidate Name"].nunique()
+    time_saved_hours = total_candidates * 3  # 6 people x 30 mins = 3 hours per candidate
+    st.metric(label="Total Hours Saved", value=f"{time_saved_hours} hours")
+
     st.subheader("👥 Internal Interviewer Stats")
     st.subheader("👥 Internal Interviewer Stats")
 
