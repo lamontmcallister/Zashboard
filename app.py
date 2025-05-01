@@ -69,15 +69,9 @@ with tab1:
         col1, col2 = st.columns(2)
         with col1:
             st.markdown('### 🧭 Overview: Streamlining Candidate Selection')
-            st.markdown('''We aim to accelerate time-to-hire and reduce bottlenecks in the candidate selection process by eliminating the need for traditional debrief meetings. Instead, we rely on historical interview data to establish objective hiring benchmarks.''')
         with col2:
             st.markdown('### ✨ Why This Matters')
-            st.markdown('''- Ensure fair, consistent hiring decisions  
-- Track scorecard submission and identify bottlenecks  
-- Empower recruiters with structured decision support''')
         st.markdown('### 🧭 How to Use This Tool')
-        st.markdown('''1. Head to the **Scorecard Dashboard** tab  
-2. Select a recruiter and optionally filter by department or score''')
 
 
         We aim to accelerate time-to-hire and reduce bottlenecks in the candidate selection process by eliminating the need for traditional debrief meetings. Instead, we rely on historical interview data to establish objective hiring benchmarks.
