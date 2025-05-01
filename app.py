@@ -188,8 +188,7 @@ elif page == "📊 Department Analytics":
         internal_df = internal_df[internal_df['Internal Interviewer'].str.lower().str.contains(name_query)]
 
     submission_rate_df = internal_df.groupby('Internal Interviewer').agg(
-    Department=('Department', 'first'),
-total_assigned=('Submitted', 'count'),
+        total_assigned=('Submitted', 'count'),
         submitted=('Submitted', 'sum')
     ).reset_index()
     submission_rate_df['% Scorecards Submitted'] = ((submission_rate_df['submitted'] / submission_rate_df['total_assigned']) * 100).round().astype(int).astype(str) + '%'
@@ -197,8 +196,7 @@ total_assigned=('Submitted', 'count'),
     internal_df = pd.merge(internal_df, submission_rate_df[['Internal Interviewer', '% Scorecards Submitted']], on='Internal Interviewer', how='left')
 
     submission_rate_df = internal_df.groupby('Internal Interviewer').agg(
-    Department=('Department', 'first'),
-total_assigned=('Submitted', 'count'),
+        total_assigned=('Submitted', 'count'),
         submitted=('Submitted', 'sum')
     ).reset_index()
     submission_rate_df['% Scorecards Submitted'] = ((submission_rate_df['submitted'] / submission_rate_df['total_assigned']) * 100).round().astype(int).astype(str) + '%'
@@ -207,8 +205,7 @@ total_assigned=('Submitted', 'count'),
 
 
     submission_rate_df = internal_df.groupby('Internal Interviewer').agg(
-    Department=('Department', 'first'),
-total_assigned=('Submitted', 'count'),
+        total_assigned=('Submitted', 'count'),
         submitted=('Submitted', 'sum')
     ).reset_index()
     submission_rate_df['submission_rate'] = (submission_rate_df['submitted'] / submission_rate_df['total_assigned']) * 100
@@ -229,26 +226,4 @@ total_assigned=('Submitted', 'count'),
           {'selector': 'th', 'props': [('font-weight', 'bold'), ('background-color', '#f0f8ff')]}
       ])
 
-    
-submission_rate_df['Completion Rate'] = (
-    (submission_rate_df['submitted'] / submission_rate_df['total_assigned']) * 100
-).round().astype(int).astype(str) + '%'
-
-for _, row in submission_rate_df.iterrows():
-    rate = int(row['Completion Rate'].strip('%'))
-    if rate < 50:
-        color = 'red'
-    elif rate < 90:
-        color = 'orange'
-    else:
-        color = 'green'
-
-    st.markdown(
-        f"<div style='display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #eee'>"
-        f"<div><strong>{row['Internal Interviewer']}</strong> ({row['Department']})</div>"
-        f"<div>{row['Scorecards_Submitted']}/{row['Scorecards_Assigned']} submitted</div>"
-        f"<div style='color:{color}; font-weight:bold'>{row['Completion Rate']}</div>"
-        f"</div>",
-        unsafe_allow_html=True
-    )
-
+    st.dataframe(styled_interviewers, use_container_width=True)
