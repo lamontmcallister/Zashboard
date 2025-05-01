@@ -56,7 +56,7 @@ st.markdown(
 )
 
 # --------- Navigation ---------
-page = st.sidebar.selectbox("🔍 Navigate", ["🔰 Landing Page", "🎯 Recruiter Dashboard", "📊 Department Analytics"])
+page = st.sidebar.selectbox("🔍 Navigate", ["🔰 Landing Page", "Scorecard Dashboard", "📊 Department Analytics"])
 
 # --------- Landing Page ---------
 if page == "🔰 Landing Page":
@@ -84,7 +84,7 @@ if page == "🔰 Landing Page":
 
 
 # --------- Recruiter Dashboard ---------
-elif page == "🎯 Recruiter Dashboard":
+elif page == "Scorecard Dashboard":
     st.title("🎯 Recruiter Interview Dashboard")
     st.caption("Filter by recruiter and department. View candidate scorecards and send reminders.")
 
@@ -172,6 +172,18 @@ elif page == "📊 Department Analytics":
     st.dataframe(styled_dept, use_container_width=True)
 
     st.subheader("👥 Internal Interviewer Stats")
+    # --- Filters for Internal Interviewer Stats ---
+    dept_options = df['Department'].dropna().unique().tolist()
+    selected_depts = st.multiselect("Filter by Department", dept_options, default=dept_options)
+
+    name_query = st.text_input("Search by Interviewer Name").strip().lower()
+
+    internal_df = df[df['Internal Interviewer'].notna()]
+    internal_df = internal_df[internal_df['Department'].isin(selected_depts)]
+
+    if name_query:
+        internal_df = internal_df[internal_df['Internal Interviewer'].str.lower().str.contains(name_query)]
+
     st.caption("Track interviewers' submission behavior and scoring trends.")
     interviewer_summary = df.groupby('Internal Interviewer').agg(
         Interviews_Conducted=('Interview', 'count'),
