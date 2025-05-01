@@ -16,18 +16,6 @@ We aim to accelerate time-to-hire and reduce bottlenecks in the candidate select
 Candidates falling below the benchmark are automatically rejected, while those exceeding it are routed for a targeted debrief between the recruiter and hiring manager.
 """)
 
-with st.container():
-    col1, col2 = st.columns([3, 1])
-    with col2:
-        st.markdown("### 📌 Assumptions")
-        st.markdown("""
-        - Scorecard rubric uses a 5-point scale  
-        - Internal interviewers have been trained on best practices  
-        - Scorecard execution training is complete  
-        - Communications have been distributed  
-        """)
-
-
 
 
 # --------- Google Sheets Setup ---------
@@ -90,6 +78,19 @@ if page == "🔰 Landing Page":
 
     st.subheader("✨ Why This Matters")
     st.markdown("""
+
+with st.container():
+    col1, col2 = st.columns([1, 3])
+    with col1:
+        st.markdown("### 📌 Assumptions")
+        st.markdown("""
+        - Scorecard rubric uses a standardized 5-point scale  
+        - Internal interviewers are trained on best practices  
+        - Communications have been distributed  
+        - Benchmarks are based on historical data  
+        - All expected scorecards are included  
+        """)
+
 - Ensure fair, consistent hiring decisions  
 - Track scorecard submission and identify bottlenecks  
 - Empower recruiters with structured decision support
@@ -236,17 +237,6 @@ elif page == "📊 Department Analytics":
     submission_rate_df['submission_rate'] = (submission_rate_df['submitted'] / submission_rate_df['total_assigned']) * 100
 
     internal_df = pd.merge(internal_df, submission_rate_df[['Internal Interviewer', 'submission_rate']], on='Internal Interviewer', how='left')
-
-    # Calculate and display completion rate if possible
-    if 'Scorecards_Submitted' in df.columns:
-        if 'Expected_Scorecards' in df.columns:
-            df['Completion_Rate'] = (df['Scorecards_Submitted'] / df['Expected_Scorecards']) * 100
-        else:
-            df['Completion_Rate'] = (df['Scorecards_Submitted'] / 4) * 100  # Assuming 4 expected by default
-        st.dataframe(df[['Interviewer', 'Avg_Interview_Score', 'Completion_Rate']])
-    else:
-        st.warning("Scorecard submission data not available to compute completion rate.")
-    
 
 
     st.caption("Track interviewers' submission behavior and scoring trends.")
