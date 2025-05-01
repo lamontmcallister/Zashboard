@@ -2,19 +2,6 @@ import streamlit as st
 import pandas as pd
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
-
-import os
-
-# Load local CSS file safely
-def local_css(file_name):
-    if os.path.exists(file_name):
-        with open(file_name) as f:
-            st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-    else:
-        st.warning(f"⚠️ Could not find CSS file: {file_name}")
-
-local_css("style.css")
-
 st.set_page_config(page_title="Recruiter Platform", layout="wide")
 # --------- Google Sheets Setup ---------
 def load_google_sheet(sheet_url, worksheet_name):
