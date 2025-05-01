@@ -3,6 +3,20 @@ import pandas as pd
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 st.set_page_config(page_title="Recruiter Platform", layout="wide")
+
+st.markdown("""
+<style>
+    html, body, [class*="css"]  {
+        font-family: 'Inter', sans-serif;
+        font-size: 16px;
+    }
+    .stTabs [role="tab"] {
+        font-size: 18px !important;
+        font-weight: 600;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 # --------- Google Sheets Setup ---------
 def load_google_sheet(sheet_url, worksheet_name):
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
@@ -54,6 +68,13 @@ st.markdown(
 tab1, tab2, tab3, tab4 = st.tabs(["🔰 Landing Page", "Scorecard Dashboard", "📊 Department Analytics", "📈 Success Metrics Overview"])
 # --------- Landing Page ---------
 with tab1:
+    st.markdown("""
+    <div style="background-color: #f5f5f5; padding: 20px; border-radius: 10px; font-size: 17px; font-family: 'Inter', sans-serif;">
+        <p>We aim to accelerate time-to-hire and reduce bottlenecks in the candidate selection process by eliminating the need for traditional debrief meetings.</p>
+        <p>Instead, we rely on historical interview data to establish objective hiring benchmarks.</p>
+        <p>Candidates falling below the benchmark are automatically rejected, while those exceeding it are routed for a targeted debrief between the recruiter and hiring manager.</p>
+    </div>
+    """, unsafe_allow_html=True)
         st.title("📊 Candidate Selection Dashboard")
         st.markdown("""
     ### 🧭 Overview: Streamlining Candidate Selection
