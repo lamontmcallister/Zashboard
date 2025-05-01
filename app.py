@@ -1,28 +1,3 @@
-
-if page_selection == "Landing":
-    st.title("📊 Candidate Selection Dashboard")
-    
-    st.markdown("""  
-    ### 🧭 Overview: Streamlining Candidate Selection
-    
-    We aim to accelerate time-to-hire and reduce bottlenecks in the candidate selection process by eliminating the need for traditional debrief meetings. Instead, we rely on historical interview data to establish objective hiring benchmarks.
-    
-    Candidates falling below the benchmark are automatically rejected, while those exceeding it are routed for a targeted debrief between the recruiter and hiring manager.
-    """)
-    
-    with st.container():
-        col1, col2 = st.columns([1, 2])
-        with col1:
-            st.markdown("### 📌 Assumptions")
-            st.markdown("""  
-            - Scorecard rubric uses a 5-point scale  
-            - Interviewers trained on best practices and scorecard execution  
-            - Communications have been distributed  
-            - Benchmarking is based on historical hiring data  
-            - Interview data is assumed to be complete and accurate  
-            """)
-
-
 import streamlit as st
 import pandas as pd
 import gspread
@@ -32,6 +7,28 @@ st.set_page_config(page_title="Recruiter Platform", layout="wide")
 
 
 st.title("📊 Candidate Selection Dashboard")
+
+st.markdown("""
+### 🧭 Overview: Streamlining Candidate Selection
+
+We aim to accelerate time-to-hire and reduce bottlenecks in the candidate selection process by eliminating the need for traditional debrief meetings. Instead, we rely on historical interview data to establish objective hiring benchmarks.
+
+Candidates falling below the benchmark are automatically rejected, while those exceeding it are routed for a targeted debrief between the recruiter and hiring manager.
+""")
+
+with st.container():
+    col1, col2 = st.columns([3, 1])
+    with col2:
+        st.markdown("### 📌 Assumptions")
+        st.markdown("""
+        - Scorecard rubric uses a 5-point scale  
+        - Internal interviewers have been trained on best practices  
+        - Scorecard execution training is complete  
+        - Communications have been distributed  
+        """)
+
+
+
 
 # --------- Google Sheets Setup ---------
 def load_google_sheet(sheet_url, worksheet_name):
@@ -240,6 +237,17 @@ elif page == "📊 Department Analytics":
 
     internal_df = pd.merge(internal_df, submission_rate_df[['Internal Interviewer', 'submission_rate']], on='Internal Interviewer', how='left')
 
+    # Calculate and display completion rate if possible
+    if 'Scorecards_Submitted' in df.columns:
+        if 'Expected_Scorecards' in df.columns:
+            df['Completion_Rate'] = (df['Scorecards_Submitted'] / df['Expected_Scorecards']) * 100
+        else:
+            df['Completion_Rate'] = (df['Scorecards_Submitted'] / 4) * 100  # Assuming 4 expected by default
+        st.dataframe(df[['Interviewer', 'Avg_Interview_Score', 'Completion_Rate']])
+    else:
+        st.warning("Scorecard submission data not available to compute completion rate.")
+    
+
 
     st.caption("Track interviewers' submission behavior and scoring trends.")
     interviewer_summary = df.groupby('Internal Interviewer').agg(
@@ -255,6 +263,3 @@ elif page == "📊 Department Analytics":
       ])
 
     st.dataframe(styled_interviewers, use_container_width=True)
-
-
-
