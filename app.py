@@ -106,19 +106,19 @@ if page == "🔰 Landing Page":
 elif page == "Scorecard Dashboard":
     st.title("🎯 Scorecard Dashboard")
     st.caption("Filter by recruiter and department. View candidate scorecards and send reminders.")
-        recruiters = sorted(df['Recruiter'].dropna().unique().tolist())
+    recruiters = sorted(df['Recruiter'].dropna().unique().tolist())
     page = st.radio("📍 Navigate", ["🔰 Landing Page", "Scorecard Dashboard", "📊 Department Analytics", "📈 Success Metrics Overview"], horizontal=True)
     departments = sorted(df['Department'].dropna().unique().tolist())
     selected_depts = st.sidebar.multiselect("🏢 Filter by Department", departments, default=departments)
     toggle_status = st.sidebar.radio("📋 Show Candidates With:", ["Complete Scorecards", "Pending Scorecards", "All"], index=0)
-        grouped = df.groupby('Candidate Name').agg(
+    grouped = df.groupby('Candidate Name').agg(
     Avg_Interview_Score=('Interview Score', 'mean'),
     Scorecards_Submitted=('Scorecard submitted', lambda x: sum(x == 'yes')),
     Total_Interviews=('Interview Score', 'count'),
     Department=('Department', 'first'),
     Recruiter=('Recruiter', 'first')
     ).reset_index()
-        def make_decision(row):
+    def make_decision(row):
     if row['Scorecards_Submitted'] < 4:
     return "🟡 Waiting for Interviews"
     elif row['Avg_Interview_Score'] <= 3.4:
@@ -126,20 +126,20 @@ elif page == "Scorecard Dashboard":
     elif row['Avg_Interview_Score'] >= 3.5:
     return "✅ HM Review"
     return "⚠️ Needs Discussion"
-        grouped['Decision'] = grouped.apply(make_decision, axis=1)
+    grouped['Decision'] = grouped.apply(make_decision, axis=1)
     grouped = grouped[
     (grouped['Recruiter'] == selected_recruiter) &
     (grouped['Department'].isin(selected_depts))
     ]
-        if toggle_status == "Complete Scorecards":
+    if toggle_status == "Complete Scorecards":
     grouped = grouped[grouped['Scorecards_Submitted'] == 4]
     elif toggle_status == "Pending Scorecards":
     grouped = grouped[grouped['Scorecards_Submitted'] < 4]
-        st.subheader(f"📋 Candidate Summary for {selected_recruiter}")
+    st.subheader(f"📋 Candidate Summary for {selected_recruiter}")
     st.markdown("Use this table to track where each candidate stands based on scorecard completion and average interview scores.")
     st.dataframe(grouped[['Candidate Name', 'Department', 'Avg_Interview_Score', 'Scorecards_Submitted', 'Decision']],
     use_container_width=True)
-        st.subheader("🧠 Candidate Details")
+    st.subheader("🧠 Candidate Details")
     for _, row in grouped.iterrows():
     with st.expander(f"{row['Candidate Name']} — {row['Decision']}"):
     st.markdown(f"**Department:** {row['Department']}")
