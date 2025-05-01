@@ -198,26 +198,6 @@ elif page == "📊 Department Analytics":
     time_saved_hours = total_candidates * 3  # 6 people x 30 mins = 3 hours per candidate
     st.metric(label=f"Estimated Time Saved in {selected_dept}", value=f"{time_saved_hours} hours")
 
-    with st.expander("📈 Show Demo: Success Metrics (Preview)"):
-        st.markdown("### 📊 Success Metrics Overview")
-
-        st.markdown("""
-        This section previews potential metrics to evaluate the effectiveness of removing candidate debriefs:
-
-        | Metric                         | Example Value        | Target      |
-        |--------------------------------|----------------------|-------------|
-        | Scorecard Completion Rate      | 92%                  | ≥ 90%       |
-        | Avg Time-to-Hire               | 7.2 days             | < 10 days   |
-        | % Resolved w/o Debrief         | 78%                  | > 70%       |
-        | Interview Load per Interviewer | 6.3 interviews       | Balanced    |
-        | Offer Acceptance Rate          | 84%                  | > 80%       |
-        """, unsafe_allow_html=True)
-    st.subheader("⏱️ Estimated Time Saved from Debrief Removal")
-    total_candidates = df["Candidate Name"].nunique()
-    time_saved_hours = total_candidates * 3  # 6 people x 30 mins = 3 hours per candidate
-    st.metric(label="Total Hours Saved", value=f"{time_saved_hours} hours")
-
-    st.subheader("👥 Internal Interviewer Stats")
     st.subheader("👥 Internal Interviewer Stats")
 
     # Filters
