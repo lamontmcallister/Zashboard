@@ -8,16 +8,6 @@ st.set_page_config(page_title="Recruiter Platform", layout="wide")
 
 st.title("📊 Candidate Selection Dashboard")
 
-st.markdown("""
-### 🧭 Overview: Streamlining Candidate Selection
-
-We aim to accelerate time-to-hire and reduce bottlenecks in the candidate selection process by eliminating the need for traditional debrief meetings. Instead, we rely on historical interview data to establish objective hiring benchmarks.
-
-Candidates falling below the benchmark are automatically rejected, while those exceeding it are routed for a targeted debrief between the recruiter and hiring manager.
-""")
-
-
-
 # --------- Google Sheets Setup ---------
 def load_google_sheet(sheet_url, worksheet_name):
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
@@ -242,14 +232,4 @@ elif page == "📊 Department Analytics":
     st.dataframe(styled_interviewers, use_container_width=True)
 
 
-with st.container():
-    col1, col2 = st.columns([1, 2])
-    with col1:
-        st.markdown("### 📌 Assumptions")
-        st.markdown("""
-        - Scorecard rubric uses a 5-point scale  
-        - Interviewers trained on best practices and scorecard execution  
-        - Communications have been distributed  
-        - Benchmarking is based on historical hiring data  
-        - Interview data is assumed to be complete and accurate  
-        """)
+
