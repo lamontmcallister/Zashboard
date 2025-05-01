@@ -33,7 +33,6 @@ df['Scorecard Complete'] = df['Scorecard submitted'] == 'yes'
 # --------- Streamlit Setup ---------
 
 st.markdown(
-    '''
 st.markdown("""
         body {
             background-color: #ffffff;
@@ -57,7 +56,6 @@ st.markdown("""
         }
     </style>
 """, unsafe_allow_html=True)
-    ''',
 
 # --------- Navigation ---------
 tab1, tab2, tab3, tab4 = st.tabs(["🔰 Landing Page", "Scorecard Dashboard", "📊 Department Analytics", "📈 Success Metrics Overview"])
