@@ -1,11 +1,36 @@
 import streamlit as st
+def inject_css():
+    st.markdown("""
+        <style>
+            html, body, [class*='css'] {
+                font-family: 'Inter', sans-serif;
+                font-size: 16px;
+            }
+            .stButton button {
+                border: 1px solid #1e90ff;
+                background-color: #ffffff;
+                color: #1e90ff;
+            }
+            th {
+                font-weight: bold;
+                background-color: #f0f8ff;
+            }
+            td {
+                text-align: center !important;
+            }
+            .dataframe {
+                border: 1px solid #ddd;
+                border-radius: 4px;
+            }
+        </style>
+        <link href='https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap' rel='stylesheet'>
+    """, unsafe_allow_html=True)
 import pandas as pd
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 st.set_page_config(page_title="Recruiter Platform", layout="wide")
-st.markdown("""
+inject_css()
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-<style>
     html, body, [class*="css"] {
         font-family: 'Inter', sans-serif;
         font-size: 16px;
@@ -31,10 +56,7 @@ st.markdown("""
         border-radius: 4px;
     }
 </style>
-""", unsafe_allow_html=True)
-st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-<style>
     html, body, [class*="css"] {
         font-family: 'Inter', sans-serif;
         font-size: 16px;
@@ -60,7 +82,32 @@ st.markdown("""
         border-radius: 4px;
     }
 </style>
-""", unsafe_allow_html=True)
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    html, body, [class*="css"] {
+        font-family: 'Inter', sans-serif;
+        font-size: 16px;
+    }
+    body {
+        background-color: #ffffff;
+        color: #1a1a1a;
+    }
+    .stButton button {
+        border: 1px solid #1e90ff;
+        background-color: #ffffff;
+        color: #1e90ff;
+    }
+    th {
+        font-weight: bold;
+        background-color: #f0f8ff;
+    }
+    td {
+        text-align: center !important;
+    }
+    .dataframe {
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+</style>
 # --------- Google Sheets Setup ---------
 def load_google_sheet(sheet_url, worksheet_name):
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
@@ -104,14 +151,12 @@ st.markdown(
         }
     </style>
     ''',
-    unsafe_allow_html=True
 )
 # --------- Navigation ---------
 tab1, tab2, tab3, tab4 = st.tabs(["🔰 Landing Page", "Scorecard Dashboard", "📊 Department Analytics", "📈 Success Metrics Overview"])
 # --------- Landing Page ---------
 with tab1:
         st.title("📊 Candidate Selection Dashboard")
-        st.markdown("""
     ### 🧭 Overview: Streamlining Candidate Selection
         We aim to accelerate time-to-hire and reduce bottlenecks in the candidate selection process by eliminating the need for traditional debrief meetings.
         Instead, we rely on historical interview data to establish objective hiring benchmarks.
@@ -119,13 +164,11 @@ with tab1:
         while those exceeding it are routed for a targeted debrief between the recruiter and hiring manager.
         """)
         st.subheader("✨ Why This Matters")
-        st.markdown("""
         - Ensure fair, consistent hiring decisions
         - Track scorecard submission and identify bottlenecks
         - Empower recruiters with structured decision support
         """)
         st.subheader("🧭 How to Use This Tool")
-        st.markdown("""
         1. Head to the **Recruiter Dashboard** tab
         2. Select a recruiter and optionally filter by department or scorecard status
         3. Review candidate decisions and send reminder nudges
@@ -136,7 +179,6 @@ with tab1:
             col1, _ = st.columns([1, 2])
             with col1:
                 st.markdown("### 📌 Assumptions")
-                st.markdown("""
                 - Scorecard rubric uses a 5-point scale
                 - Interviewers trained on best practices and scorecard execution
                 - Benchmarking is based on historical hiring data
@@ -249,7 +291,6 @@ Avg_Interview_Score": "{:.2f}
 with tab4:
         st.title("📈 Success Metrics Overview")
         st.markdown("### Previewing Metrics That Reflect Dashboard Impact")
-        st.markdown("""
         | Metric                         | Example Value        | Target      |
         |--------------------------------|----------------------|-------------|
         | Scorecard Completion Rate      | 92%                  | ≥ 90%       |
@@ -257,5 +298,4 @@ with tab4:
         | % Resolved w/o Debrief         | 78%                  | > 70%       |
         | Interview Load per Interviewer | 6.3 interviews       | Balanced    |
         | Offer Acceptance Rate          | 84%                  | > 80%       |
-        """, unsafe_allow_html=True)
         st.info("This is a demo view. You can bring these metrics to life as your data maturity grows.")
