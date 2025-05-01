@@ -34,7 +34,7 @@ df['Scorecard Complete'] = df['Scorecard submitted'] == 'yes'
 
 st.markdown(
     '''
-    <style>
+st.markdown("""
         body {
             background-color: #ffffff;
             color: #1a1a1a;
@@ -56,8 +56,8 @@ st.markdown(
             border-radius: 4px;
         }
     </style>
+""", unsafe_allow_html=True)
     ''',
-    unsafe_allow_html=True
 
 # --------- Navigation ---------
 tab1, tab2, tab3, tab4 = st.tabs(["🔰 Landing Page", "Scorecard Dashboard", "📊 Department Analytics", "📈 Success Metrics Overview"])
@@ -261,6 +261,5 @@ with tab4:
         | % Resolved w/o Debrief         | 78%                  | > 70%        |
         | Interview Load per Interviewer | 6.3 interviews       | Balanced     |
         | Offer Acceptance Rate          | 84%                  | > 80%        |
-        """, unsafe_allow_html=True)
 
         st.info("This is a demo view. You can bring these metrics to life as your data maturity grows.")
