@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
@@ -110,10 +109,10 @@ with tab2:
         st.caption("Filter by recruiter and department. View candidate scorecards and send reminders.")
 
         recruiters = sorted(df['Recruiter'].dropna().unique().tolist())
-        selected_recruiter = st.sidebar.selectbox("👤 Choose Recruiter", recruiters)
+    selected_recruiter = st.sidebar.selectbox("👤 Choose Recruiter", recruiters)
         departments = sorted(df['Department'].dropna().unique().tolist())
-        selected_depts = st.sidebar.multiselect("🏢 Filter by Department", departments, default=departments)
-        toggle_status = st.sidebar.radio("📋 Show Candidates With:", ["Complete Scorecards", "Pending Scorecards", "All"], index=0)
+    selected_depts = st.sidebar.multiselect("🏢 Filter by Department", departments, default=departments)
+    toggle_status = st.sidebar.radio("📋 Show Candidates With:", ["Complete Scorecards", "Pending Scorecards", "All"], index=0)
 
         grouped = df.groupby('Candidate Name').agg(
             Avg_Interview_Score=('Interview Score', 'mean'),
