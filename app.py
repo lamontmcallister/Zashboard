@@ -1,11 +1,8 @@
-
 import streamlit as st
 import pandas as pd
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
-
 st.set_page_config(page_title="Recruiter Platform", layout="wide")
-
 # --------- Google Sheets Setup ---------
 def load_google_sheet(sheet_url, worksheet_name):
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
@@ -16,88 +13,246 @@ def load_google_sheet(sheet_url, worksheet_name):
     worksheet = sheet.worksheet(worksheet_name)
     data = worksheet.get_all_records()
     return pd.DataFrame(data)
-
 # --------- Load Data ---------
 sheet_url = "https://docs.google.com/spreadsheets/d/1_hypJt1kwUNZE6Xck1VVjrPeYiIJpTDXSAwi4dgXXko"
 worksheet_name = "Mixed Raw Candidate Data"
 df = load_google_sheet(sheet_url, worksheet_name)
 departments = sorted(df['Department'].dropna().unique().tolist())
-
-
-# --------- Sidebar Filters Replaced with Inline Filter Bar ---------
-st.markdown("### 🔍 Filter Candidates")
-
-col1, col2, col3 = st.columns([1.5, 2, 2])
-
-# Recruiter filter
-recruiter_list = sorted(df['Recruiter'].dropna().unique().tolist()) if 'Recruiter' in df.columns else []
-default_recruiter = recruiter_list[0] if recruiter_list else None
-with col1:
-    recruiter_filter = st.selectbox("👤 Recruiter", recruiter_list, key="recruiter_filter")
-
-# Department filter as multi-select
-department_list = sorted(df['Department'].dropna().unique().tolist()) if 'Department' in df.columns else []
-with col2:
-    selected_departments = st.multiselect("🏢 Department", department_list, default=department_list)
-
-# Scorecard status radio
-with col3:
-    scorecard_status = st.radio("📋 Show Candidates With", ["Complete Scorecards", "Pending Scorecards", "All"], horizontal=True, key="scorecard_status")
-
-# Apply filters
-if recruiter_filter:
-    df = df[df["Recruiter"] == recruiter_filter]
-
-if selected_departments:
-    df = df[df["Department"].isin(selected_departments)]
-
-if scorecard_status == "Complete Scorecards":
-    df = df[df["Score"].notna()]
-elif scorecard_status == "Pending Scorecards":
-    df = df[df["Score"].isna()]
-
-# Optional reset button
-if st.button("🔄 Reset Filters"):
-    st.session_state.recruiter_filter = default_recruiter
-    st.session_state.scorecard_status = "All"
-
-    st.header("Filter Candidates")
-    selected_department = st.selectbox("Department", ["All"] + departments)
-
-# --------- Apply Filters ---------
-if selected_department != "All":
-    df = df[df["Department"] == selected_department]
-
-# --------- Display Metrics ---------
-st.title("Scorecard Dashboard")
-
-col1, col2, col3 = st.columns(3)
-col1.metric("Total Candidates", len(df))
-if "Score" in df.columns:
-    col2.metric("Avg Score", round(df["Score"].mean(), 1))
-    col3.metric("Missing Scores", df["Score"].isna().sum())
-else:
-    col2.write("Score column not found")
-    col3.write("Score column not found")
-
-# --------- Tabs for Views ---------
-tab1, tab2 = st.tabs(["Candidate Summary", "Scorecard Completion"])
-
+# --------- Prep ---------
+df['Interview Score'] = pd.to_numeric(df['Interview Score'], errors='coerce')
+df['Scorecard submitted'] = df['Scorecard submitted'].str.strip().str.lower()
+df['Scorecard Complete'] = df['Scorecard submitted'] == 'yes'
+# --------- Streamlit Setup ---------
+st.markdown(
+    '''
+    <style>
+        body {
+            background-color: #ffffff;
+            color: #1a1a1a;
+        }
+        .stButton button {
+            border: 1px solid #1e90ff;
+            background-color: #ffffff;
+            color: #1e90ff;
+        }
+        th {
+            font-weight: bold;
+            background-color: #f0f8ff;
+        }
+        td {
+            text-align: center !important;
+        }
+        .dataframe {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+    ''',
+    unsafe_allow_html=True
+)
+# --------- Navigation ---------
+tab1, tab2, tab3, tab4 = st.tabs(["🔰 Landing Page", "Scorecard Dashboard", "📊 Department Analytics", "📈 Success Metrics Overview"])
+# --------- Landing Page ---------
 with tab1:
-    st.subheader("Candidate Summary")
-    def color_missing(val):
-        return 'background-color: #ffcccc' if pd.isna(val) else ''
-    st.dataframe(df.style.applymap(color_missing, subset=["Score"] if "Score" in df.columns else None))
+        st.title("📊 Candidate Selection Dashboard")
+        st.markdown("""
+    ### 🧭 Overview: Streamlining Candidate Selection
+        We aim to accelerate time-to-hire and reduce bottlenecks in the candidate selection process by eliminating the need for traditional debrief meetings.
+        Instead, we rely on historical interview data to establish objective hiring benchmarks.
+        Candidates falling below the benchmark are automatically rejected,
+        while those exceeding it are routed for a targeted debrief between the recruiter and hiring manager.
+        """)
+        st.subheader("✨ Why This Matters")
+        st.markdown("""
+        - Ensure fair, consistent hiring decisions  
+        - Track scorecard submission and identify bottlenecks  
+        - Empower recruiters with structured decision support
+        """)
+        st.subheader("🧭 How to Use This Tool")
+        st.markdown("""
+        1. Head to the **Recruiter Dashboard** tab  
+        2. Select a recruiter and optionally filter by department or scorecard status  
+        3. Review candidate decisions and send reminder nudges  
+        4. Use **Department Analytics** to track overall submission and scoring health
+        """)
+        st.success("Tip: Click any candidate name in the dashboard to view interview details!")
+        with st.container():
+            col1, _ = st.columns([1, 2])
+            with col1:
+                st.markdown("### 📌 Assumptions")
+                st.markdown("""
+                - Scorecard rubric uses a 5-point scale  
+                - Interviewers trained on best practices and scorecard execution   
+                - Benchmarking is based on historical hiring data  
+                """)
 
 with tab2:
-    st.subheader("Scorecard Completion Rate by Department")
-    if "Score" in df.columns and "Department" in df.columns:
-        completion_df = df.groupby("Department")["Score"].apply(lambda x: x.notna().mean()).reset_index()
-        completion_df.columns = ["Department", "Completion Rate"]
-        completion_df["Completion Rate"] = (completion_df["Completion Rate"] * 100).round(1)
-        st.dataframe(completion_df.style.format({"Completion Rate": "{:.1f}%"}).applymap(
-            lambda x: "background-color: #d0f0c0" if isinstance(x, float) and x >= 90 else "background-color: #ffd6cc",
-            subset=["Completion Rate"]
-        ))
-    else:
-        st.warning("Missing required columns to display completion rates.")
+    st.title("🎯 Scorecard Dashboard")
+    st.caption("Filter by recruiter and department. View candidate scorecards and send reminders.")
+
+    col1, col2, col3 = st.columns([1.5, 2, 2])
+
+    recruiter_list = sorted(df['Recruiter'].dropna().unique().tolist()) if 'Recruiter' in df.columns else []
+    default_recruiter = recruiter_list[0] if recruiter_list else None
+    with col1:
+        selected_recruiter = st.selectbox("👤 Choose Recruiter", recruiter_list, key="recruiter_filter")
+
+    department_list = sorted(df['Department'].dropna().unique().tolist()) if 'Department' in df.columns else []
+    with col2:
+        selected_depts = st.multiselect("🏢 Filter by Department", department_list, default=department_list)
+
+    with col3:
+        toggle_status = st.radio("📋 Show Candidates With", ["Complete Scorecards", "Pending Scorecards", "All"], index=0, horizontal=True, key="scorecard_status")
+
+    # Apply filters
+    grouped = df.groupby('Candidate Name').agg(
+        Avg_Interview_Score=('Interview Score', 'mean'),
+        Scorecards_Submitted=('Scorecard submitted', lambda x: sum(x.str.lower() == 'yes')),
+        Total_Interviews=('Interview Score', 'count'),
+        Department=('Department', 'first'),
+        Recruiter=('Recruiter', 'first')
+    ).reset_index()
+
+    def make_decision(row):
+        if row['Scorecards_Submitted'] < 4:
+            return "🟡 Waiting for Interviews"
+        elif row['Avg_Interview_Score'] <= 3.4:
+            return "❌ Auto-Reject"
+        elif row['Avg_Interview_Score'] >= 3.5:
+            return "✅ HM Review"
+        return "⚠️ Needs Discussion"
+
+    grouped['Decision'] = grouped.apply(make_decision, axis=1)
+
+    grouped = grouped[
+        (grouped['Recruiter'] == selected_recruiter) &
+        (grouped['Department'].isin(selected_depts))
+    ]
+
+    if toggle_status == "Complete Scorecards":
+        grouped = grouped[grouped['Scorecards_Submitted'] == 4]
+    elif toggle_status == "Pending Scorecards":
+        grouped = grouped[grouped['Scorecards_Submitted'] < 4]
+
+    st.subheader(f"📋 Candidate Summary for {selected_recruiter}")
+    st.markdown("Use this table to track where each candidate stands based on scorecard completion and average interview scores.")
+    st.dataframe(grouped[['Candidate Name', 'Department', 'Avg_Interview_Score', 'Scorecards_Submitted', 'Decision']],
+                use_container_width=True)
+
+        st.title("🎯 Scorecard Dashboard")
+        st.caption("Filter by recruiter and department. View candidate scorecards and send reminders.")
+        recruiters = sorted(df['Recruiter'].dropna().unique().tolist())
+        col1, col2, col3 = st.columns([1, 1, 2])
+        with col1:
+            selected_recruiter = st.selectbox("👤 Choose Recruiter", recruiters)
+        with col2:
+            selected_depts = st.multiselect("🏢 Filter by Department", departments, default=departments)
+        with col3:
+            toggle_status = st.radio("📋 Show Candidates With", ["Complete Scorecards", "Pending Scorecards", "All"], index=0)
+        grouped = df.groupby('Candidate Name').agg(
+            Avg_Interview_Score=('Interview Score', 'mean'),
+            Scorecards_Submitted=('Scorecard submitted', lambda x: sum(x == 'yes')),
+            Total_Interviews=('Interview Score', 'count'),
+            Department=('Department', 'first'),
+            Recruiter=('Recruiter', 'first')
+        ).reset_index()
+        def make_decision(row):
+            if row['Scorecards_Submitted'] < 4:
+                return "🟡 Waiting for Interviews"
+            elif row['Avg_Interview_Score'] <= 3.4:
+                return "❌ Auto-Reject"
+            elif row['Avg_Interview_Score'] >= 3.5:
+                return "✅ HM Review"
+            return "⚠️ Needs Discussion"
+        grouped['Decision'] = grouped.apply(make_decision, axis=1)
+        grouped = grouped[
+            (grouped['Recruiter'] == selected_recruiter) &
+            (grouped['Department'].isin(selected_depts))
+        ]
+        if toggle_status == "Complete Scorecards":
+            grouped = grouped[grouped['Scorecards_Submitted'] == 4]
+        elif toggle_status == "Pending Scorecards":
+            grouped = grouped[grouped['Scorecards_Submitted'] < 4]
+        st.subheader(f"📋 Candidate Summary for {selected_recruiter}")
+        st.markdown("Use this table to track where each candidate stands based on scorecard completion and average interview scores.")
+        st.dataframe(grouped[['Candidate Name', 'Department', 'Avg_Interview_Score', 'Scorecards_Submitted', 'Decision']],
+                    use_container_width=True)
+        st.subheader("🧠 Candidate Details")
+        for _, row in grouped.iterrows():
+            with st.expander(f"{row['Candidate Name']} — {row['Decision']}"):
+                st.markdown(f"**Department:** {row['Department']}")
+                st.markdown(f"**Scorecards Submitted:** {row['Scorecards_Submitted']} / 4")
+                st.markdown("---")
+                st.markdown("### Interviewer Scores")
+                candidate_rows = df[df['Candidate Name'] == row['Candidate Name']]
+                for _, r in candidate_rows.iterrows():
+                    score = r['Interview Score']
+                    status = r['Scorecard submitted']
+                    line = f"- **{r['Internal Interviewer']}** ({r['Interview']})"
+                    if status == 'yes':
+                        st.markdown(f"{line}: ✅ {score}")
+                        st.markdown(f"{line}: ❌ Not Submitted")
+                        st.button(f"📩 Send Reminder to {r['Internal Interviewer']}", key=f"{r['Candidate Name']}-{r['Internal Interviewer']}")
+# --------- Department Analytics ---------
+with tab3:
+        st.title("📊 Department Scorecard Analytics")
+        st.caption("This view shows how well departments and interviewers are keeping up with scorecard submissions.")
+        dept_summary = df.groupby('Department').agg(
+            Total_Interviews=('Interview Score', 'count'),
+            Completed=('Scorecard Complete', 'sum'),
+            Avg_Score=('Interview Score', 'mean')
+        ).reset_index()
+        dept_summary['Completion Rate (%)'] = round(100 * dept_summary['Completed'] / dept_summary['Total_Interviews'], 1)
+        def highlight_completion(val):
+            color = 'green' if val >= 90 else 'red'
+            return f'color: {color}; font-weight: bold'
+        styled_dept = dept_summary.style.format({
+            'Avg_Score': '{:.2f}',
+            'Completion Rate (%)': '{:.1f}%'
+        }).applymap(highlight_completion, subset=['Completion Rate (%)'])       .set_properties(**{'text-align': 'center'})       .set_table_styles([
+            {'selector': 'th', 'props': [('font-weight', 'bold'), ('background-color', '#f0f8ff')]}
+        ])
+        st.subheader("✅ Scorecard Submission Rate by Department")
+        st.dataframe(styled_dept, use_container_width=True)
+        st.subheader("⏱️ Estimated Time Saved from Debrief Removal")
+        dept_choices = df["Department"].dropna().unique().tolist()
+        selected_dept = st.selectbox("Select Department", sorted(dept_choices))
+        dept_df = df[df["Department"] == selected_dept]
+        total_candidates = dept_df["Candidate Name"].nunique()
+        time_saved_hours = total_candidates * 3  # 6 people x 30 mins = 3 hours per candidate
+        st.metric(label=f"Estimated Time Saved in {selected_dept}", value=f"{time_saved_hours} hours")
+        st.subheader("👥 Internal Interviewer Stats")
+    # Filters
+        dept_options = df["Department"].dropna().unique().tolist()
+        selected_depts = st.multiselect("Filter by Department", dept_options, default=dept_options)
+        name_query = st.text_input("Search by Interviewer Name").strip().lower()
+    # Filtered internal interviewers only
+        interviewer_df = df[df["Internal Interviewer"].notna()]
+        interviewer_df = interviewer_df[interviewer_df["Department"].isin(selected_depts)]
+        if name_query:
+            interviewer_df = interviewer_df[interviewer_df["Internal Interviewer"].str.lower().str.contains(name_query)]
+    # Summary by interviewer
+        interviewer_summary = interviewer_df.groupby("Internal Interviewer").agg(
+            Interviews_Conducted=("Interview", "count"),
+            Scorecards_Submitted=("Scorecard Complete", "sum"),
+            Avg_Interview_Score=("Interview Score", "mean")
+        ).reset_index()
+        styled_interviewers = interviewer_summary.style.format({
+            "Avg_Interview_Score": "{:.2f}"
+        }).set_properties(**{"text-align": "center"}).set_table_styles([
+            {"selector": "th", "props": [("font-weight", "bold"), ("background-color", "#f0f8ff")]}
+        ])
+        st.dataframe(styled_interviewers, use_container_width=True)
+with tab4:
+        st.title("📈 Success Metrics Overview")
+        st.markdown("### Previewing Metrics That Reflect Dashboard Impact")
+        st.markdown("""
+        | Metric                         | Example Value        | Target      |
+        |--------------------------------|----------------------|-------------|
+        | Scorecard Completion Rate      | 92%                  | ≥ 90%       |
+        | Avg Time-to-Hire               | 7.2 days             | < 10 days   |
+        | % Resolved w/o Debrief         | 78%                  | > 70%       |
+        | Interview Load per Interviewer | 6.3 interviews       | Balanced    |
+        | Offer Acceptance Rate          | 84%                  | > 80%       |
+        """, unsafe_allow_html=True)
+        st.info("This is a demo view. You can bring these metrics to life as your data maturity grows.")
