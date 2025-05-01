@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 st.set_page_config(page_title="Recruiter Platform", layout="wide")
@@ -86,60 +85,7 @@ with tab1:
                 - Interviewers trained on best practices and scorecard execution   
                 - Benchmarking is based on historical hiring data  
                 """)
-
 with tab2:
-    st.title("🎯 Scorecard Dashboard")
-    st.caption("Filter by recruiter and department. View candidate scorecards and send reminders.")
-
-    col1, col2, col3 = st.columns([1.5, 2, 2])
-
-    recruiter_list = sorted(df['Recruiter'].dropna().unique().tolist()) if 'Recruiter' in df.columns else []
-    default_recruiter = recruiter_list[0] if recruiter_list else None
-    with col1:
-        selected_recruiter = st.selectbox("👤 Choose Recruiter", recruiter_list, key="recruiter_filter")
-
-    department_list = sorted(df['Department'].dropna().unique().tolist()) if 'Department' in df.columns else []
-    with col2:
-        selected_depts = st.multiselect("🏢 Filter by Department", department_list, default=department_list)
-
-    with col3:
-        toggle_status = st.radio("📋 Show Candidates With", ["Complete Scorecards", "Pending Scorecards", "All"], index=0, horizontal=True, key="scorecard_status")
-
-    # Apply filters
-    grouped = df.groupby('Candidate Name').agg(
-        Avg_Interview_Score=('Interview Score', 'mean'),
-        Scorecards_Submitted=('Scorecard submitted', lambda x: sum(x.str.lower() == 'yes')),
-        Total_Interviews=('Interview Score', 'count'),
-        Department=('Department', 'first'),
-        Recruiter=('Recruiter', 'first')
-    ).reset_index()
-
-    def make_decision(row):
-        if row['Scorecards_Submitted'] < 4:
-            return "🟡 Waiting for Interviews"
-        elif row['Avg_Interview_Score'] <= 3.4:
-            return "❌ Auto-Reject"
-        elif row['Avg_Interview_Score'] >= 3.5:
-            return "✅ HM Review"
-        return "⚠️ Needs Discussion"
-
-    grouped['Decision'] = grouped.apply(make_decision, axis=1)
-
-    grouped = grouped[
-        (grouped['Recruiter'] == selected_recruiter) &
-        (grouped['Department'].isin(selected_depts))
-    ]
-
-    if toggle_status == "Complete Scorecards":
-        grouped = grouped[grouped['Scorecards_Submitted'] == 4]
-    elif toggle_status == "Pending Scorecards":
-        grouped = grouped[grouped['Scorecards_Submitted'] < 4]
-
-    st.subheader(f"📋 Candidate Summary for {selected_recruiter}")
-    st.markdown("Use this table to track where each candidate stands based on scorecard completion and average interview scores.")
-    st.dataframe(grouped[['Candidate Name', 'Department', 'Avg_Interview_Score', 'Scorecards_Submitted', 'Decision']],
-                use_container_width=True)
-
         st.title("🎯 Scorecard Dashboard")
         st.caption("Filter by recruiter and department. View candidate scorecards and send reminders.")
         recruiters = sorted(df['Recruiter'].dropna().unique().tolist())
