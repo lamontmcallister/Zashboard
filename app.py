@@ -232,9 +232,6 @@ interviewer_summary['Completion Rate (%)'] = round(
     100 * interviewer_summary['Scorecards_Submitted'] / interviewer_summary['Interviews_Conducted'], 1
 )
 
-interviewer_summary['Completion Rate (%)'] = round(
-    100 * interviewer_summary['Scorecards_Submitted'] / interviewer_summary['Interviews_Conducted'], 1
-)
         Interviews_Conducted=('Interview', 'count'),
         Scorecards_Submitted=('Scorecard Complete', 'sum'),
         Avg_Interview_Score=('Interview Score', 'mean')
