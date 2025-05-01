@@ -6,75 +6,74 @@ from oauth2client.service_account import ServiceAccountCredentials
 st.set_page_config(page_title="Recruiter Platform", layout="wide")
 
 
-if selected == 'Landing Page':
-    st.title("📊 Candidate Selection Dashboard")
+st.title("📊 Candidate Selection Dashboard")
 
-    st.markdown("""
-    ### 🧭 Overview: Streamlining Candidate Selection
+st.markdown("""
+### 🧭 Overview: Streamlining Candidate Selection
 
-    We aim to accelerate time-to-hire and reduce bottlenecks in the candidate selection process by eliminating the need for traditional debrief meetings. Instead, we rely on historical interview data to establish objective hiring benchmarks.
+We aim to accelerate time-to-hire and reduce bottlenecks in the candidate selection process by eliminating the need for traditional debrief meetings. Instead, we rely on historical interview data to establish objective hiring benchmarks.
 
-    Candidates falling below the benchmark are automatically rejected, while those exceeding it are routed for a targeted debrief between the recruiter and hiring manager.
-    """)
-
+Candidates falling below the benchmark are automatically rejected, while those exceeding it are routed for a targeted debrief between the recruiter and hiring manager.
+""")
 
 
-    # --------- Google Sheets Setup ---------
-    def load_google_sheet(sheet_url, worksheet_name):
-        scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-        creds_dict = st.secrets["google"]
-        creds = ServiceAccountCredentials.from_json_keyfile_dict(dict(creds_dict), scope)
-        client = gspread.authorize(creds)
-        sheet = client.open_by_url(sheet_url)
-        worksheet = sheet.worksheet(worksheet_name)
-        data = worksheet.get_all_records()
-        return pd.DataFrame(data)
 
-    # --------- Load Data ---------
-    sheet_url = "https://docs.google.com/spreadsheets/d/1_hypJt1kwUNZE6Xck1VVjrPeYiIJpTDXSAwi4dgXXko"
-    worksheet_name = "Mixed Raw Candidate Data"
-    df = load_google_sheet(sheet_url, worksheet_name)
+# --------- Google Sheets Setup ---------
+def load_google_sheet(sheet_url, worksheet_name):
+    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+    creds_dict = st.secrets["google"]
+    creds = ServiceAccountCredentials.from_json_keyfile_dict(dict(creds_dict), scope)
+    client = gspread.authorize(creds)
+    sheet = client.open_by_url(sheet_url)
+    worksheet = sheet.worksheet(worksheet_name)
+    data = worksheet.get_all_records()
+    return pd.DataFrame(data)
 
-    # --------- Prep ---------
-    df['Interview Score'] = pd.to_numeric(df['Interview Score'], errors='coerce')
-    df['Scorecard submitted'] = df['Scorecard submitted'].str.strip().str.lower()
-    df['Scorecard Complete'] = df['Scorecard submitted'] == 'yes'
+# --------- Load Data ---------
+sheet_url = "https://docs.google.com/spreadsheets/d/1_hypJt1kwUNZE6Xck1VVjrPeYiIJpTDXSAwi4dgXXko"
+worksheet_name = "Mixed Raw Candidate Data"
+df = load_google_sheet(sheet_url, worksheet_name)
 
-    # --------- Streamlit Setup ---------
+# --------- Prep ---------
+df['Interview Score'] = pd.to_numeric(df['Interview Score'], errors='coerce')
+df['Scorecard submitted'] = df['Scorecard submitted'].str.strip().str.lower()
+df['Scorecard Complete'] = df['Scorecard submitted'] == 'yes'
 
-    st.markdown(
-        '''
-        <style>
-            body {
-                background-color: #ffffff;
-                color: #1a1a1a;
-            }
-            .stButton button {
-                border: 1px solid #1e90ff;
-                background-color: #ffffff;
-                color: #1e90ff;
-            }
-            th {
-                font-weight: bold;
-                background-color: #f0f8ff;
-            }
-            td {
-                text-align: center !important;
-            }
-            .dataframe {
-                border: 1px solid #ddd;
-                border-radius: 4px;
-            }
-        </style>
-        ''',
-        unsafe_allow_html=True
-    )
+# --------- Streamlit Setup ---------
 
-    # --------- Navigation ---------
-    page = st.sidebar.selectbox("🔍 Navigate", ["🔰 Landing Page", "Scorecard Dashboard", "📊 Department Analytics"])
+st.markdown(
+    '''
+    <style>
+        body {
+            background-color: #ffffff;
+            color: #1a1a1a;
+        }
+        .stButton button {
+            border: 1px solid #1e90ff;
+            background-color: #ffffff;
+            color: #1e90ff;
+        }
+        th {
+            font-weight: bold;
+            background-color: #f0f8ff;
+        }
+        td {
+            text-align: center !important;
+        }
+        .dataframe {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+    ''',
+    unsafe_allow_html=True
+)
 
-    # --------- Landing Page ---------
-    if page == "🔰 Landing Page":
+# --------- Navigation ---------
+page = st.sidebar.selectbox("🔍 Navigate", ["🔰 Landing Page", "Scorecard Dashboard", "📊 Department Analytics"])
+
+# --------- Landing Page ---------
+if page == "🔰 Landing Page":
 
 
     st.subheader("✨ Why This Matters")
@@ -241,3 +240,16 @@ elif page == "📊 Department Analytics":
       ])
 
     st.dataframe(styled_interviewers, use_container_width=True)
+
+
+with st.container():
+    col1, col2 = st.columns([1, 2])
+    with col1:
+        st.markdown("### 📌 Assumptions")
+        st.markdown("""
+        - Scorecard rubric uses a 5-point scale  
+        - Interviewers trained on best practices and scorecard execution  
+        - Communications have been distributed  
+        - Benchmarking is based on historical hiring data  
+        - Interview data is assumed to be complete and accurate  
+        """)
