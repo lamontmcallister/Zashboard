@@ -99,8 +99,7 @@ with tab1:
                 st.markdown("### 📌 Assumptions")
                 st.markdown("""
                 - Scorecard rubric uses a 5-point scale  
-                - Interviewers trained on best practices and scorecard execution  
-                - Communications have been distributed  
+                - Interviewers trained on best practices and scorecard execution   
                 - Benchmarking is based on historical hiring data  
                 - Interview data is assumed to be complete and accurate  
                 """)
