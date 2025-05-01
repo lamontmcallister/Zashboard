@@ -227,6 +227,10 @@ elif page == "📊 Department Analytics":
       ])
 
     
+submission_rate_df['Completion Rate'] = (
+    (submission_rate_df['Scorecards_Submitted'] / submission_rate_df['Scorecards_Assigned']) * 100
+).round().astype(int).astype(str) + '%'
+
 for _, row in submission_rate_df.iterrows():
     rate = int(row['Completion Rate'].strip('%'))
     if rate < 50:
