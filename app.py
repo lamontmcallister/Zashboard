@@ -115,6 +115,7 @@ elif page == "Scorecard Dashboard":
     grouped = grouped[
         (grouped['Recruiter'] == selected_recruiter) &
         (grouped['Department'].isin(selected_depts))
+    ]
 
     if toggle_status == "Complete Scorecards":
         grouped = grouped[grouped['Scorecards_Submitted'] == 4]
@@ -194,6 +195,7 @@ elif page == "📊 Department Analytics":
 
     internal_df = pd.merge(internal_df, submission_rate_df[['Internal Interviewer', '% Scorecards Submitted']], on='Internal Interviewer', how='left')
 
+    submission_rate_df = internal_df.groupby('Internal Interviewer').agg(
         total_assigned=('Submitted', 'count'),
         submitted=('Submitted', 'sum')
     ).reset_index()
@@ -202,6 +204,7 @@ elif page == "📊 Department Analytics":
     internal_df = pd.merge(internal_df, submission_rate_df[['Internal Interviewer', '% Scorecards Submitted']], on='Internal Interviewer', how='left')
 
 
+    submission_rate_df = internal_df.groupby('Internal Interviewer').agg(
         total_assigned=('Submitted', 'count'),
         submitted=('Submitted', 'sum')
     ).reset_index()
