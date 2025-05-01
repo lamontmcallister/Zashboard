@@ -24,7 +24,7 @@ df['Scorecard submitted'] = df['Scorecard submitted'].str.strip().str.lower()
 df['Scorecard Complete'] = df['Scorecard submitted'] == 'yes'
 # --------- Streamlit Setup ---------
 st.markdown(
-    '''
+'
     <style>
         body {
             background-color: #ffffff;
@@ -162,7 +162,7 @@ with tab3:
             return f'color: {color}; font-weight: bold'
         styled_dept = dept_summary.style.format({
             'Avg_Score': '{:.2f}',
-            'Completion Rate (%)': '{:.1f}%'
+Completion Rate (%)': '{:.1f}%
         }).applymap(highlight_completion, subset=['Completion Rate (%)'])       .set_properties(**{'text-align': 'center'})       .set_table_styles([
             {'selector': 'th', 'props': [('font-weight', 'bold'), ('background-color', '#f0f8ff')]}
         ])
@@ -190,7 +190,7 @@ with tab3:
             Avg_Interview_Score=("Interview Score", "mean")
         ).reset_index()
         styled_interviewers = interviewer_summary.style.format({
-            "Avg_Interview_Score": "{:.2f}"
+Avg_Interview_Score": "{:.2f}
         }).set_properties(**{"text-align": "center"}).set_table_styles([
             {"selector": "th", "props": [("font-weight", "bold"), ("background-color", "#f0f8ff")]}
         ])
