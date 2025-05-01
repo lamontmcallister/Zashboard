@@ -88,8 +88,6 @@ with tab2:
         st.title("🎯 Scorecard Dashboard")
         st.caption("Filter by recruiter and department. View candidate scorecards and send reminders.")
         recruiters = sorted(df['Recruiter'].dropna().unique().tolist())
-    recruiters = sorted(df["Recruiter"].dropna().unique().tolist())
-    departments = sorted(df["Department"].dropna().unique().tolist())
         col1, col2, col3 = st.columns([1, 1, 2])
         with col1:
             selected_recruiter = st.selectbox("👤 Choose Recruiter", recruiters)
