@@ -58,7 +58,6 @@ st.markdown(
     </style>
     ''',
     unsafe_allow_html=True
-)
 
 # --------- Navigation ---------
 tab1, tab2, tab3, tab4 = st.tabs(["🔰 Landing Page", "Scorecard Dashboard", "📊 Department Analytics", "📈 Success Metrics Overview"])
