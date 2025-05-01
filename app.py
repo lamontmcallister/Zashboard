@@ -6,6 +6,17 @@ from oauth2client.service_account import ServiceAccountCredentials
 st.set_page_config(page_title="Recruiter Platform", layout="wide")
 
 
+st.title("📊 Candidate Selection Dashboard")
+
+st.markdown("""
+### 🧭 Overview: Streamlining Candidate Selection
+
+We aim to accelerate time-to-hire and reduce bottlenecks in the candidate selection process by eliminating the need for traditional debrief meetings. Instead, we rely on historical interview data to establish objective hiring benchmarks.
+
+Candidates falling below the benchmark are automatically rejected, while those exceeding it are routed for a targeted debrief between the recruiter and hiring manager.
+""")
+
+
 
 # --------- Google Sheets Setup ---------
 def load_google_sheet(sheet_url, worksheet_name):
@@ -64,47 +75,25 @@ page = st.sidebar.selectbox("🔍 Navigate", ["🔰 Landing Page", "Scorecard Da
 # --------- Landing Page ---------
 if page == "🔰 Landing Page":
 
-st.title("📊 Candidate Selection Dashboard")
-
-st.markdown("""
-### 🧭 Overview: Streamlining Candidate Selection
-
-We aim to accelerate time-to-hire and reduce bottlenecks in the candidate selection process by eliminating the need for traditional debrief meetings. Instead, we rely on historical interview data to establish objective hiring benchmarks.
-
-Candidates falling below the benchmark are automatically rejected, while those exceeding it are routed for a targeted debrief between the recruiter and hiring manager.
-""")
 
     st.subheader("✨ Why This Matters")
     st.markdown("""
-- Ensure fair, consistent hiring decisions  
-- Track scorecard submission and identify bottlenecks  
-- Empower recruiters with structured decision support
-""")
+    - Ensure fair, consistent hiring decisions  
+    - Track scorecard submission and identify bottlenecks  
+    - Empower recruiters with structured decision support
+    """)
 
     st.subheader("🧭 How to Use This Tool")
     st.markdown("""
-1. Head to the **Recruiter Dashboard** tab  
-2. Select a recruiter and optionally filter by department or scorecard status  
-3. Review candidate decisions and send reminder nudges  
-4. Use **Department Analytics** to track overall submission and scoring health
-""")
+    1. Head to the **Recruiter Dashboard** tab  
+    2. Select a recruiter and optionally filter by department or scorecard status  
+    3. Review candidate decisions and send reminder nudges  
+    4. Use **Department Analytics** to track overall submission and scoring health
+    """)
 
     st.success("Tip: Click any candidate name in the dashboard to view interview details!")
 
-    with st.container():
-    col1, col2 = st.columns([1, 2])
-    with col1:
-        st.markdown("### 📌 Assumptions")
-        st.markdown("""
-        - Scorecard rubric uses a 5-point scale  
-        - Interviewers trained on best practices and scorecard execution  
-        - Communications have been distributed  
-        - Benchmarking is based on historical hiring data  
-        - Interview data is assumed to be complete and accurate  
-        """)
-
-
-# Remaining pages not included for brevity (Recruiter Dashboard, Analytics)...
+    # Remaining pages not included for brevity (Recruiter Dashboard, Analytics)...
 
 
 # --------- Recruiter Dashboard ---------
@@ -251,5 +240,3 @@ elif page == "📊 Department Analytics":
       ])
 
     st.dataframe(styled_interviewers, use_container_width=True)
-
-
