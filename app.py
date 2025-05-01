@@ -59,7 +59,33 @@ if page == "🎯 Scorecard Dashboard":
         grouped = grouped[grouped['Scorecards_Submitted'] < 4]
 
     st.subheader(f"📋 Candidate Summary for {selected_recruiter}")
-    st.dataframe(grouped[['Candidate Name', 'Department', 'Avg_Interview_Score', 'Scorecards_Submitted', 'Decision']], use_container_width=True)
+    
+    # --- Enhancements Start ---
+    grouped['Completion Rate (%)'] = round(100 * grouped['Scorecards_Submitted'] / grouped['Total_Interviews'], 1)
+
+    # Search bar to filter candidates by name
+    search_query = st.text_input("🔍 Search Candidate Name")
+    if search_query:
+        grouped = grouped[grouped['Candidate Name'].str.contains(search_query, case=False, na=False)]
+
+    # Display enhanced dataframe
+    styled_grouped = grouped.style.format({
+        'Avg_Interview_Score': '{:.2f}',
+        'Completion Rate (%)': '{:.1f}%'
+    }).applymap(
+        lambda val: 'color: green; font-weight: bold' if isinstance(val, (int, float)) and val >= 90 else 'color: red;',
+        subset=['Completion Rate (%)']
+    ).set_properties(**{'text-align': 'center'}).set_table_styles([
+        {'selector': 'th', 'props': [('font-weight', 'bold'), ('background-color', '#f0f8ff')]}
+    ])
+
+    st.dataframe(styled_grouped[['Candidate Name', 'Department', 'Avg_Interview_Score', 'Scorecards_Submitted', 'Completion Rate (%)', 'Decision']], use_container_width=True)
+
+    # CSV Export
+    csv = grouped.to_csv(index=False).encode('utf-8')
+    st.download_button("📥 Download as CSV", data=csv, file_name="candidate_summary.csv", mime="text/csv")
+    # --- Enhancements End ---
+
 
     st.subheader("🧠 Candidate Details")
     for i, row in grouped.iterrows():
@@ -200,7 +226,33 @@ if page == "🎯 Scorecard Dashboard":
         grouped = grouped[grouped['Scorecards_Submitted'] < 4]
 
     st.subheader(f"📋 Candidate Summary for {selected_recruiter}")
-    st.dataframe(grouped[['Candidate Name', 'Department', 'Avg_Interview_Score', 'Scorecards_Submitted', 'Decision']], use_container_width=True)
+    
+    # --- Enhancements Start ---
+    grouped['Completion Rate (%)'] = round(100 * grouped['Scorecards_Submitted'] / grouped['Total_Interviews'], 1)
+
+    # Search bar to filter candidates by name
+    search_query = st.text_input("🔍 Search Candidate Name")
+    if search_query:
+        grouped = grouped[grouped['Candidate Name'].str.contains(search_query, case=False, na=False)]
+
+    # Display enhanced dataframe
+    styled_grouped = grouped.style.format({
+        'Avg_Interview_Score': '{:.2f}',
+        'Completion Rate (%)': '{:.1f}%'
+    }).applymap(
+        lambda val: 'color: green; font-weight: bold' if isinstance(val, (int, float)) and val >= 90 else 'color: red;',
+        subset=['Completion Rate (%)']
+    ).set_properties(**{'text-align': 'center'}).set_table_styles([
+        {'selector': 'th', 'props': [('font-weight', 'bold'), ('background-color', '#f0f8ff')]}
+    ])
+
+    st.dataframe(styled_grouped[['Candidate Name', 'Department', 'Avg_Interview_Score', 'Scorecards_Submitted', 'Completion Rate (%)', 'Decision']], use_container_width=True)
+
+    # CSV Export
+    csv = grouped.to_csv(index=False).encode('utf-8')
+    st.download_button("📥 Download as CSV", data=csv, file_name="candidate_summary.csv", mime="text/csv")
+    # --- Enhancements End ---
+
 
     st.subheader("🧠 Candidate Details")
     for i, row in grouped.iterrows():
