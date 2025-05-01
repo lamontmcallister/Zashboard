@@ -172,6 +172,21 @@ elif page == "📊 Department Analytics":
     st.dataframe(styled_dept, use_container_width=True)
 
     st.subheader("👥 Internal Interviewer Stats")
+    # --- Internal Interviewer Submission Stats ---
+    df['Submitted'] = df['Scorecard submitted'].str.lower() == 'yes'
+    internal_df = df[df['Internal Interviewer'].notna()]
+
+    submission_stats = internal_df.groupby('Internal Interviewer').agg(
+        total_assigned=('Submitted', 'count'),
+        submitted=('Submitted', 'sum')
+    ).reset_index()
+
+    submission_stats['submission_rate'] = (submission_stats['submitted'] / submission_stats['total_assigned']) * 100
+    submission_stats = submission_stats.sort_values(by='submission_rate', ascending=True)
+
+    st.markdown("### 📊 Interviewer Submission Rates")
+    st.dataframe(submission_stats)
+
     # --- Filters for Internal Interviewer Stats ---
     dept_options = df['Department'].dropna().unique().tolist()
     selected_depts = st.multiselect("Filter by Department", dept_options, default=dept_options)
