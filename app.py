@@ -65,25 +65,32 @@ tab1, tab2, tab3, tab4 = st.tabs(["🔰 Landing Page", "Scorecard Dashboard", "�
 
 # --------- Landing Page ---------
 with tab1:
-        st.title("📊 Candidate Selection Dashboard")
+    with st.container():
+        st.title('📊 Candidate Selection Dashboard')
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown('### 🧭 Overview: Streamlining Candidate Selection')
+            st.markdown('''We aim to accelerate time-to-hire and reduce bottlenecks in the candidate selection process by eliminating the need for traditional debrief meetings. Instead, we rely on historical interview data to establish objective hiring benchmarks.''')
+        with col2:
+            st.markdown('### ✨ Why This Matters')
+            st.markdown('''- Ensure fair, consistent hiring decisions  
+- Track scorecard submission and identify bottlenecks  
+- Empower recruiters with structured decision support''')
+        st.markdown('### 🧭 How to Use This Tool')
+        st.markdown('''1. Head to the **Scorecard Dashboard** tab  
+2. Select a recruiter and optionally filter by department or score''')
 
-        st.markdown("""
-    ### 🧭 Overview: Streamlining Candidate Selection
 
         We aim to accelerate time-to-hire and reduce bottlenecks in the candidate selection process by eliminating the need for traditional debrief meetings. Instead, we rely on historical interview data to establish objective hiring benchmarks.
 
         Candidates falling below the benchmark are automatically rejected, while those exceeding it are routed for a targeted debrief between the recruiter and hiring manager.
         """)
 
-        st.subheader("✨ Why This Matters")
-        st.markdown("""
         - Ensure fair, consistent hiring decisions  
         - Track scorecard submission and identify bottlenecks  
         - Empower recruiters with structured decision support
         """)
 
-        st.subheader("🧭 How to Use This Tool")
-        st.markdown("""
         1. Head to the **Recruiter Dashboard** tab  
         2. Select a recruiter and optionally filter by department or scorecard status  
         3. Review candidate decisions and send reminder nudges  
@@ -95,8 +102,6 @@ with tab1:
         with st.container():
             col1, _ = st.columns([1, 2])
             with col1:
-                st.markdown("### 📌 Assumptions")
-                st.markdown("""
                 - Scorecard rubric uses a 5-point scale  
                 - Interviewers trained on best practices and scorecard execution  
                 - Communications have been distributed  
@@ -105,6 +110,11 @@ with tab1:
                 """)
 
 with tab2:
+    recruiter_filter = st.sidebar.selectbox('Filter by Recruiter:', options=['All'] + sorted(df['Recruiter'].dropna().unique().tolist()))
+    if recruiter_filter != 'All':
+        filtered_df = df[df['Recruiter'] == recruiter_filter]
+    else:
+        filtered_df = df
         st.title("🎯 Scorecard Dashboard")
         st.caption("Filter by recruiter and department. View candidate scorecards and send reminders.")
 
