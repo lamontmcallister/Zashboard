@@ -91,11 +91,18 @@ with tab2:
         recruiters = sorted(df['Recruiter'].dropna().unique().tolist())
         col1, col2, col3 = st.columns([1, 1, 2])
         with col1:
-            selected_recruiter = st.selectbox("👤 Choose Recruiter", recruiters)
+        with st.container():
+            st.subheader("🎛️ Filters")
+            col1, col2, col3 = st.columns([1, 1, 1])
+            with col1:
+                selected_recruiter = st.selectbox("👤 Choose Recruiter", recruiters)
+            with col2:
+                selected_depts = st.multiselect("🏢 Filter by Department", departments, default=departments)
+            with col3:
+                toggle_status = st.radio("📋 Show Candidates With", ["Complete Scorecards", "Pending Scorecards", "All"], index=0)
+            st.divider()
         with col2:
-            selected_depts = st.multiselect("🏢 Filter by Department", departments, default=departments)
         with col3:
-            toggle_status = st.radio("📋 Show Candidates With", ["Complete Scorecards", "Pending Scorecards", "All"], index=0)
         grouped = df.groupby('Candidate Name').agg(
             Avg_Interview_Score=('Interview Score', 'mean'),
             Scorecards_Submitted=('Scorecard submitted', lambda x: sum(x == 'yes')),
@@ -163,7 +170,6 @@ with tab3:
         st.dataframe(styled_dept, use_container_width=True)
         st.subheader("⏱️ Estimated Time Saved from Debrief Removal")
         dept_choices = df["Department"].dropna().unique().tolist()
-        selected_dept = st.selectbox("Select Department", sorted(dept_choices))
         dept_df = df[df["Department"] == selected_dept]
         total_candidates = dept_df["Candidate Name"].nunique()
         time_saved_hours = total_candidates * 3  # 6 people x 30 mins = 3 hours per candidate
@@ -171,7 +177,6 @@ with tab3:
         st.subheader("👥 Internal Interviewer Stats")
     # Filters
         dept_options = df["Department"].dropna().unique().tolist()
-        selected_depts = st.multiselect("Filter by Department", dept_options, default=dept_options)
         name_query = st.text_input("Search by Interviewer Name").strip().lower()
     # Filtered internal interviewers only
         interviewer_df = df[df["Internal Interviewer"].notna()]
