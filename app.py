@@ -188,7 +188,8 @@ elif page == "📊 Department Analytics":
         internal_df = internal_df[internal_df['Internal Interviewer'].str.lower().str.contains(name_query)]
 
     submission_rate_df = internal_df.groupby('Internal Interviewer').agg(
-        total_assigned=('Submitted', 'count'),
+    Department=('Department', 'first'),
+total_assigned=('Submitted', 'count'),
         submitted=('Submitted', 'sum')
     ).reset_index()
     submission_rate_df['% Scorecards Submitted'] = ((submission_rate_df['submitted'] / submission_rate_df['total_assigned']) * 100).round().astype(int).astype(str) + '%'
@@ -196,7 +197,8 @@ elif page == "📊 Department Analytics":
     internal_df = pd.merge(internal_df, submission_rate_df[['Internal Interviewer', '% Scorecards Submitted']], on='Internal Interviewer', how='left')
 
     submission_rate_df = internal_df.groupby('Internal Interviewer').agg(
-        total_assigned=('Submitted', 'count'),
+    Department=('Department', 'first'),
+total_assigned=('Submitted', 'count'),
         submitted=('Submitted', 'sum')
     ).reset_index()
     submission_rate_df['% Scorecards Submitted'] = ((submission_rate_df['submitted'] / submission_rate_df['total_assigned']) * 100).round().astype(int).astype(str) + '%'
@@ -205,7 +207,8 @@ elif page == "📊 Department Analytics":
 
 
     submission_rate_df = internal_df.groupby('Internal Interviewer').agg(
-        total_assigned=('Submitted', 'count'),
+    Department=('Department', 'first'),
+total_assigned=('Submitted', 'count'),
         submitted=('Submitted', 'sum')
     ).reset_index()
     submission_rate_df['submission_rate'] = (submission_rate_df['submitted'] / submission_rate_df['total_assigned']) * 100
