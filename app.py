@@ -228,7 +228,7 @@ elif page == "📊 Department Analytics":
 
     
 submission_rate_df['Completion Rate'] = (
-    (submission_rate_df['Scorecards_Submitted'] / submission_rate_df['Scorecards_Assigned']) * 100
+    (submission_rate_df['submitted'] / submission_rate_df['total_assigned']) * 100
 ).round().astype(int).astype(str) + '%'
 
 for _, row in submission_rate_df.iterrows():
