@@ -153,6 +153,8 @@ elif page == "🎯 Recruiter Dashboard":
 
     st.markdown("Below is a list of candidates. Click to expand and view their full scorecard detail.")
 
+    grouped = grouped.drop_duplicates(subset=['Candidate Name'])
+
     for _, row in grouped.iterrows():
         with st.expander(f"{row['Candidate Name']} — {row['Decision']}"):
             st.markdown(f"**Department:** {row['Department']}")
