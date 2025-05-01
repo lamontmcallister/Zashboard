@@ -94,11 +94,12 @@ with tab1:
             with col1:
         with col1:
             st.markdown("""
+            st.markdown("""
             - Scorecard rubric uses a 5-point scale
             - Interviewers trained on best practices and scorecard execution
             - Communications have been distributed
             - Benchmarking is based on historical hiring data
-            - Interview data is assumed to be complete and accurate  
+            - Interview data is assumed to be complete and accurate
             """)
 
 with tab2:
