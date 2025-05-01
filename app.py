@@ -74,8 +74,7 @@ page = st.sidebar.selectbox("🔍 Navigate", ["🔰 Landing Page", "Scorecard Da
 
 # --------- Landing Page ---------
 if page == "🔰 Landing Page":
-    st.title("Welcome to the Recruiter Decision Dashboard")
-    st.markdown("This platform helps you evaluate candidates based on interviewer feedback, scorecard submissions, and department-level analytics — all in one view.")
+
 
     st.subheader("✨ Why This Matters")
     st.markdown("""
