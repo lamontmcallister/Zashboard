@@ -1,9 +1,5 @@
 
 # --------- Landing Page ---------
-if page == "🔰 Landing Page":
-    st.title("Welcome to the Scorecard Dashboard")
-    st.markdown("This tool helps recruiters and hiring teams make informed decisions by visualizing candidate interview scorecard data.")
-    
     st.subheader("✨ Why Use This Dashboard?")
     st.markdown("""
     - Centralize candidate scorecard data
@@ -139,4 +135,10 @@ elif page == "📊 Department Analytics":
         {'selector': 'th', 'props': [('font-weight', 'bold'), ('background-color', '#f0f8ff')]}
     ])
 
-    st.dataframe(styled_interviewers, use_container_width=True)
+    st.dataframe(styled_interviewers, use_container_width=True
+page = st.sidebar.selectbox("🔍 Navigate", ["🔰 Landing Page", "🎯 Scorecard Dashboard", "📊 Department Analytics"])
+
+if page == "🔰 Landing Page":
+    st.title("Welcome to the Scorecard Dashboard")
+    st.markdown("This tool helps recruiters and hiring teams make informed decisions by visualizing candidate interview scorecard data.")
+    )
