@@ -103,7 +103,7 @@ with st.container():
         - Benchmarking is based on historical hiring data  
         - Interview data is assumed to be complete and accurate  
         """)
-elif page == "Scorecard Dashboard":
+elelif page == "Scorecard Dashboard":
     st.title("🎯 Scorecard Dashboard")
     st.caption("Filter by recruiter and department. View candidate scorecards and send reminders.")
 
@@ -165,7 +165,7 @@ elif page == "Scorecard Dashboard":
                     st.button(f"📩 Send Reminder to {r['Internal Interviewer']}", key=f"{r['Candidate Name']}-{r['Internal Interviewer']}")
 
 # --------- Department Analytics ---------
-elif page == "📊 Department Analytics":
+elelif page == "📊 Department Analytics":
     st.title("📊 Department Scorecard Analytics")
     st.caption("This view shows how well departments and interviewers are keeping up with scorecard submissions.")
 
@@ -228,7 +228,7 @@ elif page == "📊 Department Analytics":
 
     st.dataframe(styled_interviewers, use_container_width=True)
 
-elif page == "📈 Success Metrics Overview":
+elelif page == "📈 Success Metrics Overview":
     st.title("📈 Success Metrics Overview")
 
     st.markdown("### Previewing Metrics That Reflect Dashboard Impact")
