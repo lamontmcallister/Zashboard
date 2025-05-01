@@ -112,10 +112,6 @@ elif page == "🎯 Recruiter Dashboard":
         return "⚠️ Needs Discussion"
 
     grouped['Decision'] = grouped.apply(make_decision, axis=1)
-
-    grouped = grouped.drop_duplicates(subset='Candidate Name', keep='first')
-    grouped = grouped.reset_index(drop=True)
-
     grouped = grouped[
         (grouped['Recruiter'] == selected_recruiter) &
         (grouped['Department'].isin(selected_depts))
@@ -222,31 +218,8 @@ elif page == "📊 Department Analytics":
 
     
     
-    
     st.subheader("👥 Internal Interviewer Stats")
-st.caption("Track interviewers' submission behavior and scoring trends.")
-
-    interviewer_summary = df.groupby('Internal Interviewer').agg(
-        Interviews_Conducted=('Interview', 'count'),
-        Scorecards_Submitted=('Scorecard Complete', 'sum'),
-        Avg_Interview_Score=('Interview Score', 'mean')
-    ).reset_index()
-
-    search_term = st.text_input("🔎 Search Interviewer")
-    filtered_summary = interviewer_summary[
-        interviewer_summary['Internal Interviewer'].str.contains(search_term, case=False)
-    ] if search_term else interviewer_summary
-
-    styled_interviewers = filtered_summary.style.format({
-        'Avg_Interview_Score': '{:.2f}'
-    }).set_properties(**{'text-align': 'center'}).set_table_styles([
-        {'selector': 'th', 'props': [('font-weight', 'bold'), ('background-color', '#f0f8ff')]}
-    ])
-
-    st.dataframe(styled_interviewers, use_container_width=True)
-
-st.subheader("👥 Internal Interviewer Stats")
-st.caption("Track interviewers' submission behavior and scoring trends.")
+    st.caption("Track interviewers' submission behavior and scoring trends.")
 
     interviewer_summary = df.groupby('Internal Interviewer').agg(
         Interviews_Conducted=('Interview', 'count'),
@@ -267,7 +240,7 @@ st.caption("Track interviewers' submission behavior and scoring trends.")
       ])
     st.dataframe(styled_interviewers, use_container_width=True)
 
-st.caption("Track interviewers' submission behavior and scoring trends.")
+    st.caption("Track interviewers' submission behavior and scoring trends.")
 
     interviewer_summary = df.groupby('Internal Interviewer').agg(
         Interviews_Conducted=('Interview', 'count'),
@@ -286,7 +259,7 @@ st.caption("Track interviewers' submission behavior and scoring trends.")
       ])
     st.dataframe(styled_interviewers, use_container_width=True)
 
-st.caption("Track interviewers' submission behavior and scoring trends.")
+    st.caption("Track interviewers' submission behavior and scoring trends.")
     interviewer_summary = df.groupby('Internal Interviewer').agg(
         Interviews_Conducted=('Interview', 'count'),
         Scorecards_Submitted=('Scorecard Complete', 'sum'),
