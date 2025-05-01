@@ -1,44 +1,8 @@
-def inject_custom_css():
-    st.markdown("""
-    <style>
-        html, body, [class*="css"]  {
-            font-family: 'Inter', sans-serif;
-            font-size: 16px;
-        }
-        .stTabs [role="tab"] {
-            font-size: 18px !important;
-            font-weight: 600;
-        }
-    </style>
-    """, unsafe_allow_html=True)
-def show_intro_paragraph():
-    st.markdown("""
-    <div style="background-color: #f5f5f5; padding: 20px; border-radius: 10px; font-size: 17px; font-family: 'Inter', sans-serif;">
-        <p>We aim to accelerate time-to-hire and reduce bottlenecks in the candidate selection process by eliminating the need for traditional debrief meetings.</p>
-        <p>Instead, we rely on historical interview data to establish objective hiring benchmarks.</p>
-        <p>Candidates falling below the benchmark are automatically rejected, while those exceeding it are routed for a targeted debrief between the recruiter and hiring manager.</p>
-    </div>
-    """, unsafe_allow_html=True)
 import streamlit as st
 import pandas as pd
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 st.set_page_config(page_title="Recruiter Platform", layout="wide")
-inject_custom_css()
-
-st.markdown("""
-<style>
-    html, body, [class*="css"]  {
-        font-family: 'Inter', sans-serif;
-        font-size: 16px;
-    }
-    .stTabs [role="tab"] {
-        font-size: 18px !important;
-        font-weight: 600;
-    }
-</style>
-""", unsafe_allow_html=True)
-
 # --------- Google Sheets Setup ---------
 def load_google_sheet(sheet_url, worksheet_name):
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
@@ -60,7 +24,14 @@ df['Scorecard submitted'] = df['Scorecard submitted'].str.strip().str.lower()
 df['Scorecard Complete'] = df['Scorecard submitted'] == 'yes'
 # --------- Streamlit Setup ---------
 st.markdown(
-    '''
+'
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+    html, body, [class*="css"] {
+        font-family: 'Inter', sans-serif;
+        font-size: 16px;
+    }
+</style>
     <style>
         body {
             background-color: #ffffff;
@@ -90,24 +61,16 @@ st.markdown(
 tab1, tab2, tab3, tab4 = st.tabs(["🔰 Landing Page", "Scorecard Dashboard", "📊 Department Analytics", "📈 Success Metrics Overview"])
 # --------- Landing Page ---------
 with tab1:
-    show_intro_paragraph()
-    st.markdown("""
-    <div style="background-color: #f5f5f5; padding: 20px; border-radius: 10px; font-size: 17px; font-family: 'Inter', sans-serif;">
-        <p>We aim to accelerate time-to-hire and reduce bottlenecks in the candidate selection process by eliminating the need for traditional debrief meetings.</p>
-        <p>Instead, we rely on historical interview data to establish objective hiring benchmarks.</p>
-        <p>Candidates falling below the benchmark are automatically rejected, while those exceeding it are routed for a targeted debrief between the recruiter and hiring manager.</p>
-    </div>
-    """, unsafe_allow_html=True)
-    st.title("📊 Candidate Selection Dashboard")
-    st.markdown("""
+        st.title("📊 Candidate Selection Dashboard")
+        st.markdown("""
     ### 🧭 Overview: Streamlining Candidate Selection
-    We aim to accelerate time-to-hire and reduce bottlenecks in the candidate selection process by eliminating the need for traditional debrief meetings.
-    Instead, we rely on historical interview data to establish objective hiring benchmarks.
-    Candidates falling below the benchmark are automatically rejected,
-    while those exceeding it are routed for a targeted debrief between the recruiter and hiring manager.
-    """)
-    st.subheader("✨ Why This Matters")
-    st.markdown("""
+        We aim to accelerate time-to-hire and reduce bottlenecks in the candidate selection process by eliminating the need for traditional debrief meetings.
+        Instead, we rely on historical interview data to establish objective hiring benchmarks.
+        Candidates falling below the benchmark are automatically rejected,
+        while those exceeding it are routed for a targeted debrief between the recruiter and hiring manager.
+        """)
+        st.subheader("✨ Why This Matters")
+        st.markdown("""
         - Ensure fair, consistent hiring decisions
         - Track scorecard submission and identify bottlenecks
         - Empower recruiters with structured decision support
@@ -199,7 +162,7 @@ with tab3:
             return f'color: {color}; font-weight: bold'
         styled_dept = dept_summary.style.format({
             'Avg_Score': '{:.2f}',
-            'Completion Rate (%)': '{:.1f}%'
+Completion Rate (%)': '{:.1f}%
         }).applymap(highlight_completion, subset=['Completion Rate (%)'])       .set_properties(**{'text-align': 'center'})       .set_table_styles([
             {'selector': 'th', 'props': [('font-weight', 'bold'), ('background-color', '#f0f8ff')]}
         ])
@@ -229,7 +192,7 @@ with tab3:
             Avg_Interview_Score=("Interview Score", "mean")
         ).reset_index()
         styled_interviewers = interviewer_summary.style.format({
-            "Avg_Interview_Score": "{:.2f}"
+Avg_Interview_Score": "{:.2f}
         }).set_properties(**{"text-align": "center"}).set_table_styles([
             {"selector": "th", "props": [("font-weight", "bold"), ("background-color", "#f0f8ff")]}
         ])
