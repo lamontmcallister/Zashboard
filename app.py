@@ -123,49 +123,49 @@ with tab2:
     ).reset_index()
     
     def make_decision(row):
-    if row['Scorecards_Submitted'] < 4:
-    return "🟡 Waiting for Interviews"
-    elif row['Avg_Interview_Score'] <= 3.4:
-    return "❌ Auto-Reject"
-    elif row['Avg_Interview_Score'] >= 3.5:
-    return "✅ HM Review"
-    return "⚠️ Needs Discussion"
-    
-    grouped['Decision'] = grouped.apply(make_decision, axis=1)
-    grouped = grouped[
-    (grouped['Recruiter'] == selected_recruiter) &
-    (grouped['Department'].isin(selected_depts))
-    ]
-    
-    if toggle_status == "Complete Scorecards":
-    grouped = grouped[grouped['Scorecards_Submitted'] == 4]
-    elif toggle_status == "Pending Scorecards":
-    grouped = grouped[grouped['Scorecards_Submitted'] < 4]
-    
-    st.subheader(f"📋 Candidate Summary for {selected_recruiter}")
-    st.markdown("Use this table to track where each candidate stands based on scorecard completion and average interview scores.")
-    st.dataframe(grouped[['Candidate Name', 'Department', 'Avg_Interview_Score', 'Scorecards_Submitted', 'Decision']],
-    use_container_width=True)
-    
-    st.subheader("🧠 Candidate Details")
-    for _, row in grouped.iterrows():
-    with st.expander(f"{row['Candidate Name']} — {row['Decision']}"):
-    st.markdown(f"**Department:** {row['Department']}")
-    st.markdown(f"**Scorecards Submitted:** {row['Scorecards_Submitted']} / 4")
-    st.markdown("---")
-    st.markdown("### Interviewer Scores")
-    candidate_rows = df[df['Candidate Name'] == row['Candidate Name']]
-    for _, r in candidate_rows.iterrows():
-    score = r['Interview Score']
-    status = r['Scorecard submitted']
-    line = f"- **{r['Internal Interviewer']}** ({r['Interview']})"
-    if status == 'yes':
-    st.markdown(f"{line}: ✅ {score}")
-    st.markdown(f"{line}: ❌ Not Submitted")
-    st.button(f"📩 Send Reminder to {r['Internal Interviewer']}", key=f"{r['Candidate Name']}-{r['Internal Interviewer']}")
-    
-    # --------- Department Analytics ---------
-    
+        if row['Scorecards_Submitted'] < 4:
+        return "🟡 Waiting for Interviews"
+        elif row['Avg_Interview_Score'] <= 3.4:
+        return "❌ Auto-Reject"
+        elif row['Avg_Interview_Score'] >= 3.5:
+        return "✅ HM Review"
+        return "⚠️ Needs Discussion"
+        
+        grouped['Decision'] = grouped.apply(make_decision, axis=1)
+        grouped = grouped[
+        (grouped['Recruiter'] == selected_recruiter) &
+        (grouped['Department'].isin(selected_depts))
+        ]
+        
+        if toggle_status == "Complete Scorecards":
+        grouped = grouped[grouped['Scorecards_Submitted'] == 4]
+        elif toggle_status == "Pending Scorecards":
+        grouped = grouped[grouped['Scorecards_Submitted'] < 4]
+        
+        st.subheader(f"📋 Candidate Summary for {selected_recruiter}")
+        st.markdown("Use this table to track where each candidate stands based on scorecard completion and average interview scores.")
+        st.dataframe(grouped[['Candidate Name', 'Department', 'Avg_Interview_Score', 'Scorecards_Submitted', 'Decision']],
+        use_container_width=True)
+        
+        st.subheader("🧠 Candidate Details")
+        for _, row in grouped.iterrows():
+        with st.expander(f"{row['Candidate Name']} — {row['Decision']}"):
+        st.markdown(f"**Department:** {row['Department']}")
+        st.markdown(f"**Scorecards Submitted:** {row['Scorecards_Submitted']} / 4")
+        st.markdown("---")
+        st.markdown("### Interviewer Scores")
+        candidate_rows = df[df['Candidate Name'] == row['Candidate Name']]
+        for _, r in candidate_rows.iterrows():
+        score = r['Interview Score']
+        status = r['Scorecard submitted']
+        line = f"- **{r['Internal Interviewer']}** ({r['Interview']})"
+        if status == 'yes':
+        st.markdown(f"{line}: ✅ {score}")
+        st.markdown(f"{line}: ❌ Not Submitted")
+        st.button(f"📩 Send Reminder to {r['Internal Interviewer']}", key=f"{r['Candidate Name']}-{r['Internal Interviewer']}")
+        
+        # --------- Department Analytics ---------
+        
 with tab3:
         st.title("📊 Department Scorecard Analytics")
         st.caption("This view shows how well departments and interviewers are keeping up with scorecard submissions.")
