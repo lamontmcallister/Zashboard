@@ -1,5 +1,4 @@
 import streamlit as st
-
 import pandas as pd
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
@@ -80,13 +79,11 @@ with tab1:
         - Ensure fair, consistent hiring decisions  
         - Track scorecard submission and identify bottlenecks  
         - Empower recruiters with structured decision support
-        """)
 
         1. Head to the **Recruiter Dashboard** tab  
         2. Select a recruiter and optionally filter by department or scorecard status  
         3. Review candidate decisions and send reminder nudges  
         4. Use **Department Analytics** to track overall submission and scoring health
-        """)
 
         st.success("Tip: Click any candidate name in the dashboard to view interview details!")
 
