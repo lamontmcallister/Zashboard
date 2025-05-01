@@ -1,5 +1,4 @@
 import streamlit as st
-
 import pandas as pd
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
@@ -93,7 +92,7 @@ elif page == "Scorecard Dashboard":
     selected_recruiter = st.sidebar.selectbox("👤 Choose Recruiter", recruiters)
     departments = sorted(df['Department'].dropna().unique().tolist())
     selected_depts = st.sidebar.multiselect("🏢 Filter by Department", departments, default=departments)
-    toggle_status = st.sidebar.radio("📋 Show Candidates With:", ["All", "Complete Scorecards", "Pending Scorecards"])
+    toggle_status = st.sidebar.radio("📋 Show Candidates With:", ["Complete Scorecards", "Pending Scorecards", "All"], index=0)
 
     grouped = df.groupby('Candidate Name').agg(
         Avg_Interview_Score=('Interview Score', 'mean'),
