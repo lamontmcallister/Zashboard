@@ -107,11 +107,11 @@ elif page == "Scorecard Dashboard":
     st.title("🎯 Scorecard Dashboard")
     st.caption("Filter by recruiter and department. View candidate scorecards and send reminders.")
 
-    recruiters = sorted(df['Recruiter'].dropna().unique().tolist())
+recruiters = sorted(df['Recruiter'].dropna().unique().tolist())
 page = st.radio("📍 Navigate", ["🔰 Landing Page", "Scorecard Dashboard", "📊 Department Analytics", "📈 Success Metrics Overview"], horizontal=True)
-    departments = sorted(df['Department'].dropna().unique().tolist())
-    selected_depts = st.sidebar.multiselect("🏢 Filter by Department", departments, default=departments)
-    toggle_status = st.sidebar.radio("📋 Show Candidates With:", ["Complete Scorecards", "Pending Scorecards", "All"], index=0)
+departments = sorted(df['Department'].dropna().unique().tolist())
+selected_depts = st.sidebar.multiselect("🏢 Filter by Department", departments, default=departments)
+toggle_status = st.sidebar.radio("📋 Show Candidates With:", ["Complete Scorecards", "Pending Scorecards", "All"], index=0)
 
     grouped = df.groupby('Candidate Name').agg(
         Avg_Interview_Score=('Interview Score', 'mean'),
@@ -192,7 +192,7 @@ elif page == "📊 Department Analytics":
 
     st.subheader("⏱️ Estimated Time Saved from Debrief Removal")
     dept_choices = df["Department"].dropna().unique().tolist()
-    selected_dept = st.selectbox("Select Department", sorted(dept_choices))
+selected_dept = st.selectbox("Select Department", sorted(dept_choices))
     dept_df = df[df["Department"] == selected_dept]
     total_candidates = dept_df["Candidate Name"].nunique()
     time_saved_hours = total_candidates * 3  # 6 people x 30 mins = 3 hours per candidate
@@ -202,7 +202,7 @@ elif page == "📊 Department Analytics":
 
     # Filters
     dept_options = df["Department"].dropna().unique().tolist()
-    selected_depts = st.multiselect("Filter by Department", dept_options, default=dept_options)
+selected_depts = st.multiselect("Filter by Department", dept_options, default=dept_options)
 
     name_query = st.text_input("Search by Interviewer Name").strip().lower()
 
