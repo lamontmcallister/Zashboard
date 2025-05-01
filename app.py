@@ -101,12 +101,14 @@ with tab1:
         with st.container():
             col1, _ = st.columns([1, 2])
             with col1:
-                - Scorecard rubric uses a 5-point scale  
-                - Interviewers trained on best practices and scorecard execution  
-                - Communications have been distributed  
-                - Benchmarking is based on historical hiring data  
-                - Interview data is assumed to be complete and accurate  
-                """)
+        with col1:
+            st.markdown("""
+            - Scorecard rubric uses a 5-point scale
+            - Interviewers trained on best practices and scorecard execution
+            - Communications have been distributed
+            - Benchmarking is based on historical hiring data
+            - Interview data is assumed to be complete and accurate  
+            """)
 
 with tab2:
     st.header('🎯 Scorecard Completion Summary')
