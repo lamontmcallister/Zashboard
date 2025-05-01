@@ -3,6 +3,21 @@ import pandas as pd
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
+st.set_page_config(page_title="Recruiter Platform", layout="wide")
+
+
+st.title("📊 Candidate Selection Dashboard")
+
+st.markdown("""
+### 🧭 Overview: Streamlining Candidate Selection
+
+We aim to accelerate time-to-hire and reduce bottlenecks in the candidate selection process by eliminating the need for traditional debrief meetings. Instead, we rely on historical interview data to establish objective hiring benchmarks.
+
+Candidates falling below the benchmark are automatically rejected, while those exceeding it are routed for a targeted debrief between the recruiter and hiring manager.
+""")
+
+
+
 # --------- Google Sheets Setup ---------
 def load_google_sheet(sheet_url, worksheet_name):
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
@@ -25,7 +40,6 @@ df['Scorecard submitted'] = df['Scorecard submitted'].str.strip().str.lower()
 df['Scorecard Complete'] = df['Scorecard submitted'] == 'yes'
 
 # --------- Streamlit Setup ---------
-st.set_page_config(page_title="Recruiter Platform", layout="wide")
 
 st.markdown(
     '''
@@ -56,18 +70,12 @@ st.markdown(
 )
 
 # --------- Navigation ---------
-page = st.sidebar.selectbox("🔍 Navigate", ["🔰 Landing Page", "🎯 Recruiter Dashboard", "📊 Department Analytics"])
+page = st.sidebar.selectbox("🔍 Navigate", ["🔰 Landing Page", "Scorecard Dashboard", "📊 Department Analytics"])
 
 # --------- Landing Page ---------
 if page == "🔰 Landing Page":
-    st.title("Welcome to the Recruiter Decision Dashboard")
-    st.markdown("""
-### 🧭 Overview: Streamlining Candidate Selection
 
-We aim to accelerate time-to-hire and reduce bottlenecks in the candidate selection process by eliminating the need for traditional debrief meetings. Instead, we rely on historical interview data to establish objective hiring benchmarks.
 
-Candidates falling below the benchmark are automatically rejected, while those exceeding it are routed for a targeted debrief between the recruiter and hiring manager.
-""")
     st.subheader("✨ Why This Matters")
     st.markdown("""
 - Ensure fair, consistent hiring decisions  
@@ -89,7 +97,7 @@ Candidates falling below the benchmark are automatically rejected, while those e
 
 
 # --------- Recruiter Dashboard ---------
-elif page == "🎯 Recruiter Dashboard":
+elif page == "Scorecard Dashboard":
     st.title("🎯 Recruiter Interview Dashboard")
     st.caption("Filter by recruiter and department. View candidate scorecards and send reminders.")
 
@@ -97,7 +105,7 @@ elif page == "🎯 Recruiter Dashboard":
     selected_recruiter = st.sidebar.selectbox("👤 Choose Recruiter", recruiters)
     departments = sorted(df['Department'].dropna().unique().tolist())
     selected_depts = st.sidebar.multiselect("🏢 Filter by Department", departments, default=departments)
-    toggle_status = st.sidebar.radio("📋 Show Candidates With:", ["All", "Complete Scorecards", "Pending Scorecards"])
+    toggle_status = st.sidebar.radio("📋 Show Candidates With:", ["Complete Scorecards", "Pending Scorecards", "All"], index=0)
 
     grouped = df.groupby('Candidate Name').agg(
         Avg_Interview_Score=('Interview Score', 'mean'),
@@ -177,15 +185,61 @@ elif page == "📊 Department Analytics":
     st.dataframe(styled_dept, use_container_width=True)
 
     st.subheader("👥 Internal Interviewer Stats")
+
+    
+    # --- Filters for Internal Interviewer Stats ---
+    dept_options = df['Department'].dropna().unique().tolist()
+    selected_depts = st.multiselect("Filter by Department", dept_options, default=dept_options)
+
+    name_query = name_query = st.text_input("Search by Interviewer Name").strip().lower()
+
+    df['Submitted'] = df['Scorecard submitted'].str.lower() == 'yes'
+    internal_df = df[df['Internal Interviewer'].notna()]
+    internal_df = internal_df[internal_df['Department'].isin(selected_depts)]
+
+    if name_query:
+        internal_df = internal_df[internal_df['Internal Interviewer'].str.lower().str.contains(name_query)]
+
+    submission_rate_df = internal_df.groupby('Internal Interviewer').agg(
+        total_assigned=('Submitted', 'count'),
+        submitted=('Submitted', 'sum')
+    ).reset_index()
+    submission_rate_df['% Scorecards Submitted'] = ((submission_rate_df['submitted'] / submission_rate_df['total_assigned']) * 100).round().astype(int).astype(str) + '%'
+
+    internal_df = pd.merge(internal_df, submission_rate_df[['Internal Interviewer', '% Scorecards Submitted']], on='Internal Interviewer', how='left')
+
+    submission_rate_df = internal_df.groupby('Internal Interviewer').agg(
+        total_assigned=('Submitted', 'count'),
+        submitted=('Submitted', 'sum')
+    ).reset_index()
+    submission_rate_df['% Scorecards Submitted'] = ((submission_rate_df['submitted'] / submission_rate_df['total_assigned']) * 100).round().astype(int).astype(str) + '%'
+
+    internal_df = pd.merge(internal_df, submission_rate_df[['Internal Interviewer', '% Scorecards Submitted']], on='Internal Interviewer', how='left')
+
+
+    submission_rate_df = internal_df.groupby('Internal Interviewer').agg(
+        total_assigned=('Submitted', 'count'),
+        submitted=('Submitted', 'sum')
+    ).reset_index()
+    submission_rate_df['submission_rate'] = (submission_rate_df['submitted'] / submission_rate_df['total_assigned']) * 100
+
+    internal_df = pd.merge(internal_df, submission_rate_df[['Internal Interviewer', 'submission_rate']], on='Internal Interviewer', how='left')
+
+
     st.caption("Track interviewers' submission behavior and scoring trends.")
     interviewer_summary = df.groupby('Internal Interviewer').agg(
+
+interviewer_summary['Completion Rate (%)'] = round(
+    100 * interviewer_summary['Scorecards_Submitted'] / interviewer_summary['Interviews_Conducted'], 1
+)
         Interviews_Conducted=('Interview', 'count'),
         Scorecards_Submitted=('Scorecard Complete', 'sum'),
         Avg_Interview_Score=('Interview Score', 'mean')
     ).reset_index()
 
     styled_interviewers = interviewer_summary.style.format({
-        'Avg_Interview_Score': '{:.2f}'
+        'Avg_Interview_Score': '{:.2f}',
+        'Completion Rate (%)': '{:.1f}%'
     }).set_properties(**{'text-align': 'center'})       .set_table_styles([
           {'selector': 'th', 'props': [('font-weight', 'bold'), ('background-color', '#f0f8ff')]}
       ])
