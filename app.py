@@ -253,11 +253,14 @@ with tab4:
         st.markdown("""
         | Metric                         | Example Value        | Target      |
         |--------------------------------|----------------------|-------------|
+        st.markdown("""
+        | Metric                          | Value                | Target       |
+        |--------------------------------|----------------------|--------------|
         | Scorecard Completion Rate      | 92%                  | >= 90%       |
-        | Avg Time-to-Hire               | 7.2 days             | < 10 days   |
-        | % Resolved w/o Debrief         | 78%                  | > 70%       |
-        | Interview Load per Interviewer | 6.3 interviews       | Balanced    |
-        | Offer Acceptance Rate          | 84%                  | > 80%       |
+        | Avg Time-to-Hire               | 7.2 days             | < 10 days    |
+        | % Resolved w/o Debrief         | 78%                  | > 70%        |
+        | Interview Load per Interviewer | 6.3 interviews       | Balanced     |
+        | Offer Acceptance Rate          | 84%                  | > 80%        |
         """, unsafe_allow_html=True)
 
         st.info("This is a demo view. You can bring these metrics to life as your data maturity grows.")
