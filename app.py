@@ -1,10 +1,15 @@
 import streamlit as st
 def inject_css():
     st.markdown("""
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
         <style>
-            html, body, [class*='css'] {
+            html, body, [class*="css"] {
                 font-family: 'Inter', sans-serif;
                 font-size: 16px;
+            }
+            body {
+                background-color: #ffffff;
+                color: #1a1a1a;
             }
             .stButton button {
                 border: 1px solid #1e90ff;
@@ -23,17 +28,37 @@ def inject_css():
                 border-radius: 4px;
             }
         </style>
-        <link href='https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap' rel='stylesheet'>
     """, unsafe_allow_html=True)
+def inject_css():
+    st.markdown("""
+            html, body, [class*='css'] {
+                font-family: 'Inter', sans-serif;
+            }
+            .stButton button {
+                border: 1px solid #1e90ff;
+                background-color: #ffffff;
+                color: #1e90ff;
+            }
+            th {
+                font-weight: bold;
+                background-color: #f0f8ff;
+            }
+            td {
+                text-align: center !important;
+            }
+            .dataframe {
+                border: 1px solid #ddd;
+                border-radius: 4px;
+            }
+        </style>
 import pandas as pd
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 st.set_page_config(page_title="Recruiter Platform", layout="wide")
 inject_css()
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+inject_css()
     html, body, [class*="css"] {
         font-family: 'Inter', sans-serif;
-        font-size: 16px;
     }
     body {
         background-color: #ffffff;
@@ -56,10 +81,8 @@ inject_css()
         border-radius: 4px;
     }
 </style>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     html, body, [class*="css"] {
         font-family: 'Inter', sans-serif;
-        font-size: 16px;
     }
     body {
         background-color: #ffffff;
@@ -82,10 +105,8 @@ inject_css()
         border-radius: 4px;
     }
 </style>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     html, body, [class*="css"] {
         font-family: 'Inter', sans-serif;
-        font-size: 16px;
     }
     body {
         background-color: #ffffff;
