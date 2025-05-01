@@ -3,7 +3,6 @@ import pandas as pd
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 st.set_page_config(page_title="Recruiter Platform", layout="wide")
-inject_css()
 # --------- Google Sheets Setup ---------
 def load_google_sheet(sheet_url, worksheet_name):
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
@@ -25,7 +24,7 @@ df['Scorecard submitted'] = df['Scorecard submitted'].str.strip().str.lower()
 df['Scorecard Complete'] = df['Scorecard submitted'] == 'yes'
 # --------- Streamlit Setup ---------
 st.markdown(
-'
+    '''
     <style>
         body {
             background-color: #ffffff;
@@ -92,18 +91,11 @@ with tab2:
         recruiters = sorted(df['Recruiter'].dropna().unique().tolist())
         col1, col2, col3 = st.columns([1, 1, 2])
         with col1:
-        with st.container():
-            st.subheader("🎛️ Filters")
-            col1, col2, col3 = st.columns([1, 1, 1])
-            with col1:
-                selected_recruiter = st.selectbox("👤 Choose Recruiter", recruiters)
-            with col2:
-                selected_depts = st.multiselect("🏢 Filter by Department", departments, default=departments)
-            with col3:
-                toggle_status = st.radio("📋 Show Candidates With", ["Complete Scorecards", "Pending Scorecards", "All"], index=0)
-            st.divider()
+            selected_recruiter = st.selectbox("👤 Choose Recruiter", recruiters)
         with col2:
+            selected_depts = st.multiselect("🏢 Filter by Department", departments, default=departments)
         with col3:
+            toggle_status = st.radio("📋 Show Candidates With", ["Complete Scorecards", "Pending Scorecards", "All"], index=0)
         grouped = df.groupby('Candidate Name').agg(
             Avg_Interview_Score=('Interview Score', 'mean'),
             Scorecards_Submitted=('Scorecard submitted', lambda x: sum(x == 'yes')),
@@ -163,7 +155,7 @@ with tab3:
             return f'color: {color}; font-weight: bold'
         styled_dept = dept_summary.style.format({
             'Avg_Score': '{:.2f}',
-Completion Rate (%)': '{:.1f}%
+            'Completion Rate (%)': '{:.1f}%'
         }).applymap(highlight_completion, subset=['Completion Rate (%)'])       .set_properties(**{'text-align': 'center'})       .set_table_styles([
             {'selector': 'th', 'props': [('font-weight', 'bold'), ('background-color', '#f0f8ff')]}
         ])
@@ -171,6 +163,7 @@ Completion Rate (%)': '{:.1f}%
         st.dataframe(styled_dept, use_container_width=True)
         st.subheader("⏱️ Estimated Time Saved from Debrief Removal")
         dept_choices = df["Department"].dropna().unique().tolist()
+        selected_dept = st.selectbox("Select Department", sorted(dept_choices))
         dept_df = df[df["Department"] == selected_dept]
         total_candidates = dept_df["Candidate Name"].nunique()
         time_saved_hours = total_candidates * 3  # 6 people x 30 mins = 3 hours per candidate
@@ -178,6 +171,7 @@ Completion Rate (%)': '{:.1f}%
         st.subheader("👥 Internal Interviewer Stats")
     # Filters
         dept_options = df["Department"].dropna().unique().tolist()
+        selected_depts = st.multiselect("Filter by Department", dept_options, default=dept_options)
         name_query = st.text_input("Search by Interviewer Name").strip().lower()
     # Filtered internal interviewers only
         interviewer_df = df[df["Internal Interviewer"].notna()]
@@ -191,7 +185,7 @@ Completion Rate (%)': '{:.1f}%
             Avg_Interview_Score=("Interview Score", "mean")
         ).reset_index()
         styled_interviewers = interviewer_summary.style.format({
-Avg_Interview_Score": "{:.2f}
+            "Avg_Interview_Score": "{:.2f}"
         }).set_properties(**{"text-align": "center"}).set_table_styles([
             {"selector": "th", "props": [("font-weight", "bold"), ("background-color", "#f0f8ff")]}
         ])
