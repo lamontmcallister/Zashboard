@@ -132,24 +132,14 @@ with tab2:
                 st.markdown("---")
                 st.markdown("### Interviewer Scores")
                 candidate_rows = df[df['Candidate Name'] == row['Candidate Name']]
-                interviewer_dict = {}
-
                 for _, r in candidate_rows.iterrows():
-                    key = r['Internal Interviewer']
-                    submitted = str(r['Scorecard submitted']).strip().lower() == 'yes'
                     score = r['Interview Score']
-                    if key not in interviewer_dict:
-                        interviewer_dict[key] = {'score': score, 'submitted': submitted, 'interview': r['Interview']}
-                    elif submitted:
-                        interviewer_dict[key] = {'score': score, 'submitted': submitted, 'interview': r['Interview']}
-
-                for interviewer, data in interviewer_dict.items():
-                    line = f"- **{interviewer}** ({data['interview']})"
-                    if data['submitted']:
-                        st.markdown(f"{line}: ✅ {data['score']}")
-                    else:
+                    status = r['Scorecard submitted']
+                    line = f"- **{r['Internal Interviewer']}** ({r['Interview']})"
+                    if status == 'yes':
+                        st.markdown(f"{line}: ✅ {score}")
                         st.markdown(f"{line}: ❌ Not Submitted")
-                        st.button(f"📩 Send Reminder to {interviewer}", key=f"{row['Candidate Name']}-{interviewer}") {r['Internal Interviewer']}", key=f"{r['Candidate Name']}-{r['Internal Interviewer']}")
+                        st.button(f"📩 Send Reminder to {r['Internal Interviewer']}", key=f"{r['Candidate Name']}-{r['Internal Interviewer']}")
 # --------- Department Analytics ---------
 with tab3:
         st.title("📊 Department Scorecard Analytics")
