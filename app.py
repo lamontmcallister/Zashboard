@@ -66,8 +66,7 @@ tab1, tab2, tab3, tab4 = st.tabs([
 # ----------------- Landing Page -----------------
 with tab1:
     st.title("🚀 Hiring Decision Engine")
-st.markdown("""
-BrightHire eliminates the need for debrief meetings — but how do we maintain structure in hiring decisions?
+    st.markdown("""BrightHire eliminates the need for debrief meetings — but how do we maintain structure in hiring decisions?
 
 This dashboard is the **Decision Engine** for async, scorecard-driven hiring.  
 It can be extended to **integrate with Workday** to automatically sync candidates, scorecards, and hiring decisions — ensuring data consistency from interview to offer.
