@@ -68,28 +68,29 @@ with tab1:
     st.title("🚀 Hiring Decision Engine")
     st.markdown("### Streamlining Scorecard-Based Decisions in a BrightHire World")
 
-    st.markdown(\"\"\"
+    st.markdown("""
     BrightHire eliminates the need for debrief meetings — but how do we maintain structure in hiring decisions?
 
     This dashboard is the **Decision Engine** for async, scorecard-driven hiring.
-    \"\"\")
+    """)
 
     st.subheader("💡 Key Use Cases")
-    st.markdown(\"\"\"
+    st.markdown("""
     - **Track scorecard submission** in real time  
     - **Benchmark interview performance** to auto-approve or reject  
     - **Replace the debrief** with a structured async summary  
     - **Hold departments accountable** for completion and fairness  
-    \"\"\")
+    """)
 
     st.subheader("📈 What You’ll Find Inside")
-    st.markdown(\"\"\"
+    st.markdown("""
     - **Scorecard Dashboard:** Filterable recruiter view with reminders  
     - **Department Analytics:** Completion rates, interviewer stats, time saved  
     - **Success Metrics:** KPIs for hiring velocity and quality  
-    \"\"\")
+    """)
 
     st.success("This dashboard supports BrightHire adoption by making async decisions confident, consistent, and fast.")
+
 
 # ----------------- Scorecard Dashboard -----------------
 with tab2:
