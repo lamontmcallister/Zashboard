@@ -25,7 +25,18 @@ def prepare_dataframe(df):
     df['Interview Score'] = pd.to_numeric(df['Interview Score'], errors='coerce')
     df['Scorecard submitted'] = df['Scorecard submitted'].str.strip().str.lower()
     df['Scorecard Complete'] = df['Scorecard submitted'] == 'yes'
-    return df
+
+    agg_df = df.groupby("Candidate").agg({
+        "Recruiter": "first",
+        "Interview Score": "mean",
+        "Scorecard Complete": "sum"
+    }).reset_index()
+
+    agg_df.rename(columns={
+        "Interview Score": "Avg_Interview_Score",
+        "Scorecard Complete": "Scorecards_Submitted"
+    }, inplace=True)
+    return agg_df
 
 def make_decision(row):
     if row['Scorecards_Submitted'] < 4:
@@ -50,14 +61,15 @@ def status_badge(decision):
 sheet_url = "https://docs.google.com/spreadsheets/d/1_hypJt1kwUNZE6Xck1VVjrPeYiIJpTDXSAwi4dgXXko"
 worksheet_name = "Mixed Raw Candidate Data"
 
-df = prepare_dataframe(load_google_sheet(sheet_url, worksheet_name))
+raw_df = load_google_sheet(sheet_url, worksheet_name)
+df = prepare_dataframe(raw_df)
 
 df['Decision'] = df.apply(make_decision, axis=1)
 df['Decision Badge'] = df['Decision'].apply(status_badge)
 
 # ----------------- Filters -----------------
 st.sidebar.title("Filters")
-selected_recruiter = st.sidebar.selectbox("Select Recruiter", ["All"] + sorted(df["Recruiter"].unique()))
+selected_recruiter = st.sidebar.selectbox("Select Recruiter", ["All"] + sorted(df["Recruiter"].dropna().unique()))
 selected_decision = st.sidebar.selectbox("Select Decision", ["All"] + sorted(df["Decision"].unique()))
 
 filtered_df = df.copy()
@@ -70,8 +82,8 @@ if selected_decision != "All":
 st.title("Recruiter Dashboard")
 col1, col2, col3, col4 = st.columns(4)
 col1.metric("Total Candidates", len(filtered_df))
-col2.metric("Completed Scorecards", filtered_df["Scorecard Complete"].sum())
-col3.metric("Avg Score", round(filtered_df["Interview Score"].mean(), 2))
+col2.metric("Scorecards Submitted", filtered_df["Scorecards_Submitted"].sum())
+col3.metric("Avg Interview Score", round(filtered_df["Avg_Interview_Score"].mean(), 2))
 col4.metric("HM Reviews", (filtered_df["Decision"] == "HM Review").sum())
 
 # ----------------- CSS Styling -----------------
@@ -103,12 +115,13 @@ def color_score(val):
     if pd.isna(val):
         return ""
     if val >= 4:
-        return "background-color: #d4edda"  # green
+        return "background-color: #d4edda"
     elif val <= 3:
-        return "background-color: #f8d7da"  # red
+        return "background-color: #f8d7da"
     return ""
 
-styled_df = filtered_df[["Candidate", "Recruiter", "Interview Score", "Decision Badge"]].style.format(escape="html").applymap(color_score, subset=["Interview Score"]).hide(axis="index")
+styled_df = filtered_df[["Candidate", "Recruiter", "Avg_Interview_Score", "Scorecards_Submitted", "Decision Badge"]]
+styled_df_display = styled_df.style.format(escape="html").applymap(color_score, subset=["Avg_Interview_Score"]).hide(axis="index")
 
 st.write("### Candidate Table")
-st.write(styled_df.to_html(escape=False), unsafe_allow_html=True)
+st.write(styled_df_display.to_html(escape=False), unsafe_allow_html=True)
