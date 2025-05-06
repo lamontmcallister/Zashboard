@@ -1,4 +1,5 @@
 import streamlit as st
+
 import pandas as pd
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
@@ -51,78 +52,33 @@ st.markdown(
     unsafe_allow_html=True
 )
 # --------- Navigation ---------
-tab1, tab2, tab3, tab4 = st.tabs(["🔰 Landing Page", "Scorecard Dashboard", "📊 Department Analytics", "📈 Success Metrics Overview"])
-# --------- Landing Page ---------
-with tab1:
-        st.title("📊 Candidate Selection Dashboard")
-        st.markdown("""
-    ### 🧭 Overview: Streamlining Candidate Selection
-        We aim to accelerate time-to-hire and reduce bottlenecks in the candidate selection process by eliminating the need for traditional debrief meetings.
-        Instead, we rely on historical interview data to establish objective hiring benchmarks.
-        Candidates falling below the benchmark are automatically rejected,
-        while those exceeding it are routed for a targeted debrief between the recruiter and hiring manager.
-        """)
-        st.subheader("✨ Why This Matters")
-        st.markdown("""
-        - Ensure fair, consistent hiring decisions  
-        - Track scorecard submission and identify bottlenecks  
-        - Empower recruiters with structured decision support
-        """)
-        st.subheader("🧭 How to Use This Tool")
-        st.markdown("""
-        1. Head to the **Recruiter Dashboard** tab  
-        2. Select a recruiter and optionally filter by department or scorecard status  
-        3. Review candidate decisions and send reminder nudges  
-        4. Use **Department Analytics** to track overall submission and scoring health
-        """)
-        st.success("Tip: Click any candidate name in the dashboard to view interview details!")
-        with st.container():
-            col1, _ = st.columns([1, 2])
-            with col1:
-                st.markdown("### 📌 Assumptions")
-                st.markdown("""
-                - Scorecard rubric uses a 5-point scale  
-                - Interviewers trained on best practices and scorecard execution   
-                - Benchmarking is based on historical hiring data  
-                """)
-with tab2:
-        st.title("🎯 Scorecard Dashboard")
-        st.caption("Filter by recruiter and department. View candidate scorecards and send reminders.")
-        recruiters = sorted(df['Recruiter'].dropna().unique().tolist())
-        col1, col2, col3 = st.columns([1, 1, 2])
-        with col1:
-            selected_recruiter = st.selectbox("👤 Choose Recruiter", recruiters)
-        with col2:
-            selected_depts = st.multiselect("🏢 Filter by Department", departments, default=departments)
-        with col3:
-            toggle_status = st.radio("📋 Show Candidates With", ["Complete Scorecards", "Pending Scorecards", "All"], index=0)
-        grouped = df.groupby('Candidate Name').agg(
-            Avg_Interview_Score=('Interview Score', 'mean'),
-            Scorecards_Submitted=('Scorecard submitted', lambda x: sum(x == 'yes')),
-            Total_Interviews=('Interview Score', 'count'),
-            Department=('Department', 'first'),
-            Recruiter=('Recruiter', 'first')
-        ).reset_index()
-        def make_decision(row):
-            if row['Scorecards_Submitted'] < 4:
-                return "🟡 Waiting for Interviews"
-            elif row['Avg_Interview_Score'] <= 3.4:
-                return "❌ Auto-Reject"
-            elif row['Avg_Interview_Score'] >= 3.5:
-                return "✅ HM Review"
-            return "⚠️ Needs Discussion"
-        grouped['Decision'] = grouped.apply(make_decision, axis=1)
-        grouped = grouped[
-            (grouped['Recruiter'] == selected_recruiter) &
-            (grouped['Department'].isin(selected_depts))
-        ]
-        if toggle_status == "Complete Scorecards":
-            grouped = grouped[grouped['Scorecards_Submitted'] == 4]
-        elif toggle_status == "Pending Scorecards":
-            grouped = grouped[grouped['Scorecards_Submitted'] < 4]
-        st.subheader(f"📋 Candidate Summary for {selected_recruiter}")
-        st.markdown("Use this table to track where each candidate stands based on scorecard completion and average interview scores.")
-        st.dataframe(grouped[['Candidate Name', 'Department', 'Avg_Interview_Score', 'Scorecards_Submitted', 'Decision']],
+tab1, tab2, tab3, tab4 = st.tabs(["🔰 Landing Page", "Scorecard Dashboard", "📊 
+st.header("📊 Department Analytics")
+
+dept_summary = df.groupby("Department").agg(
+    Interviews_Conducted=("Interview", "count"),
+    Scorecards_Submitted=("Scorecard Complete", "sum"),
+    Avg_Interview_Score=("Interview Score", "mean")
+).reset_index()
+
+dept_summary["Completion Rate (%)"] = (
+    dept_summary["Scorecards_Submitted"] / dept_summary["Interviews_Conducted"] * 100
+).round(1)
+
+def highlight_dept_completion(val):
+    return "color: green;" if val >= 90 else "color: red;"
+
+styled_dept = dept_summary.style.format({
+    "Avg_Interview_Score": "{:.2f}",
+    "Completion Rate (%)": "{:.1f}%"
+}).applymap(
+    highlight_dept_completion, subset=["Completion Rate (%)"]
+).set_properties(**{"text-align": "center"}).set_table_styles([
+    {"selector": "th", "props": [("font-weight", "bold"), ("background-color", "#f0f8ff")]}
+])
+
+st.dataframe(styled_dept, use_container_width=True)
+ 'Decision']],
                     use_container_width=True)
         st.subheader("🧠 Candidate Details")
         for _, row in grouped.iterrows():
@@ -184,44 +140,40 @@ with tab3:
         total_candidates = dept_df["Candidate Name"].nunique()
         time_saved_hours = total_candidates * 3  # 6 people x 30 mins = 3 hours per candidate
         st.metric(label=f"Estimated Time Saved in {selected_dept}", value=f"{time_saved_hours} hours")
-        
-if page == "Internal Interviewer Stats":
-    st.subheader("👥 Internal Interviewer Stats")
-# Filters (department filter and name search remain unchanged)
+        st.subheader("👥 
+st.header("Internal Interviewer Stats")
 dept_options = df["Department"].dropna().unique().tolist()
 selected_depts = st.multiselect("Filter by Department", dept_options, default=dept_options)
 name_query = st.text_input("Search by Interviewer Name").strip().lower()
 
-# Filter internal interviewer records based on selections
 interviewer_df = df[df["Internal Interviewer"].notna()]
 interviewer_df = interviewer_df[interviewer_df["Department"].isin(selected_depts)]
 if name_query:
     interviewer_df = interviewer_df[interviewer_df["Internal Interviewer"].str.lower().str.contains(name_query)]
 
-# Summary statistics per interviewer
 interviewer_summary = interviewer_df.groupby("Internal Interviewer").agg(
-    Total_Interviews=('Interview Score', 'count'),
-    Completed=('Scorecard Complete', 'sum'),
-    Avg_Score=('Interview Score', 'mean')
+    Interviews_Conducted=("Interview", "count"),
+    Scorecards_Submitted=("Scorecard Complete", "sum"),
+    Avg_Interview_Score=("Interview Score", "mean")
 ).reset_index()
-interviewer_summary['Completion Rate (%)'] = round(
-    100 * interviewer_summary['Completed'] / interviewer_summary['Total_Interviews'], 1
-)
 
-# Apply formatting and styling
+interviewer_summary["Completion Rate (%)"] = (
+    interviewer_summary["Scorecards_Submitted"] / interviewer_summary["Interviews_Conducted"] * 100
+).round(1)
+
 def highlight_completion(val):
-    color = 'green' if val >= 90 else 'red'
-    return f'color: {color}; font-weight: bold'
+    return "color: green;" if val >= 90 else "color: red;"
 
 styled_interviewers = interviewer_summary.style.format({
-    'Avg_Score': '{:.2f}',
-    'Completion Rate (%)': '{:.1f}%'
-}).applymap(highlight_completion, subset=['Completion Rate (%)'])   .set_properties(**{'text-align': 'center'})   .set_table_styles([
-      {'selector': 'th', 'props': [('font-weight', 'bold'), ('background-color', '#f0f8ff')]}
-  ])
+    "Avg_Interview_Score": "{:.2f}",
+    "Completion Rate (%)": "{:.1f}%"
+}).applymap(
+    highlight_completion, subset=["Completion Rate (%)"]
+).set_properties(**{"text-align": "center"}).set_table_styles([
+    {"selector": "th", "props": [("font-weight", "bold"), ("background-color", "#f0f8ff")]}
+])
 
 st.dataframe(styled_interviewers, use_container_width=True)
-
 with tab4:
         st.title("📈 Success Metrics Overview")
         st.markdown("### Previewing Metrics That Reflect Dashboard Impact")
@@ -235,5 +187,3 @@ with tab4:
         | Offer Acceptance Rate          | 84%                  | > 80%       |
         """, unsafe_allow_html=True)
         st.info("This is a demo view. You can bring these metrics to life as your data maturity grows.")
-
-
