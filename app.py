@@ -265,7 +265,6 @@ interviewer_summary = interviewer_summary[
 
 # Display
 st.dataframe(interviewer_summary)
-": [91.7, 88.9],
         "Avg Interview Score": [4.2, 3.9]
     }))
 with tab4:
