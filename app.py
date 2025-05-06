@@ -116,6 +116,7 @@ with tab2:
 
     # Second row: Department filter (full width)
     st.markdown("### 🏢 Filter by Department")
+    st.caption("Filter by recruiter and department. View candidate scorecards and send reminders.")
     selected_depts = st.multiselect("", departments, default=departments)
 
     grouped = df.groupby('Candidate Name').agg(
@@ -136,6 +137,7 @@ with tab2:
         grouped = grouped[grouped['Scorecards_Submitted'] < 4]
 
     st.subheader(f"📋 Candidate Summary for {selected_recruiter}")
+    st.markdown("Use this table to track where each candidate stands based on scorecard completion and average interview scores.")
     st.dataframe(grouped[['Candidate Name', 'Department', 'Avg_Interview_Score', 'Scorecards_Submitted', 'Decision']],
                 use_container_width=True)
 
