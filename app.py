@@ -43,7 +43,6 @@ st.markdown('''
         border: 1px solid #1e90ff;
         background-color: #ffffff;
         color: #1e90ff;
-    }
     th { font-weight: bold; background-color: #f0f8ff; }
     td { text-align: center !important; }
 </style>
@@ -169,7 +168,6 @@ with tab2:
                         "submitted": submitted,
                         "score": score if submitted else None,
                         "interview": interview_label
-                    }
 
             for interviewer, data in interviewer_dict.items():
                 line = f"- **{interviewer}** ({data['interview']})"
@@ -265,8 +263,6 @@ interviewer_summary = interviewer_summary[
 
 # Display
 st.dataframe(interviewer_summary)
-        "Avg Interview Score": [4.2, 3.9]
-    }))
 with tab4:
     st.title("📈 Success Metrics Overview")
     st.markdown("### Previewing Metrics That Reflect Dashboard Impact")
