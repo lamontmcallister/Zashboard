@@ -227,43 +227,43 @@ with tab3:
         key="interviewer_dept_filter"
     )
     name_query = st.text_input("Search by Interviewer Name").strip().lower()
-
+    
     # Filter logic (mocked for now)
     # interviewer_df = interviewer_df[interviewer_df["Department"].isin(dept_filter)]
     # if name_query:
     #     interviewer_df = interviewer_df[interviewer_df["Internal Interviewer"].str.lower().str.contains(name_query)]
-
     
-# --- Internal Interviewer Stats Section ---
-
-st.subheader("👥 Internal Interviewer Stats")
-st.markdown("Use the filters below to view interview activity and submission performance.")
-
-# Filters
+    
+    # --- Internal Interviewer Stats Section ---
+    
+    st.subheader("👥 Internal Interviewer Stats")
+    st.markdown("Use the filters below to view interview activity and submission performance.")
+    
+    # Filters
     dept_filter = st.multiselect(
         "Filter by Department",
         dept_summary["Department"].unique().tolist(),
         key="interviewer_dept_filter"
     )
-name_query = st.text_input("Search by Interviewer Name").strip().lower()
-
-# Filter internal interviewers only
-interviewer_df = df[df["Internal Interviewer"].notna()]
-if dept_filter:
+    name_query = st.text_input("Search by Interviewer Name").strip().lower()
+    
+    # Filter internal interviewers only
+    interviewer_df = df[df["Internal Interviewer"].notna()]
+    if dept_filter:
     interviewer_df = interviewer_df[interviewer_df["Department"].isin(dept_filter)]
-if name_query:
+    if name_query:
     interviewer_df = interviewer_df[interviewer_df["Internal Interviewer"].str.lower().str.contains(name_query)]
-
-# Group and summarize
-interviewer_summary = interviewer_df.groupby("Internal Interviewer").agg(
+    
+    # Group and summarize
+    interviewer_summary = interviewer_df.groupby("Internal Interviewer").agg(
     Interviews_Conducted=("Interview", "count"),
     Scorecards_Submitted=("Scorecard Complete", "sum"),
     Avg_Interview_Score=("Interview Score", "mean")
-).reset_index()
-
-interviewer_summary["Completion Rate (%)"] = round(
+    ).reset_index()
+    
+    interviewer_summary["Completion Rate (%)"] = round(
     100 * interviewer_summary["Scorecards_Submitted"] / interviewer_summary["Interviews_Conducted"], 1
-)
+    )
 
 # Clean column order
 interviewer_summary = interviewer_summary[
