@@ -168,6 +168,7 @@ with tab2:
                         "submitted": submitted,
                         "score": score if submitted else None,
                         "interview": interview_label
+                        }
 
             for interviewer, data in interviewer_dict.items():
                 line = f"- **{interviewer}** ({data['interview']})"
