@@ -217,57 +217,39 @@ if __name__ == "__main__":
 
 
 
-# ----------------- Tabbed Scorecard Dashboard -----------------
+# ----------------- 🎯 Scorecard Dashboard -----------------
 import altair as alt
 
-st.title("🧮 Scorecard Dashboard")
+st.title("🎯 Scorecard Dashboard")
 
-tab1, tab2, tab3 = st.tabs(["📥 Submission Health", "📊 Avg Scores", "⏱️ Overdue Scorecards"])
+# 🎛️ Metrics Overview
+col1, col2 = st.columns([3, 1])
+with col1:
+    st.markdown("#### ⏱️ Estimated Time Saved from Debrief Removal")
+    st.markdown("**112 hours** saved this month through automated scoring insights.")
+with col2:
+    st.metric(label="Time Saved", value="112 hrs")
 
-with tab1:
-    st.subheader("📥 Scorecard Submission Health")
-    submission_health = pd.DataFrame({
-        "Candidate": ["Ava Chen", "Lucas Grant", "Maya Singh", "Ethan Brown"],
-        "Role": ["PM", "Engineer", "Designer", "Engineer"],
-        "Stage": ["Onsite", "Onsite", "Final", "Phone Screen"],
-        "Interviewers Assigned": [4, 3, 5, 2],
-        "Submitted": [3, 3, 4, 1],
-        "Missing": [1, 0, 1, 1]
-    })
-    st.dataframe(submission_health.style
-        .highlight_between(subset=["Missing"], left=1, right=10, color="#ffe6e6")
-        .highlight_between(subset=["Submitted"], left=3, right=10, color="#e6ffea"))
+st.markdown("---")
 
-with tab2:
-    st.subheader("📊 Average Interview Scores")
-    average_scores = pd.DataFrame({
-        "Candidate": ["Ava Chen", "Lucas Grant", "Maya Singh", "Ethan Brown"],
-        "Avg Score": [3.8, 4.2, 2.9, 3.5],
-        "# of Scorecards": [3, 3, 4, 1],
-        "Stage": ["Onsite", "Onsite", "Final", "Phone Screen"]
-    })
-    score_chart = alt.Chart(average_scores).mark_bar(color="#1f77b4").encode(
-        x=alt.X("Avg Score:Q", scale=alt.Scale(domain=[0, 5]), title="Avg Score"),
-        y=alt.Y("Candidate:N", sort="-x"),
-        tooltip=["Candidate", "Avg Score", "# of Scorecards"]
-    ).properties(width=600, height=300)
-    labels = alt.Chart(average_scores).mark_text(
-        align="left",
-        baseline="middle",
-        dx=3
-    ).encode(
-        x="Avg Score",
-        y="Candidate",
-        text="Avg Score"
-    )
-    st.altair_chart(score_chart + labels, use_container_width=True)
-
-with tab3:
-    st.subheader("⏱️ Overdue Scorecards by Candidate")
-    overdue_data = submission_health[submission_health["Missing"] > 0]
-    overdue_chart = alt.Chart(overdue_data).mark_bar(color="#d62728").encode(
-        x=alt.X("Missing:Q", title="Missing Scorecards"),
-        y=alt.Y("Candidate:N", sort="-x"),
-        tooltip=["Candidate", "Missing"]
-    ).properties(width=500)
-    st.altair_chart(overdue_chart, use_container_width=True)
+# 📊 Scorecard Submission Rate by Department
+st.subheader("📊 Scorecard Submission Rate by Department")
+dept_data = pd.DataFrame({
+    "Department": ["Engineering", "Product", "Design", "Sales"],
+    "Submission Rate (%)": [94, 89, 76, 81]
+})
+dept_chart = alt.Chart(dept_data).mark_bar(color="#1f77b4").encode(
+    x=alt.X("Submission Rate (%):Q", scale=alt.Scale(domain=[0, 100]), title="Submission Rate (%)"),
+    y=alt.Y("Department:N", sort="-x"),
+    tooltip=["Department", "Submission Rate (%)"]
+).properties(width=600, height=300)
+label = alt.Chart(dept_data).mark_text(
+    align="left",
+    baseline="middle",
+    dx=3
+).encode(
+    x="Submission Rate (%)",
+    y="Department",
+    text="Submission Rate (%)"
+)
+st.altair_chart(dept_chart + label, use_container_width=True)
