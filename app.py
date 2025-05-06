@@ -93,15 +93,19 @@ It can be extended to **integrate with Workday** to automatically sync candidate
 # ----------------- Scorecard Dashboard -----------------
 with tab2:
     st.title("🎯 Scorecard Dashboard")
+
     recruiters = sorted(df['Recruiter'].dropna().unique().tolist())
 
-    col1, col2, col3 = st.columns([1, 1, 2])
-    with col1:
+    # First row: Recruiter + Status
+    top_col1, top_col2 = st.columns([1, 1])
+    with top_col1:
         selected_recruiter = st.selectbox("👤 Choose Recruiter", recruiters)
-    with col2:
-        selected_depts = st.multiselect("🏢 Filter by Department", departments, default=departments)
-    with col3:
+    with top_col2:
         toggle_status = st.radio("📋 Show Candidates With", ["Complete Scorecards", "Pending Scorecards", "All"], index=0)
+
+    # Second row: Department filter (full width)
+    st.markdown("### 🏢 Filter by Department")
+    selected_depts = st.multiselect("", departments, default=departments)
 
     grouped = df.groupby('Candidate Name').agg(
         Avg_Interview_Score=('Interview Score', 'mean'),
