@@ -116,7 +116,6 @@ with tab2:
 
     # Second row: Department filter (full width)
     st.markdown("### 🏢 Filter by Department")
-    st.caption("Filter by recruiter and department. View candidate scorecards and send reminders.")
     selected_depts = st.multiselect("", departments, default=departments)
 
     grouped = df.groupby('Candidate Name').agg(
@@ -145,6 +144,7 @@ with tab2:
     st.download_button("📥 Download Results", data=csv, file_name="scorecard_summary.csv")
 
     st.subheader("🧠 Candidate Details")
+    st.caption("Deep dive into candidate details, and nudge interviewers yet to submit scorcard feedback.")
     for _, row in grouped.iterrows():
         with st.expander(f"{row['Candidate Name']} — {row['Decision']}"):
             st.markdown(f"**Department:** {row['Department']}")
@@ -209,6 +209,7 @@ with tab3:
 
     with col2:
         st.subheader("⏱️ Time Saved")
+        st.caption("Time saved by removing debrief process.")
         selected_dept = st.selectbox("Select Department", sorted(dept_summary['Department']))
         total_candidates = df[df["Department"] == selected_dept]["Candidate Name"].nunique()
         time_saved_hours = total_candidates * 3
@@ -216,6 +217,7 @@ with tab3:
 
 
     st.subheader("👥 Internal Interviewer Stats")
+    st.caption("Opportunity to spotlight top performers, and address low performance.")
     selected_depts = st.multiselect("Filter by Department", departments, default=departments)
     name_query = st.text_input("Search by Interviewer Name").strip().lower()
 
