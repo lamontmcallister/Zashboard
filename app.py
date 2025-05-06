@@ -162,7 +162,7 @@ with tab2:
 
 with tab3:
 
-    # --- Department Analytics Section (With Sidebar Filters and Fixes) ---
+    # --- Department Analytics Section (Improved Layout with Altair) ---
 
     # Prepare department summary data
     dept_summary = df.groupby('Department').agg(
@@ -172,23 +172,14 @@ with tab3:
     ).reset_index()
     dept_summary['Completion Rate (%)'] = round(100 * dept_summary['Completed'] / dept_summary['Total_Interviews'], 1)
 
-    # Sidebar filters
-    with st.sidebar:
-        st.header("🔍 Analytics Filters")
-        dept_filter = st.multiselect("Filter by Department", dept_summary["Department"].unique().tolist(), default=dept_summary["Department"].tolist())
-        name_query = st.text_input("Search Interviewer Name").strip().lower()
-
-    # Filtered summary
-    filtered_dept_summary = dept_summary[dept_summary["Department"].isin(dept_filter)]
-
-    # Layout for chart + metric
+    # Create layout columns
     col1, col2 = st.columns([2, 1])
 
     # Completion Rate Chart using Altair
     with col1:
         st.subheader("✅ Completion Rate by Department")
         import altair as alt
-        bar_chart = alt.Chart(filtered_dept_summary).mark_bar().encode(
+        bar_chart = alt.Chart(dept_summary).mark_bar().encode(
             x=alt.X("Completion Rate (%):Q"),
             y=alt.Y("Department:N", sort="-x"),
             tooltip=["Department", "Completion Rate (%)"]
@@ -199,37 +190,67 @@ with tab3:
         )
         st.altair_chart(bar_chart, use_container_width=True)
 
-    # Time Saved Metric
+    # Time Saved Metric + Filters
     with col2:
         st.subheader("⏱️ Estimated Time Saved")
-        selected_dept = st.selectbox("Select Department", filtered_dept_summary["Department"].unique())
-        selected_rows = filtered_dept_summary[filtered_dept_summary["Department"] == selected_dept]
+        selected_dept = st.selectbox("Select Department", dept_summary["Department"].unique())
+        selected_rows = dept_summary[dept_summary["Department"] == selected_dept]
         total_candidates = selected_rows["Completed"].values[0]
         time_saved_hours = total_candidates * 3  # Assumes 3 hrs saved per candidate
         st.metric(label=f"{selected_dept} Department", value=f"{time_saved_hours} hours")
 
-    # --- Internal Interviewer Stats ---
+    # Interviewer Stats Section
     st.subheader("👥 Internal Interviewer Stats")
+    st.markdown("Use the filters below to view interview activity and submission performance.")
 
-    # Filter and compute interviewer-level summary
-    interviewer_df = df[df["Internal Interviewer"].notna()]
+    # Example filters
+    dept_filter = st.multiselect("Filter by Department", dept_summary["Department"].unique().tolist())
+    name_query = st.text_input("Search by Interviewer Name").strip().lower()
+
+    # Filter logic (mocked for now)
+    # interviewer_df = interviewer_df[interviewer_df["Department"].isin(dept_filter)]
+    # if name_query:
+    #     interviewer_df = interviewer_df[interviewer_df["Internal Interviewer"].str.lower().str.contains(name_query)]
+
+    # Placeholder data for interviewer stats
+    
+# Interviewer Stats Section
+st.subheader("👥 Internal Interviewer Stats")
+st.markdown("Use the filters below to view interview activity and submission performance.")
+
+# Filters
+dept_filter = st.multiselect("Filter by Department", dept_summary["Department"].unique().tolist())
+name_query = st.text_input("Search by Interviewer Name").strip().lower()
+
+# Filter down to interviews with valid interviewers
+interviewer_df = df[df["Internal Interviewer"].notna()]
+
+# Apply filters
+if dept_filter:
     interviewer_df = interviewer_df[interviewer_df["Department"].isin(dept_filter)]
+if name_query:
+    interviewer_df = interviewer_df[interviewer_df["Internal Interviewer"].str.lower().str.contains(name_query)]
 
-    if name_query:
-        interviewer_df = interviewer_df[interviewer_df["Internal Interviewer"].str.lower().str.contains(name_query)]
+# Group by Internal Interviewer
+interviewer_summary = interviewer_df.groupby("Internal Interviewer").agg(
+    Interviews_Conducted=("Interview Score", "count"),
+    Scorecards_Submitted=("Scorecard Complete", "sum"),
+    Avg_Interview_Score=("Interview Score", "mean")
+).reset_index()
 
-    interviewer_summary = interviewer_df.groupby("Internal Interviewer").agg(
-        Interviews_Conducted=("Interview", "count"),
-        Scorecards_Submitted=("Scorecard Complete", "sum"),
-        Completion_Rate=("Scorecard Complete", lambda x: round(100 * x.sum() / len(x), 1)),
-        Avg_Interview_Score=("Interview Score", "mean")
-    ).reset_index()
+# Compute Completion Rate
+interviewer_summary["Completion Rate (%)"] = round(
+    100 * interviewer_summary["Scorecards_Submitted"] / interviewer_summary["Interviews_Conducted"], 1
+)
 
-    # Display interviewer summary
-    st.dataframe(interviewer_summary.style.format({
-        "Completion_Rate": "{:.1f}%",
-        "Avg_Interview_Score": "{:.2f}"
-    }))
+# Reorder columns
+interviewer_summary = interviewer_summary[
+    ["Internal Interviewer", "Interviews_Conducted", "Scorecards_Submitted", "Completion Rate (%)", "Avg_Interview_Score"]
+]
+
+# Display table
+st.dataframe(interviewer_summary, use_container_width=True)
+
 with tab4:
     st.title("📈 Success Metrics Overview")
     st.markdown("### Previewing Metrics That Reflect Dashboard Impact")
