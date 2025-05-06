@@ -158,10 +158,13 @@ with tab2:
                     st.markdown(f"{line}: ❌ Not Submitted")
                     st.button(f"📩 Send Reminder to {interviewer}", key=f"{row['Candidate Name']}-{interviewer}")
 
+import plotly.express as px
+
 # ----------------- Department Analytics -----------------
 with tab3:
     st.title("📊 Department Scorecard Analytics")
 
+    # Compute department summary
     dept_summary = df.groupby('Department').agg(
         Total_Interviews=('Interview Score', 'count'),
         Completed=('Scorecard Complete', 'sum'),
@@ -170,13 +173,25 @@ with tab3:
     dept_summary['Completion Rate (%)'] = round(100 * dept_summary['Completed'] / dept_summary['Total_Interviews'], 1)
 
     st.subheader("✅ Scorecard Submission Rate by Department")
-    st.dataframe(dept_summary, use_container_width=True)
 
+    # Plot blue bar chart using Plotly
+    fig = px.bar(
+        dept_summary,
+        x='Department',
+        y='Completion Rate (%)',
+        title='Scorecard Completion Rate by Department',
+        color_discrete_sequence=['#1f77b4']  # Blue
+    )
+    fig.update_layout(xaxis_title='Department', yaxis_title='Completion Rate (%)')
+    st.plotly_chart(fig, use_container_width=True)
+
+    # Time saved estimation
     st.subheader("⏱️ Estimated Time Saved from Debrief Removal")
     selected_dept = st.selectbox("Select Department", sorted(departments))
     total_candidates = df[df["Department"] == selected_dept]["Candidate Name"].nunique()
     time_saved_hours = total_candidates * 3
     st.metric(label=f"Estimated Time Saved in {selected_dept}", value=f"{time_saved_hours} hours")
+
 
     st.subheader("👥 Internal Interviewer Stats")
     selected_depts = st.multiselect("Filter by Department", departments, default=departments)
