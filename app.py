@@ -214,11 +214,3 @@ with tab4:
 # ----------------- Entry Point -----------------
 if __name__ == "__main__":
     pass
-
-
-# [Added Scorecard Submission Rate Chart]
-
-    # ✅ Scorecard Submission Rate by Department
-    st.subheader("✅ Scorecard Submission Rate by Department")
-    completion_by_dept = df.groupby("Department")["Scorecard Complete"].mean() * 100
-    st.bar_chart(completion_by_dept)
