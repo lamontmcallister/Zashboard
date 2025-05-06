@@ -52,7 +52,13 @@ st.markdown('''
 # ----------------- Load Data -----------------
 sheet_url = "https://docs.google.com/spreadsheets/d/1_hypJt1kwUNZE6Xck1VVjrPeYiIJpTDXSAwi4dgXXko"
 worksheet_name = "Mixed Raw Candidate Data"
-df = prepare_dataframe(load_google_sheet(sheet_url, worksheet_name))
+
+try:
+    df = prepare_dataframe(load_google_sheet(sheet_url, worksheet_name))
+except Exception as e:
+    st.error(f"❌ Failed to load data from Google Sheet: {e}")
+    st.stop()
+
 departments = sorted(df['Department'].dropna().unique().tolist())
 
 # ----------------- Tabs -----------------
