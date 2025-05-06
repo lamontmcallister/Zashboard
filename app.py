@@ -55,6 +55,11 @@ worksheet_name = "Mixed Raw Candidate Data"
 
 try:
     df = prepare_dataframe(load_google_sheet(sheet_url, worksheet_name))
+
+# ✅ Debug: Preview raw data
+st.write("🧪 Raw data preview")
+st.dataframe(df.head())
+
 except Exception as e:
     st.error(f"❌ Failed to load data from Google Sheet: {e}")
     st.stop()
