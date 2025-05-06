@@ -221,7 +221,11 @@ with tab3:
     st.markdown("Use the filters below to view interview activity and submission performance.")
 
     # Example filters
-    dept_filter = st.multiselect("Filter by Department", dept_summary["Department"].unique().tolist(, key="interviewer_dept_filter")
+    dept_filter = st.multiselect(
+        "Filter by Department",
+        dept_summary["Department"].unique().tolist(),
+        key="interviewer_dept_filter"
+    )
     name_query = st.text_input("Search by Interviewer Name").strip().lower()
 
     # Filter logic (mocked for now)
@@ -236,7 +240,11 @@ st.subheader("👥 Internal Interviewer Stats")
 st.markdown("Use the filters below to view interview activity and submission performance.")
 
 # Filters
-dept_filter = st.multiselect("Filter by Department", df["Department"].dropna().unique().tolist(, key="interviewer_dept_filter")
+    dept_filter = st.multiselect(
+        "Filter by Department",
+        dept_summary["Department"].unique().tolist(),
+        key="interviewer_dept_filter"
+    )
 name_query = st.text_input("Search by Interviewer Name").strip().lower()
 
 # Filter internal interviewers only
