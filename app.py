@@ -237,19 +237,3 @@ with tab4:
         st.info("This is a demo view. You can bring these metrics to life as your data maturity grows.")
 
 
-if page == "Internal Interviewer Stats":
-    st.subheader("👥 Internal Interviewer Stats")
-
-    if 'Completion Rate (%)' in interviewer_stats_df.columns:
-        interviewer_stats_df['Completion Rate (%)'] = interviewer_stats_df['Completion Rate (%)'].astype(float)
-        def highlight_completion(val):
-            if val >= 90:
-                return 'background-color: #d4edda; color: #155724'  # Green
-            elif val < 75:
-                return 'background-color: #f8d7da; color: #721c24'  # Red
-            else:
-                return 'background-color: #fff3cd; color: #856404'  # Yellow
-        interviewer_stats_df_styled = interviewer_stats_df.style.applymap(highlight_completion, subset=['Completion Rate (%)'])
-        st.dataframe(interviewer_stats_df_styled)
-    else:
-        st.dataframe(interviewer_stats_df)
