@@ -1,4 +1,6 @@
 import streamlit as st
+page = st.sidebar.selectbox("Navigate", ["Candidate Summary", "Department Analytics", "Internal Interviewer Stats"])
+
 import pandas as pd
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
@@ -186,6 +188,7 @@ with tab3:
         st.metric(label=f"Estimated Time Saved in {selected_dept}", value=f"{time_saved_hours} hours")
         
 if page == "Internal Interviewer Stats":
+    if page == "Internal Interviewer Stats":
     st.subheader("👥 Internal Interviewer Stats")
 # Filters (department filter and name search remain unchanged)
 dept_options = df["Department"].dropna().unique().tolist()
