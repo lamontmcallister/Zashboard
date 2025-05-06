@@ -71,7 +71,7 @@ tab1, tab2, tab3, tab4 = st.tabs([
 
 # ----------------- Landing Page -----------------
 with tab1:
-    st.title("🚀 Hiring Decision Engine")
+    st.title("Hiring Decision Engine")
     # Landing page introducing the purpose of this recruiter dashboard.
 
     st.markdown("""BrightHire eliminates the need for debrief meetings — but how do we maintain structure in hiring decisions?
@@ -101,7 +101,8 @@ It can be extended to **integrate with Workday** to automatically sync candidate
 # ----------------- Scorecard Dashboard -----------------
 with tab2:
     st.title("🎯 Scorecard Dashboard")
-    # This section allows users to filter candidates by recruiter, department, and scorecard completion status.
+    st.caption("Filter by recruiter and department. View candidate scorecards and send reminders.")
+
 
 
     recruiters = sorted(df['Recruiter'].dropna().unique().tolist())
@@ -177,8 +178,8 @@ import plotly.express as px
 # ----------------- Department Analytics -----------------
 with tab3:
     st.title("📊 Department Scorecard Analytics")
-    # This section visualizes scorecard completion rates by department
-    # and estimates time saved by removing debrief meetings.
+    st.caption("This view shows how well departments and interviewers are keeping up with scorecard submissions, and estimates time saved by removing debrief meetings.")
+   
 
 
     dept_summary = df.groupby('Department').agg(
