@@ -159,44 +159,6 @@ with tab2:
                     st.button(f"📩 Send Reminder to {interviewer}", key=f"{row['Candidate Name']}-{interviewer}")
 
 # ----------------- Department Analytics -----------------
-
-# ----------------- 📊 Department Analytics Tab -----------------
-with tab3:
-    st.header("📊 Department-Level Insights")
-
-    # Average Interview Score by Department
-    st.subheader("Average Interview Score by Department")
-    avg_score_by_dept = df.groupby("Department")["Avg_Interview_Score"].mean()
-    st.bar_chart(avg_score_by_dept)
-
-    # Scorecard Completion Rate
-    st.subheader("Scorecard Completion Rate")
-    completion_rate = df["Scorecard Complete"].value_counts(normalize=True) * 100
-    st.metric("Completed", f"{completion_rate.get(True, 0):.1f}%")
-    st.metric("Incomplete", f"{completion_rate.get(False, 0):.1f}%")
-
-    # Interview Score Distribution
-    st.subheader("Interview Score Distribution")
-    import matplotlib.pyplot as plt
-    fig, ax = plt.subplots()
-    df["Interview Score"].hist(bins=10, ax=ax)
-    st.pyplot(fig)
-
-# ----------------- 📈 Success Metrics Overview Tab -----------------
-with tab4:
-    st.header("📈 Summary of Hiring Outcomes")
-
-    # Apply decision logic
-    df["Decision"] = df.apply(make_decision, axis=1)
-
-    # Decision Summary Pie Chart
-    import plotly.express as px
-    decision_counts = df["Decision"].value_counts().reset_index()
-    decision_counts.columns = ["Decision", "count"]
-    fig = px.pie(decision_counts, values="count", names="Decision", title="Hiring Decisions Overview")
-    st.plotly_chart(fig)
-
-
 with tab3:
     st.title("📊 Department Scorecard Analytics")
 
