@@ -53,8 +53,12 @@ st.markdown('''
 sheet_url = "https://docs.google.com/spreadsheets/d/1_hypJt1kwUNZE6Xck1VVjrPeYiIJpTDXSAwi4dgXXko"
 worksheet_name = "Mixed Raw Candidate Data"
 
+
 try:
     df = prepare_dataframe(load_google_sheet(sheet_url, worksheet_name))
+    st.write("🧪 Raw data preview")
+    st.dataframe(df.head())
+
 
 # ✅ Debug: Preview raw data
 st.write("🧪 Raw data preview")
