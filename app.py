@@ -159,6 +159,44 @@ with tab2:
                     st.button(f"📩 Send Reminder to {interviewer}", key=f"{row['Candidate Name']}-{interviewer}")
 
 # ----------------- Department Analytics -----------------
+
+# ----------------- 📊 Department Analytics Tab -----------------
+with tab3:
+    st.header("📊 Department-Level Insights")
+
+    # Average Interview Score by Department
+    st.subheader("Average Interview Score by Department")
+    avg_score_by_dept = df.groupby("Department")["Avg_Interview_Score"].mean()
+    st.bar_chart(avg_score_by_dept)
+
+    # Scorecard Completion Rate
+    st.subheader("Scorecard Completion Rate")
+    completion_rate = df["Scorecard Complete"].value_counts(normalize=True) * 100
+    st.metric("Completed", f"{completion_rate.get(True, 0):.1f}%")
+    st.metric("Incomplete", f"{completion_rate.get(False, 0):.1f}%")
+
+    # Interview Score Distribution
+    st.subheader("Interview Score Distribution")
+    import matplotlib.pyplot as plt
+    fig, ax = plt.subplots()
+    df["Interview Score"].hist(bins=10, ax=ax)
+    st.pyplot(fig)
+
+# ----------------- 📈 Success Metrics Overview Tab -----------------
+with tab4:
+    st.header("📈 Summary of Hiring Outcomes")
+
+    # Apply decision logic
+    df["Decision"] = df.apply(make_decision, axis=1)
+
+    # Decision Summary Pie Chart
+    import plotly.express as px
+    decision_counts = df["Decision"].value_counts().reset_index()
+    decision_counts.columns = ["Decision", "count"]
+    fig = px.pie(decision_counts, values="count", names="Decision", title="Hiring Decisions Overview")
+    st.plotly_chart(fig)
+
+
 with tab3:
     st.title("📊 Department Scorecard Analytics")
 
@@ -214,42 +252,3 @@ with tab4:
 # ----------------- Entry Point -----------------
 if __name__ == "__main__":
     pass
-
-
-
-# ----------------- 🎯 Scorecard Dashboard -----------------
-import altair as alt
-
-st.title("🎯 Scorecard Dashboard")
-
-# 🎛️ Metrics Overview
-col1, col2 = st.columns([3, 1])
-with col1:
-    st.markdown("#### ⏱️ Estimated Time Saved from Debrief Removal")
-    st.markdown("**112 hours** saved this month through automated scoring insights.")
-with col2:
-    st.metric(label="Time Saved", value="112 hrs")
-
-st.markdown("---")
-
-# 📊 Scorecard Submission Rate by Department
-st.subheader("📊 Scorecard Submission Rate by Department")
-dept_data = pd.DataFrame({
-    "Department": ["Engineering", "Product", "Design", "Sales"],
-    "Submission Rate (%)": [94, 89, 76, 81]
-})
-dept_chart = alt.Chart(dept_data).mark_bar(color="#1f77b4").encode(
-    x=alt.X("Submission Rate (%):Q", scale=alt.Scale(domain=[0, 100]), title="Submission Rate (%)"),
-    y=alt.Y("Department:N", sort="-x"),
-    tooltip=["Department", "Submission Rate (%)"]
-).properties(width=600, height=300)
-label = alt.Chart(dept_data).mark_text(
-    align="left",
-    baseline="middle",
-    dx=3
-).encode(
-    x="Submission Rate (%)",
-    y="Department",
-    text="Submission Rate (%)"
-)
-st.altair_chart(dept_chart + label, use_container_width=True)
