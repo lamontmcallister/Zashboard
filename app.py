@@ -1,5 +1,4 @@
 import streamlit as st
-page = st.sidebar.selectbox("Navigate", ["Candidate Summary", "Department Analytics", "Internal Interviewer Stats"])
 
 import pandas as pd
 import gspread
@@ -186,46 +185,28 @@ with tab3:
         total_candidates = dept_df["Candidate Name"].nunique()
         time_saved_hours = total_candidates * 3  # 6 people x 30 mins = 3 hours per candidate
         st.metric(label=f"Estimated Time Saved in {selected_dept}", value=f"{time_saved_hours} hours")
-        
-if page == "Internal Interviewer Stats":
-    if page == "Internal Interviewer Stats":
-if page == "Internal Interviewer Stats":
         st.subheader("👥 Internal Interviewer Stats")
-# Filters (department filter and name search remain unchanged)
-dept_options = df["Department"].dropna().unique().tolist()
-selected_depts = st.multiselect("Filter by Department", dept_options, default=dept_options)
-name_query = st.text_input("Search by Interviewer Name").strip().lower()
-
-# Filter internal interviewer records based on selections
-interviewer_df = df[df["Internal Interviewer"].notna()]
-interviewer_df = interviewer_df[interviewer_df["Department"].isin(selected_depts)]
-if name_query:
-    interviewer_df = interviewer_df[interviewer_df["Internal Interviewer"].str.lower().str.contains(name_query)]
-
-# Summary statistics per interviewer
-interviewer_summary = interviewer_df.groupby("Internal Interviewer").agg(
-    Total_Interviews=('Interview Score', 'count'),
-    Completed=('Scorecard Complete', 'sum'),
-    Avg_Score=('Interview Score', 'mean')
-).reset_index()
-interviewer_summary['Completion Rate (%)'] = round(
-    100 * interviewer_summary['Completed'] / interviewer_summary['Total_Interviews'], 1
-)
-
-# Apply formatting and styling
-def highlight_completion(val):
-    color = 'green' if val >= 90 else 'red'
-    return f'color: {color}; font-weight: bold'
-
-styled_interviewers = interviewer_summary.style.format({
-    'Avg_Score': '{:.2f}',
-    'Completion Rate (%)': '{:.1f}%'
-}).applymap(highlight_completion, subset=['Completion Rate (%)'])   .set_properties(**{'text-align': 'center'})   .set_table_styles([
-      {'selector': 'th', 'props': [('font-weight', 'bold'), ('background-color', '#f0f8ff')]}
-  ])
-
-st.dataframe(styled_interviewers, use_container_width=True)
-
+    # Filters
+        dept_options = df["Department"].dropna().unique().tolist()
+        selected_depts = st.multiselect("Filter by Department", dept_options, default=dept_options)
+        name_query = st.text_input("Search by Interviewer Name").strip().lower()
+    # Filtered internal interviewers only
+        interviewer_df = df[df["Internal Interviewer"].notna()]
+        interviewer_df = interviewer_df[interviewer_df["Department"].isin(selected_depts)]
+        if name_query:
+            interviewer_df = interviewer_df[interviewer_df["Internal Interviewer"].str.lower().str.contains(name_query)]
+    # Summary by interviewer
+        interviewer_summary = interviewer_df.groupby("Internal Interviewer").agg(
+            Interviews_Conducted=("Interview", "count"),
+            Scorecards_Submitted=("Scorecard Complete", "sum"),
+            Avg_Interview_Score=("Interview Score", "mean")
+        ).reset_index()
+        styled_interviewers = interviewer_summary.style.format({
+            "Avg_Interview_Score": "{:.2f}"
+        }).set_properties(**{"text-align": "center"}).set_table_styles([
+            {"selector": "th", "props": [("font-weight", "bold"), ("background-color", "#f0f8ff")]}
+        ])
+        st.dataframe(styled_interviewers, use_container_width=True)
 with tab4:
         st.title("📈 Success Metrics Overview")
         st.markdown("### Previewing Metrics That Reflect Dashboard Impact")
