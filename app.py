@@ -189,7 +189,8 @@ with tab3:
         
 if page == "Internal Interviewer Stats":
     if page == "Internal Interviewer Stats":
-    st.subheader("👥 Internal Interviewer Stats")
+if page == "Internal Interviewer Stats":
+        st.subheader("👥 Internal Interviewer Stats")
 # Filters (department filter and name search remain unchanged)
 dept_options = df["Department"].dropna().unique().tolist()
 selected_depts = st.multiselect("Filter by Department", dept_options, default=dept_options)
