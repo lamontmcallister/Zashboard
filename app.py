@@ -65,25 +65,31 @@ tab1, tab2, tab3, tab4 = st.tabs([
 
 # ----------------- Landing Page -----------------
 with tab1:
-    st.title("📊 Candidate Selection Dashboard")
-    st.markdown("""
-    ### 🧭 Overview: Streamlining Candidate Selection
-    Objective hiring using scorecard data instead of meetings.
-    """)
-    st.subheader("✨ Why This Matters")
-    st.markdown("""
-    - Ensure fair, consistent hiring decisions  
-    - Track scorecard submission and identify bottlenecks  
-    - Empower recruiters with structured decision support
-    """)
-    st.subheader("🧭 How to Use This Tool")
-    st.markdown("""
-    1. Go to **Scorecard Dashboard** tab  
-    2. Filter by recruiter or department  
-    3. View candidate decisions and send reminders  
-    4. Check **Department Analytics** for trends
-    """)
-    st.success("Tip: Click any candidate name in the dashboard to view interview details!")
+    st.title("🚀 Hiring Decision Engine")
+    st.markdown("### Streamlining Scorecard-Based Decisions in a BrightHire World")
+
+    st.markdown(\"\"\"
+    BrightHire eliminates the need for debrief meetings — but how do we maintain structure in hiring decisions?
+
+    This dashboard is the **Decision Engine** for async, scorecard-driven hiring.
+    \"\"\")
+
+    st.subheader("💡 Key Use Cases")
+    st.markdown(\"\"\"
+    - **Track scorecard submission** in real time  
+    - **Benchmark interview performance** to auto-approve or reject  
+    - **Replace the debrief** with a structured async summary  
+    - **Hold departments accountable** for completion and fairness  
+    \"\"\")
+
+    st.subheader("📈 What You’ll Find Inside")
+    st.markdown(\"\"\"
+    - **Scorecard Dashboard:** Filterable recruiter view with reminders  
+    - **Department Analytics:** Completion rates, interviewer stats, time saved  
+    - **Success Metrics:** KPIs for hiring velocity and quality  
+    \"\"\")
+
+    st.success("This dashboard supports BrightHire adoption by making async decisions confident, consistent, and fast.")
 
 # ----------------- Scorecard Dashboard -----------------
 with tab2:
