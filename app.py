@@ -187,7 +187,7 @@ with tab3:
         Avg_Interview_Score=("Interview Score", "mean")
     ).reset_index()
 
-    interviewer_summary['Completion Rate (%)'] = round(100 * interviewer_summary['Scorecards_Submitted'] / interviewer_summary['Interviews_Conducted'] * 100, 1)
+    interviewer_summary['Completion Rate (%)'] = round(100 * interviewer_summary['Scorecards_Submitted'] / interviewer_summary['Interviews_Conducted'] * 1, 1)
 
     st.dataframe(interviewer_summary, use_container_width=True)
 
