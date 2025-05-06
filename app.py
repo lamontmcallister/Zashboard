@@ -1,5 +1,4 @@
 # recruiter_dashboard.py
-
 import streamlit as st
 import pandas as pd
 import gspread
@@ -53,19 +52,13 @@ st.markdown('''
 # ----------------- Load Data -----------------
 sheet_url = "https://docs.google.com/spreadsheets/d/1_hypJt1kwUNZE6Xck1VVjrPeYiIJpTDXSAwi4dgXXko"
 worksheet_name = "Mixed Raw Candidate Data"
-
 try:
-    try:
     df = prepare_dataframe(load_google_sheet(sheet_url, worksheet_name))
     st.write("🧪 Raw data preview")
     st.dataframe(df.head())
 except Exception as e:
     st.error(f"❌ Failed to load data from Google Sheet: {e}")
     st.stop()
-except Exception as e:
-    st.error(f"❌ Failed to load data from Google Sheet: {e}")
-    st.stop()
-
 departments = sorted(df['Department'].dropna().unique().tolist())
 
 # ----------------- Tabs -----------------
@@ -79,8 +72,6 @@ tab1, tab2, tab3, tab4 = st.tabs([
 # ----------------- Landing Page -----------------
 with tab1:
     st.title("🚀 Hiring Decision Engine")
-    # Landing page introducing the purpose of this recruiter dashboard.
-
     st.markdown("""BrightHire eliminates the need for debrief meetings — but how do we maintain structure in hiring decisions?
 
 This dashboard is the **Decision Engine** for async, scorecard-driven hiring.  
@@ -108,21 +99,15 @@ It can be extended to **integrate with Workday** to automatically sync candidate
 # ----------------- Scorecard Dashboard -----------------
 with tab2:
     st.title("🎯 Scorecard Dashboard")
-    # This section allows users to filter candidates by recruiter, department, and scorecard completion status.
-
-
     recruiters = sorted(df['Recruiter'].dropna().unique().tolist())
 
-    # First row: Recruiter + Status
-    top_col1, top_col2 = st.columns([1, 1])
-    with top_col1:
+    col1, col2, col3 = st.columns([1, 1, 2])
+    with col1:
         selected_recruiter = st.selectbox("👤 Choose Recruiter", recruiters)
-    with top_col2:
+    with col2:
+        selected_depts = st.multiselect("🏢 Filter by Department", departments, default=departments)
+    with col3:
         toggle_status = st.radio("📋 Show Candidates With", ["Complete Scorecards", "Pending Scorecards", "All"], index=0)
-
-    # Second row: Department filter (full width)
-    st.markdown("### 🏢 Filter by Department")
-    selected_depts = st.multiselect("", departments, default=departments)
 
     grouped = df.groupby('Candidate Name').agg(
         Avg_Interview_Score=('Interview Score', 'mean'),
@@ -184,10 +169,8 @@ import plotly.express as px
 # ----------------- Department Analytics -----------------
 with tab3:
     st.title("📊 Department Scorecard Analytics")
-    # This section visualizes scorecard completion rates by department
-    # and estimates time saved by removing debrief meetings.
 
-
+    # Compute department summary
     dept_summary = df.groupby('Department').agg(
         Total_Interviews=('Interview Score', 'count'),
         Completed=('Scorecard Complete', 'sum'),
@@ -197,26 +180,23 @@ with tab3:
 
     st.subheader("✅ Scorecard Submission Rate by Department")
 
-    col1, col2 = st.columns([3, 1])
+    # Plot blue bar chart using Plotly
+    fig = px.bar(
+        dept_summary,
+        x='Department',
+        y='Completion Rate (%)',
+        title='Scorecard Completion Rate by Department',
+        color_discrete_sequence=['#1f77b4']  # Blue
+    )
+    fig.update_layout(xaxis_title='Department', yaxis_title='Completion Rate (%)')
+    st.plotly_chart(fig, use_container_width=True)
 
-    with col1:
-        fig = px.bar(
-            dept_summary,
-            y='Department',
-            x='Completion Rate (%)',
-            orientation='h',
-            title='Scorecard Completion Rate by Department',
-            color_discrete_sequence=['#1f77b4']
-        )
-        fig.update_layout(yaxis_title='Department', xaxis_title='Completion Rate (%)')
-        st.plotly_chart(fig, use_container_width=True)
-
-    with col2:
-        st.subheader("⏱️ Time Saved")
-        selected_dept = st.selectbox("Select Department", sorted(dept_summary['Department']))
-        total_candidates = df[df["Department"] == selected_dept]["Candidate Name"].nunique()
-        time_saved_hours = total_candidates * 3
-        st.metric(label=f"{selected_dept}", value=f"{time_saved_hours} hours")
+    # Time saved estimation
+    st.subheader("⏱️ Estimated Time Saved from Debrief Removal")
+    selected_dept = st.selectbox("Select Department", sorted(departments))
+    total_candidates = df[df["Department"] == selected_dept]["Candidate Name"].nunique()
+    time_saved_hours = total_candidates * 3
+    st.metric(label=f"Estimated Time Saved in {selected_dept}", value=f"{time_saved_hours} hours")
 
 
     st.subheader("👥 Internal Interviewer Stats")
