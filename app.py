@@ -164,7 +164,6 @@ import plotly.express as px
 with tab3:
     st.title("📊 Department Scorecard Analytics")
 
-    # Compute department summary
     dept_summary = df.groupby('Department').agg(
         Total_Interviews=('Interview Score', 'count'),
         Completed=('Scorecard Complete', 'sum'),
@@ -174,23 +173,26 @@ with tab3:
 
     st.subheader("✅ Scorecard Submission Rate by Department")
 
-    # Plot blue bar chart using Plotly
-    fig = px.bar(
-        dept_summary,
-        x='Department',
-        y='Completion Rate (%)',
-        title='Scorecard Completion Rate by Department',
-        color_discrete_sequence=['#1f77b4']  # Blue
-    )
-    fig.update_layout(xaxis_title='Department', yaxis_title='Completion Rate (%)')
-    st.plotly_chart(fig, use_container_width=True)
+    col1, col2 = st.columns([3, 1])
 
-    # Time saved estimation
-    st.subheader("⏱️ Estimated Time Saved from Debrief Removal")
-    selected_dept = st.selectbox("Select Department", sorted(departments))
-    total_candidates = df[df["Department"] == selected_dept]["Candidate Name"].nunique()
-    time_saved_hours = total_candidates * 3
-    st.metric(label=f"Estimated Time Saved in {selected_dept}", value=f"{time_saved_hours} hours")
+    with col1:
+        fig = px.bar(
+            dept_summary,
+            y='Department',
+            x='Completion Rate (%)',
+            orientation='h',
+            title='Scorecard Completion Rate by Department',
+            color_discrete_sequence=['#1f77b4']
+        )
+        fig.update_layout(yaxis_title='Department', xaxis_title='Completion Rate (%)')
+        st.plotly_chart(fig, use_container_width=True)
+
+    with col2:
+        st.subheader("⏱️ Time Saved")
+        selected_dept = st.selectbox("Select Department", sorted(dept_summary['Department']))
+        total_candidates = df[df["Department"] == selected_dept]["Candidate Name"].nunique()
+        time_saved_hours = total_candidates * 3
+        st.metric(label=f"{selected_dept}", value=f"{time_saved_hours} hours")
 
 
     st.subheader("👥 Internal Interviewer Stats")
