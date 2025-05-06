@@ -2,6 +2,7 @@ import streamlit as st
 page = st.sidebar.selectbox("Navigate", ["Candidate Summary", "Department Analytics", "Internal Interviewer Stats"])
 
 import pandas as pd
+
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 st.set_page_config(page_title="Recruiter Platform", layout="wide")
