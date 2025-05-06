@@ -186,7 +186,8 @@ with tab3:
         time_saved_hours = total_candidates * 3  # 6 people x 30 mins = 3 hours per candidate
         st.metric(label=f"Estimated Time Saved in {selected_dept}", value=f"{time_saved_hours} hours")
         
-st.subheader("👥 Internal Interviewer Stats")
+if page == "Internal Interviewer Stats":
+    st.subheader("👥 Internal Interviewer Stats")
 # Filters (department filter and name search remain unchanged)
 dept_options = df["Department"].dropna().unique().tolist()
 selected_depts = st.multiselect("Filter by Department", dept_options, default=dept_options)
