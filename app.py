@@ -91,10 +91,17 @@ It can be extended to **integrate with Workday** to automatically sync candidate
 
 
 # ----------------- Scorecard Dashboard -----------------
-with tab2:
-    st.title("🎯 Scorecard Dashboard")
-    recruiters = sorted(df['Recruiter'].dropna().unique().tolist())
 
+with tab2:
+
+    # --- Scorecard Dashboard (Upgraded Layout & Filters) ---
+
+    st.title("🎯 Scorecard Dashboard")
+    st.caption("Filter by recruiter and department. View candidate scorecards and send reminders.")
+
+    # Recruiter and Department Filters
+    recruiters = sorted(df["Recruiter"].dropna().unique().tolist())
+    departments = sorted(df["Department"].dropna().unique().tolist())
     col1, col2, col3 = st.columns([1, 1, 2])
     with col1:
         selected_recruiter = st.selectbox("👤 Choose Recruiter", recruiters)
@@ -103,30 +110,43 @@ with tab2:
     with col3:
         toggle_status = st.radio("📋 Show Candidates With", ["Complete Scorecards", "Pending Scorecards", "All"], index=0)
 
-    grouped = df.groupby('Candidate Name').agg(
-        Avg_Interview_Score=('Interview Score', 'mean'),
-        Scorecards_Submitted=('Scorecard submitted', lambda x: sum(x == 'yes')),
-        Total_Interviews=('Interview Score', 'count'),
-        Department=('Department', 'first'),
-        Recruiter=('Recruiter', 'first')
+    # Candidate Summary Aggregation
+    grouped = df.groupby("Candidate Name").agg(
+        Avg_Interview_Score=("Interview Score", "mean"),
+        Scorecards_Submitted=("Scorecard submitted", lambda x: sum(x.str.lower() == "yes")),
+        Total_Interviews=("Interview Score", "count"),
+        Department=("Department", "first"),
+        Recruiter=("Recruiter", "first")
     ).reset_index()
 
-    grouped['Decision'] = grouped.apply(make_decision, axis=1)
-    grouped = grouped[(grouped['Recruiter'] == selected_recruiter) &
-                      (grouped['Department'].isin(selected_depts))]
+    # Decision Logic
+    def make_decision(row):
+        if row["Scorecards_Submitted"] < 4:
+            return "🟡 Waiting"
+        elif row["Avg_Interview_Score"] <= 3.4:
+            return "❌ Auto-Reject"
+        elif row["Avg_Interview_Score"] >= 3.5:
+            return "✅ HM Review"
+        return "⚠️ Needs Discussion"
+    grouped["Decision"] = grouped.apply(make_decision, axis=1)
 
+    # Apply Filters
+    grouped = grouped[
+        (grouped["Recruiter"] == selected_recruiter) &
+        (grouped["Department"].isin(selected_depts))
+    ]
     if toggle_status == "Complete Scorecards":
-        grouped = grouped[grouped['Scorecards_Submitted'] == 4]
+        grouped = grouped[grouped["Scorecards_Submitted"] == 4]
     elif toggle_status == "Pending Scorecards":
-        grouped = grouped[grouped['Scorecards_Submitted'] < 4]
+        grouped = grouped[grouped["Scorecards_Submitted"] < 4]
 
+    # Display Summary Table
     st.subheader(f"📋 Candidate Summary for {selected_recruiter}")
-    st.dataframe(grouped[['Candidate Name', 'Department', 'Avg_Interview_Score', 'Scorecards_Submitted', 'Decision']],
-                use_container_width=True)
+    st.dataframe(grouped[[
+        "Candidate Name", "Department", "Avg_Interview_Score", "Scorecards_Submitted", "Decision"
+    ]], use_container_width=True)
 
-    csv = grouped.to_csv(index=False).encode('utf-8')
-    st.download_button("📥 Download Results", data=csv, file_name="scorecard_summary.csv")
-
+    # Candidate Details
     st.subheader("🧠 Candidate Details")
     for _, row in grouped.iterrows():
         with st.expander(f"{row['Candidate Name']} — {row['Decision']}"):
@@ -135,31 +155,29 @@ with tab2:
             st.markdown("---")
             st.markdown("### Interviewer Scores")
 
-            candidate_rows = df[df['Candidate Name'] == row['Candidate Name']]
+            candidate_rows = df[df["Candidate Name"] == row["Candidate Name"]]
             interviewer_dict = {}
 
             for _, r in candidate_rows.iterrows():
-                interviewer = r['Internal Interviewer']
-                submitted = str(r['Scorecard submitted']).strip().lower() == 'yes'
-                score = r['Interview Score']
-                interview_label = r['Interview']
+                interviewer = r["Internal Interviewer"]
+                submitted = str(r["Scorecard submitted"]).strip().lower() == "yes"
+                score = r["Interview Score"]
+                interview_label = r["Interview"]
+
                 if interviewer not in interviewer_dict or submitted:
                     interviewer_dict[interviewer] = {
-                        'submitted': submitted,
-                        'score': score if submitted else None,
-                        'interview': interview_label
+                        "submitted": submitted,
+                        "score": score if submitted else None,
+                        "interview": interview_label
                     }
 
             for interviewer, data in interviewer_dict.items():
                 line = f"- **{interviewer}** ({data['interview']})"
-                if data['submitted']:
+                if data["submitted"]:
                     st.markdown(f"{line}: ✅ {data['score']}")
                 else:
                     st.markdown(f"{line}: ❌ Not Submitted")
                     st.button(f"📩 Send Reminder to {interviewer}", key=f"{row['Candidate Name']}-{interviewer}")
-
-# ----------------- Department Analytics -----------------
-
 with tab3:
 
     # --- Department Analytics Section (Improved Layout with Altair) ---
@@ -212,12 +230,42 @@ with tab3:
     # if name_query:
     #     interviewer_df = interviewer_df[interviewer_df["Internal Interviewer"].str.lower().str.contains(name_query)]
 
-    # Placeholder data for interviewer stats
-    st.dataframe(pd.DataFrame({
-        "Internal Interviewer": ["Jane Doe", "John Smith"],
-        "Interviews Conducted": [12, 9],
-        "Scorecards Submitted": [11, 8],
-        "Completion Rate (%)": [91.7, 88.9],
+    
+# --- Internal Interviewer Stats Section ---
+
+st.subheader("👥 Internal Interviewer Stats")
+st.markdown("Use the filters below to view interview activity and submission performance.")
+
+# Filters
+dept_filter = st.multiselect("Filter by Department", df["Department"].dropna().unique().tolist())
+name_query = st.text_input("Search by Interviewer Name").strip().lower()
+
+# Filter internal interviewers only
+interviewer_df = df[df["Internal Interviewer"].notna()]
+if dept_filter:
+    interviewer_df = interviewer_df[interviewer_df["Department"].isin(dept_filter)]
+if name_query:
+    interviewer_df = interviewer_df[interviewer_df["Internal Interviewer"].str.lower().str.contains(name_query)]
+
+# Group and summarize
+interviewer_summary = interviewer_df.groupby("Internal Interviewer").agg(
+    Interviews_Conducted=("Interview", "count"),
+    Scorecards_Submitted=("Scorecard Complete", "sum"),
+    Avg_Interview_Score=("Interview Score", "mean")
+).reset_index()
+
+interviewer_summary["Completion Rate (%)"] = round(
+    100 * interviewer_summary["Scorecards_Submitted"] / interviewer_summary["Interviews_Conducted"], 1
+)
+
+# Clean column order
+interviewer_summary = interviewer_summary[
+    ["Internal Interviewer", "Interviews_Conducted", "Scorecards_Submitted", "Completion Rate (%)", "Avg_Interview_Score"]
+]
+
+# Display
+st.dataframe(interviewer_summary)
+": [91.7, 88.9],
         "Avg Interview Score": [4.2, 3.9]
     }))
 with tab4:
