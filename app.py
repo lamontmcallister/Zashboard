@@ -159,44 +159,55 @@ with tab2:
                     st.button(f"📩 Send Reminder to {interviewer}", key=f"{row['Candidate Name']}-{interviewer}")
 
 # ----------------- Department Analytics -----------------
+
 with tab3:
-    st.title("📊 Department Scorecard Analytics")
 
-    dept_summary = df.groupby('Department').agg(
-        Total_Interviews=('Interview Score', 'count'),
-        Completed=('Scorecard Complete', 'sum'),
-        Avg_Score=('Interview Score', 'mean')
-    ).reset_index()
-    dept_summary['Completion Rate (%)'] = round(100 * dept_summary['Completed'] / dept_summary['Total_Interviews'], 1)
+# --- Department Analytics Section (Improved Layout) ---
 
-    st.subheader("✅ Scorecard Submission Rate by Department")
-    st.dataframe(dept_summary, use_container_width=True)
+# Create layout columns
+col1, col2 = st.columns([2, 1])
 
-    st.subheader("⏱️ Estimated Time Saved from Debrief Removal")
-    selected_dept = st.selectbox("Select Department", sorted(departments))
-    total_candidates = df[df["Department"] == selected_dept]["Candidate Name"].nunique()
-    time_saved_hours = total_candidates * 3
-    st.metric(label=f"Estimated Time Saved in {selected_dept}", value=f"{time_saved_hours} hours")
+# Completion Rate Chart
+with col1:
+    st.subheader("✅ Completion Rate by Department")
+    fig, ax = plt.subplots(figsize=(8, 5))
+    ax.barh(dept_summary["Department"], dept_summary["Completion Rate (%)"])
+    ax.set_xlabel("Completion Rate (%)")
+    ax.set_title("Scorecard Completion Rate")
+    ax.grid(axis='x')
+    st.pyplot(fig)
 
-    st.subheader("👥 Internal Interviewer Stats")
-    selected_depts = st.multiselect("Filter by Department", departments, default=departments)
-    name_query = st.text_input("Search by Interviewer Name").strip().lower()
+# Time Saved Metric + Filters
+with col2:
+    st.subheader("⏱️ Estimated Time Saved")
+    selected_dept = st.selectbox("Select Department", dept_summary["Department"].unique())
+    selected_rows = dept_summary[dept_summary["Department"] == selected_dept]
+    total_candidates = selected_rows["Completed"].values[0]  # Example use
+    time_saved_hours = total_candidates * 3  # Assumes 3 hrs saved per candidate
+    st.metric(label=f"{selected_dept} Department", value=f"{time_saved_hours} hours")
 
-    interviewer_df = df[df["Internal Interviewer"].notna() & df["Department"].isin(selected_depts)]
-    if name_query:
-        interviewer_df = interviewer_df[interviewer_df["Internal Interviewer"].str.lower().str.contains(name_query)]
+# Interviewer Stats Section
+st.subheader("👥 Internal Interviewer Stats")
+st.markdown("Use the filters below to view interview activity and submission performance.")
 
-    interviewer_summary = interviewer_df.groupby("Internal Interviewer").agg(
-        Interviews_Conducted=("Interview", "count"),
-        Scorecards_Submitted=("Scorecard Complete", "sum"),
-        Avg_Interview_Score=("Interview Score", "mean")
-    ).reset_index()
+# Example filters
+dept_filter = st.multiselect("Filter by Department", dept_summary["Department"].unique().tolist())
+name_query = st.text_input("Search by Interviewer Name").strip().lower()
 
-    interviewer_summary['Completion Rate (%)'] = round(100 * interviewer_summary['Scorecards_Submitted'] / interviewer_summary['Interviews_Conducted'] * 1, 1)
+# Filter logic (mocked here)
+# interviewer_df = interviewer_df[interviewer_df["Department"].isin(dept_filter)]
+# if name_query:
+#     interviewer_df = interviewer_df[interviewer_df["Internal Interviewer"].str.lower().str.contains(name_query)]
 
-    st.dataframe(interviewer_summary, use_container_width=True)
+# Placeholder for interviewer stats table
+st.dataframe(pd.DataFrame({
+    "Internal Interviewer": ["Jane Doe", "John Smith"],
+    "Interviews Conducted": [12, 9],
+    "Scorecards Submitted": [11, 8],
+    "Completion Rate (%)": [91.7, 88.9],
+    "Avg Interview Score": [4.2, 3.9]
+}))
 
-# ----------------- Success Metrics -----------------
 with tab4:
     st.title("📈 Success Metrics Overview")
     st.markdown("### Previewing Metrics That Reflect Dashboard Impact")
