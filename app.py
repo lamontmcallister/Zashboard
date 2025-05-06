@@ -1,5 +1,6 @@
 # recruiter_dashboard.py
 import streamlit as st
+st.set_page_config(page_title="Recruiter Platform", layout="wide")
 import pandas as pd
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
@@ -23,7 +24,6 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-st.set_page_config(page_title="Recruiter Platform", layout="wide")
 
 # ----------------- Data Loading -----------------
 @st.cache_data(ttl=600)
