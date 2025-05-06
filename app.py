@@ -1,4 +1,3 @@
-import matplotlib.pyplot as plt
 # recruiter_dashboard.py
 import streamlit as st
 import pandas as pd
@@ -163,20 +162,25 @@ with tab2:
 
 with tab3:
 
-    # --- Department Analytics Section (Improved Layout) ---
+    # --- Department Analytics Section (Improved Layout with Altair) ---
 
     # Create layout columns
     col1, col2 = st.columns([2, 1])
 
-    # Completion Rate Chart
+    # Completion Rate Chart using Altair
     with col1:
         st.subheader("✅ Completion Rate by Department")
-        fig, ax = plt.subplots(figsize=(8, 5))
-        ax.barh(dept_summary["Department"], dept_summary["Completion Rate (%)"])
-        ax.set_xlabel("Completion Rate (%)")
-        ax.set_title("Scorecard Completion Rate")
-        ax.grid(axis='x')
-        st.pyplot(fig)
+        import altair as alt
+        bar_chart = alt.Chart(dept_summary).mark_bar().encode(
+            x=alt.X("Completion Rate (%):Q"),
+            y=alt.Y("Department:N", sort="-x"),
+            tooltip=["Department", "Completion Rate (%)"]
+        ).properties(
+            width=500,
+            height=300,
+            title="Scorecard Completion Rate by Department"
+        )
+        st.altair_chart(bar_chart, use_container_width=True)
 
     # Time Saved Metric + Filters
     with col2:
