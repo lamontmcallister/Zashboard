@@ -74,10 +74,10 @@ with tab1:
     st.title("Hiring Decision Engine")
     # Landing page introducing the purpose of this recruiter dashboard.
 
-    st.markdown("""BrightHire eliminates the need for debrief meetings — but how do we maintain structure in hiring decisions?
+    st.markdown("""BrightHire eliminates the need for debrief meetings,  but how do we maintain structure in hiring decisions?
 
 This dashboard is the **Decision Engine** for async, scorecard-driven hiring.  
-It can be extended to **integrate with Workday** to automatically sync candidates, scorecards, and hiring decisions — ensuring data consistency from interview to offer.
+It can be extended to **integrate with Workday** to automatically sync candidates, scorecards, and hiring decisions ensuring data consistency from interview to offer.
 """)
 
     st.subheader("💡 Key Use Cases")
