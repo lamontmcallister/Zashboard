@@ -1,6 +1,14 @@
 # recruiter_dashboard.py
 import streamlit as st
+import pandas as pd
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 
+# ----------------- Page Setup -----------------
+# PAGE CONFIG MUST BE FIRST
+st.set_page_config(page_title="Recruiter Platform", layout="wide")
+
+# GLOBAL FONT STYLING
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
@@ -18,12 +26,6 @@ h1, h2, h3 {
 </style>
 """, unsafe_allow_html=True)
 
-import pandas as pd
-import gspread
-from oauth2client.service_account import ServiceAccountCredentials
-
-# ----------------- Page Setup -----------------
-st.set_page_config(page_title="Recruiter Platform", layout="wide")
 
 # ----------------- Data Loading -----------------
 @st.cache_data(ttl=600)
