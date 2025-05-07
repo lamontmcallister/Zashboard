@@ -1,3 +1,4 @@
+st.set_page_config(page_title="Recruiter Platform", layout="wide")
 # recruiter_dashboard.py
 import streamlit as st
 
@@ -21,8 +22,6 @@ from oauth2client.service_account import ServiceAccountCredentials
 
 # ----------------- Page Setup -----------------
 # PAGE CONFIG MUST BE FIRST
-st.set_page_config(page_title="Recruiter Platform", layout="wide")
-
 # GLOBAL FONT STYLING
 st.markdown("""
 <style>
