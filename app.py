@@ -74,11 +74,36 @@ with tab1:
     st.title("Hiring Decision Engine")
     # Landing page introducing the purpose of this recruiter dashboard.
 
-    st.markdown("""BrightHire eliminates the need for debrief meetings,  but how do we maintain structure in hiring decisions?
+    
+    st.markdown("""
+    ### Why This Exists
 
-This dashboard is the **Decision Engine** for async, scorecard-driven hiring.  
-It can be extended to **integrate with Workday** to automatically sync candidates, scorecards, and hiring decisions ensuring data consistency from interview to offer.
-""")
+    BrightHire records your interviews — but what happens next?
+
+    Without live debriefs, teams still need a way to align, compare feedback, and move fast with confidence.
+
+    **This dashboard is your async Decision Engine.**  
+    It transforms scattered scorecards into structured, data-driven decisions — so teams can move from interviews to offers without needing a meeting.
+
+    ---
+
+    ### Key Features:
+    - Real-time scorecard completion tracking
+    - Auto-recommendation logic (Reject / HM Review / Needs Discussion)
+    - Department-level analytics and interviewer insights
+    - Ready for future Workday integration
+
+    ---
+
+    🔍 **Want to know how it works?**  
+    Every tab includes a step-by-step guide — just open the “❓ How to Use This Dashboard” dropdown at the top of each page.
+
+    ---
+
+    ⚠️ *Note: This dashboard is currently running on dummy data.*  
+    Once integrated with Workday, it will reflect live candidate pipelines, recruiter activity, and interview results in real time.
+    """)
+
 
     st.subheader("💡 Key Use Cases")
     st.markdown("""
