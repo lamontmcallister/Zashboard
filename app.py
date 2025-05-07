@@ -92,7 +92,7 @@ tab1, tab2, tab3, tab4 = st.tabs([
 # ----------------- Landing Page -----------------
 with tab1:
 
-    st.image("https://seeklogo.com/images/Z/zillow-logo-AD5393B8EC-seeklogo.com.png", width=200)
+    st.image("https://github.com/lamontmcallister/Zashboard/blob/main/zillow_logo_for_upload.png?raw=true", width=200)
 
 
     st.markdown("## 🚀 The Hiring Decision Engine")
