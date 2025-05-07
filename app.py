@@ -131,9 +131,8 @@ with tab1:
     """)
 
   st.markdown("### 💡 Pro Tip")
-    st.info("Every tab includes a ‘❓ How to Use’ dropdown to walk you through the dashboard step-by-step.")
-
-    st.warning("⚠️ This version uses dummy data. Workday integration is planned for live candidate tracking.")
+  st.info("Every tab includes a ‘❓ How to Use’ dropdown to walk you through the dashboard step-by-step.")
+  st.warning("⚠️ This version uses dummy data. Workday integration is planned for live candidate tracking.")
 
 # ----------------- Scorecard Dashboard -----------------
 with tab2:
