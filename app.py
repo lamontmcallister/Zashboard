@@ -91,7 +91,7 @@ tab1, tab2, tab3, tab4 = st.tabs([
 
 # ----------------- Landing Page -----------------
 with tab1:
-    
+
     st.markdown("## 🚀 The Hiring Decision Engine")
 
     st.markdown("""
@@ -122,7 +122,6 @@ with tab1:
     - ⏱ Time saved from fewer debriefs  
     """)
 
-
     st.subheader("📈 What You’ll Find Inside")
     st.markdown("""
     - **Scorecard Dashboard:** Filterable recruiter view with reminders  
@@ -130,10 +129,9 @@ with tab1:
     - **Success Metrics:** KPIs for hiring velocity and quality  
     """)
 
-  st.markdown("### 💡 Pro Tip")
-  st.info("Every tab includes a ‘❓ How to Use’ dropdown to walk you through the dashboard step-by-step.")
-  st.warning("⚠️ This version uses dummy data. Workday integration is planned for live candidate tracking.")
-
+    st.markdown("### 💡 Pro Tip")
+    st.info("Every tab includes a ‘❓ How to Use’ dropdown to walk you through the dashboard step-by-step.")
+    st.warning("⚠️ This version uses dummy data. Workday integration is planned for live candidate tracking.")
 # ----------------- Scorecard Dashboard -----------------
 with tab2:
 
