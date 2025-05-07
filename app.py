@@ -94,7 +94,7 @@ with tab1:
 
     st.markdown("""
         <div style="
-            background: url('zillow_logo.png') no-repeat center;
+            background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Zillow_logo.svg/512px-Zillow_logo.svg.png') no-repeat center;
             background-size: contain;
             height: 100px;
             margin-bottom: 2rem;">
