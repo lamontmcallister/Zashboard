@@ -94,7 +94,7 @@ with tab1:
 
     st.markdown(
         "<div style='text-align: center;'>"
-        "<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Zillow_logo.svg/512px-Zillow_logo.svg.png' width='200'/>"
+        "<img src='https://seeklogo.com/images/Z/zillow-logo-AD5393B8EC-seeklogo.com.png' width='200'/>"
         "</div>",
         unsafe_allow_html=True
     )
