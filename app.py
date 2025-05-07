@@ -148,6 +148,28 @@ with tab1:
 
 # ----------------- Scorecard Dashboard -----------------
 with tab2:
+
+    with st.expander("❓ How to Use This Dashboard"):
+        st.markdown("""
+        **Welcome to the Scorecard Decision Engine!**
+
+        This tab helps recruiters review interview scorecards, identify strong candidates, and take action — all asynchronously.
+
+        **How to Use:**
+        1. Choose a **Recruiter** to view candidates they’re managing
+        2. Set the **Scorecard Status** filter (Complete, Pending, or All)
+        3. Filter by **Department(s)** to drill down further
+        4. Review the summary table and expand candidates for full details
+        5. Use **Download Results** to export candidate data
+
+        **What the colors mean:**
+        - ✅ Score ≥ 3.5: Recommend for HM review
+        - ❌ Score ≤ 3.4: Auto-Reject
+        - ⚠️ Edge case: Needs discussion
+        - 🟡 Waiting: Not enough scorecards submitted
+
+        > This complements BrightHire and helps eliminate the need for live debriefs.
+        """)
     st.title("🎯 Scorecard Dashboard")
     st.caption("Filter by recruiter and department. View candidate scorecards and send reminders.")
 
@@ -227,6 +249,21 @@ import plotly.express as px
 
 # ----------------- Department Analytics -----------------
 with tab3:
+
+    with st.expander("❓ How to Use This Dashboard"):
+        st.markdown("""
+        **Welcome to the Department Analytics view!**
+
+        This tab helps you monitor scorecard completion rates, track interviewer participation, and estimate time saved from eliminating live debriefs.
+
+        **How to Use:**
+        1. View the **bar chart** to compare completion rates by department
+        2. Select a department to see how much time was saved (est. 3 hrs per candidate)
+        3. Use the **Interviewer Stats** section to search by name or filter by department
+        4. Check **Completion Rate %** to identify who’s submitting scorecards consistently
+
+        > Use this view to hold departments accountable and uncover coaching opportunities.
+        """)
     st.title("📊 Department Scorecard Analytics")
     st.caption("This view shows how well departments and interviewers are keeping up with scorecard submissions, and estimates time saved by removing debrief meetings.")
    
