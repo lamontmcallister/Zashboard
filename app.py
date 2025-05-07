@@ -92,9 +92,6 @@ tab1, tab2, tab3, tab4 = st.tabs([
 # ----------------- Landing Page -----------------
 with tab1:
 
-    st.image("https://github.com/lamontmcallister/Zashboard/blob/main/Zillow-Logo-PNG-Photos.png?raw=true", width=300)
-
-
     st.markdown("## 🚀 The Hiring Decision Engine")
 
     st.markdown("""
