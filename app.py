@@ -1,5 +1,6 @@
 st.set_page_config(page_title="Recruiter Platform", layout="wide")
 # recruiter_dashboard.py
+
 import streamlit as st
 
 st.markdown("""
