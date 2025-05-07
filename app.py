@@ -1,5 +1,23 @@
 # recruiter_dashboard.py
 import streamlit as st
+
+st.markdown("""
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+html, body, [class*="css"]  {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 16px;
+    line-height: 1.6;
+    color: #1e1e1e;
+}
+
+h1, h2, h3 {
+    font-weight: 600 !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
 import pandas as pd
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
@@ -71,39 +89,50 @@ tab1, tab2, tab3, tab4 = st.tabs([
 
 # ----------------- Landing Page -----------------
 with tab1:
-    st.title("Hiring Decision Engine")
-    # Landing page introducing the purpose of this recruiter dashboard.
-
     
-    st.markdown("""
-    ### Why This Exists
+    st.markdown("## 🚀 The Hiring Decision Engine")
 
+    st.markdown("""
     BrightHire records your interviews — but what happens next?
 
-    Without live debriefs, teams still need a way to align, compare feedback, and move fast with confidence.
+    Without live debriefs, teams still need structure, alignment, and velocity.
 
-    **This dashboard is your async Decision Engine.**  
-    It transforms scattered scorecards into structured, data-driven decisions — so teams can move from interviews to offers without needing a meeting.
-
-    ---
-
-    ### Key Features:
-    - Real-time scorecard completion tracking
-    - Auto-recommendation logic (Reject / HM Review / Needs Discussion)
-    - Department-level analytics and interviewer insights
-    - Ready for future Workday integration
-
-    ---
-
-    🔍 **Want to know how it works?**  
-    Every tab includes a step-by-step guide — just open the “❓ How to Use This Dashboard” dropdown at the top of each page.
-
-    ---
-
-    ⚠️ *Note: This dashboard is currently running on dummy data.*  
-    Once integrated with Workday, it will reflect live candidate pipelines, recruiter activity, and interview results in real time.
+    This dashboard **translates interview scorecards into fast, fair hiring decisions** — without needing a meeting.
     """)
 
+    st.success("✅ Purpose-built to support async hiring in a BrightHire-enabled world.")
+
+    st.markdown("---")
+
+    st.markdown("### 🧠 Why It Matters")
+    st.markdown("""
+    - ✋ Live debriefs are slow, subjective, and inconsistent  
+    - 🔍 Scorecards hold signal — but they’re underused  
+    - 📊 This dashboard transforms those signals into structured decisions  
+    """)
+
+    st.markdown("### 🔧 Key Features")
+    st.markdown("""
+    - 📈 Track scorecard completion in real-time  
+    - 🚦 Automated logic: Reject / HM Review / Needs Discussion  
+    - 🏢 Department-level analytics + interviewer stats  
+    - 📬 Nudges to improve participation  
+    - ⏱ Time saved from fewer debriefs  
+    """)
+
+    st.markdown("### 💡 Pro Tip")
+    st.info("Every tab includes a ‘❓ How to Use’ dropdown to walk you through the dashboard step-by-step.")
+
+    st.warning("⚠️ This version uses dummy data. Workday integration is planned for live candidate tracking.")
+
+
+    st.subheader("💡 Key Use Cases")
+    st.markdown("""
+    - **Track scorecard submission** in real time  
+    - **Benchmark interview performance** to auto-approve or reject  
+    - **Replace the debrief** with a structured async summary  
+    - **Hold departments accountable** for completion and fairness  
+    """)
 
     st.subheader("📈 What You’ll Find Inside")
     st.markdown("""
@@ -117,28 +146,6 @@ with tab1:
 
 # ----------------- Scorecard Dashboard -----------------
 with tab2:
-
-    with st.expander("❓ How to Use This Dashboard"):
-        st.markdown("""
-        **Welcome to the Scorecard Decision Engine!**
-
-        This tab helps recruiters review interview scorecards, identify strong candidates, and take action — all asynchronously.
-
-        **How to Use:**
-        1. Choose a **Recruiter** to view candidates they’re managing
-        2. Set the **Scorecard Status** filter (Complete, Pending, or All)
-        3. Filter by **Department(s)** to drill down further
-        4. Review the summary table and expand candidates for full details
-        5. Use **Download Results** to export candidate data
-
-        **What the colors mean:**
-        - ✅ Score ≥ 3.5: Recommend for HM review
-        - ❌ Score ≤ 3.4: Auto-Reject
-        - ⚠️ Edge case: Needs discussion
-        - 🟡 Waiting: Not enough scorecards submitted
-
-        > This complements BrightHire and helps eliminate the need for live debriefs.
-        """)
     st.title("🎯 Scorecard Dashboard")
     st.caption("Filter by recruiter and department. View candidate scorecards and send reminders.")
 
@@ -218,21 +225,6 @@ import plotly.express as px
 
 # ----------------- Department Analytics -----------------
 with tab3:
-
-    with st.expander("❓ How to Use This Dashboard"):
-        st.markdown("""
-        **Welcome to the Department Analytics view!**
-
-        This tab helps you monitor scorecard completion rates, track interviewer participation, and estimate time saved from eliminating live debriefs.
-
-        **How to Use:**
-        1. View the **bar chart** to compare completion rates by department
-        2. Select a department to see how much time was saved (est. 3 hrs per candidate)
-        3. Use the **Interviewer Stats** section to search by name or filter by department
-        4. Check **Completion Rate %** to identify who’s submitting scorecards consistently
-
-        > Use this view to hold departments accountable and uncover coaching opportunities.
-        """)
     st.title("📊 Department Scorecard Analytics")
     st.caption("This view shows how well departments and interviewers are keeping up with scorecard submissions, and estimates time saved by removing debrief meetings.")
    
