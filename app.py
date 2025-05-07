@@ -105,14 +105,6 @@ with tab1:
     """)
 
 
-    st.subheader("💡 Key Use Cases")
-    st.markdown("""
-    - **Track scorecard submission** in real time  
-    - **Benchmark interview performance** to auto-approve or reject  
-    - **Replace the debrief** with a structured async summary  
-    - **Hold departments accountable** for completion and fairness  
-    """)
-
     st.subheader("📈 What You’ll Find Inside")
     st.markdown("""
     - **Scorecard Dashboard:** Filterable recruiter view with reminders  
