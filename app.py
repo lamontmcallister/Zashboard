@@ -92,14 +92,12 @@ tab1, tab2, tab3, tab4 = st.tabs([
 # ----------------- Landing Page -----------------
 with tab1:
 
-    st.markdown("""
-        <div style="
-            background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Zillow_logo.svg/512px-Zillow_logo.svg.png') no-repeat center;
-            background-size: contain;
-            height: 100px;
-            margin-bottom: 2rem;">
-        </div>
-    """, unsafe_allow_html=True)
+    st.markdown(
+        "<div style='text-align: center;'>"
+        "<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Zillow_logo.svg/512px-Zillow_logo.svg.png' width='200'/>"
+        "</div>",
+        unsafe_allow_html=True
+    )
 
 
     st.markdown("## 🚀 The Hiring Decision Engine")
