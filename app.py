@@ -1,28 +1,13 @@
-st.set_page_config(page_title="Recruiter Platform", layout="wide")
 # recruiter_dashboard.py
-
 import streamlit as st
-
-st.markdown("""
-    <style>
-        #zillow-header {
-            position: fixed;
-            top: 0.5rem;
-            left: 1rem;
-            z-index: 9999;
-        }
-    </style>
-    <div id="zillow-header">
-        <img src="https://github.com/lamontmcallister/Zashboard/blob/main/zillow_logo_for_upload.png?raw=true" width="100">
-    </div>
-""", unsafe_allow_html=True)
-
 import pandas as pd
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
 # ----------------- Page Setup -----------------
 # PAGE CONFIG MUST BE FIRST
+st.set_page_config(page_title="Recruiter Platform", layout="wide")
+
 # GLOBAL FONT STYLING
 st.markdown("""
 <style>
@@ -106,6 +91,14 @@ tab1, tab2, tab3, tab4 = st.tabs([
 
 # ----------------- Landing Page -----------------
 with tab1:
+
+    st.markdown(
+        "<div style='text-align: center; margin-bottom: 1.5rem;'>"
+        "<img src='https://github.com/lamontmcallister/Zashboard/blob/main/zillow_logo_for_upload.png?raw=true' width='300'/>"
+        "</div>",
+        unsafe_allow_html=True
+    )
+
 
     st.markdown("## 🚀 The Hiring Decision Engine")
 
