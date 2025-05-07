@@ -71,24 +71,59 @@ tab1, tab2, tab3, tab4 = st.tabs([
 
 # ----------------- Landing Page -----------------
 with tab1:
-    
-st.markdown(f"""
-    <div style="
-        background: url('zillow_logo.png') no-repeat center;
-        background-size: contain;
-        height: 100px;
-        margin-bottom: 2rem;">
-    </div>
-""", unsafe_allow_html=True)
 
-    st.title("Hiring Decision Engine")
-    # Landing page introducing the purpose of this recruiter dashboard.
 
-    st.markdown("""BrightHire eliminates the need for debrief meetings,  but how do we maintain structure in hiring decisions?
+    st.markdown(f"""
+        <div style="
+            background: url('zillow_logo.png') no-repeat center;
+            background-size: contain;
+            height: 100px;
+            margin-bottom: 2rem;">
+        </div>
+    """, unsafe_allow_html=True)
 
-This dashboard is the **Decision Engine** for async, scorecard-driven hiring.  
-It can be extended to **integrate with Workday** to automatically sync candidates, scorecards, and hiring decisions ensuring data consistency from interview to offer.
-""")
+
+    st.markdown("## 🚀 The Hiring Decision Engine")
+
+    st.markdown("""
+    BrightHire records your interviews — but what happens next?
+
+    Without live debriefs, teams still need structure, alignment, and velocity.
+
+    This dashboard **translates interview scorecards into fast, fair hiring decisions** — without needing a meeting.
+    """)
+
+    st.success("✅ Purpose-built to support async hiring in a BrightHire-enabled world.")
+
+    st.markdown("---")
+
+    st.markdown("### 🧠 Why It Matters")
+    st.markdown("""
+    - ✋ Live debriefs are slow, subjective, and inconsistent  
+    - 🔍 Scorecards hold signal — but they’re underused  
+    - 📊 This dashboard transforms those signals into structured decisions  
+    """)
+
+    st.markdown("### 🔧 Key Features")
+    st.markdown("""
+    - 📈 Track scorecard completion in real-time  
+    - 🚦 Automated logic: Reject / HM Review / Needs Discussion  
+    - 🏢 Department-level analytics + interviewer stats  
+    - 📬 Nudges to improve participation  
+    - ⏱ Time saved from fewer debriefs  
+    """)
+
+    st.subheader("📈 What You’ll Find Inside")
+    st.markdown("""
+    - **Scorecard Dashboard:** Filterable recruiter view with reminders  
+    - **Department Analytics:** Completion rates, interviewer stats, time saved  
+    - **Success Metrics:** KPIs for hiring velocity and quality  
+    """)
+
+    st.markdown("### 💡 Pro Tip")
+    st.info("Every tab includes a ‘❓ How to Use’ dropdown to walk you through the dashboard step-by-step.")
+    st.warning("⚠️ This version uses dummy data. Workday integration is planned for live candidate tracking.")
+
 
     st.subheader("💡 Key Use Cases")
     st.markdown("""
