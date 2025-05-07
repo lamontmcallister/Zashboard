@@ -122,19 +122,6 @@ with tab1:
     - ⏱ Time saved from fewer debriefs  
     """)
 
-    st.markdown("### 💡 Pro Tip")
-    st.info("Every tab includes a ‘❓ How to Use’ dropdown to walk you through the dashboard step-by-step.")
-
-    st.warning("⚠️ This version uses dummy data. Workday integration is planned for live candidate tracking.")
-
-
-    st.subheader("💡 Key Use Cases")
-    st.markdown("""
-    - **Track scorecard submission** in real time  
-    - **Benchmark interview performance** to auto-approve or reject  
-    - **Replace the debrief** with a structured async summary  
-    - **Hold departments accountable** for completion and fairness  
-    """)
 
     st.subheader("📈 What You’ll Find Inside")
     st.markdown("""
@@ -143,8 +130,10 @@ with tab1:
     - **Success Metrics:** KPIs for hiring velocity and quality  
     """)
 
-    st.success("This dashboard supports BrightHire adoption by making async decisions confident, consistent, and fast.")
+  st.markdown("### 💡 Pro Tip")
+    st.info("Every tab includes a ‘❓ How to Use’ dropdown to walk you through the dashboard step-by-step.")
 
+    st.warning("⚠️ This version uses dummy data. Workday integration is planned for live candidate tracking.")
 
 # ----------------- Scorecard Dashboard -----------------
 with tab2:
