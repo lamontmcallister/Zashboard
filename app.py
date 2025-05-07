@@ -92,7 +92,13 @@ tab1, tab2, tab3, tab4 = st.tabs([
 # ----------------- Landing Page -----------------
 with tab1:
 
-    st.image("https://github.com/lamontmcallister/Zashboard/blob/main/zillow_logo_for_upload.png?raw=true", width=200)
+    st.markdown(
+        "<div style='display: flex; align-items: center; margin-bottom: 1rem;'>"
+        "<img src='https://github.com/lamontmcallister/Zashboard/blob/main/zillow_logo_for_upload.png?raw=true' width='120' style='margin-right: 1rem'/>"
+        "<h2 style='margin: 0;'>The Hiring Decision Engine</h2>"
+        "</div>",
+        unsafe_allow_html=True
+    )
 
 
     st.markdown("## 🚀 The Hiring Decision Engine")
@@ -137,6 +143,15 @@ with tab1:
     st.warning("⚠️ This version uses dummy data. Workday integration is planned for live candidate tracking.")
 # ----------------- Scorecard Dashboard -----------------
 with tab2:
+
+    st.markdown(
+        "<div style='display: flex; align-items: center; margin-bottom: 1rem;'>"
+        "<img src='https://github.com/lamontmcallister/Zashboard/blob/main/zillow_logo_for_upload.png?raw=true' width='120' style='margin-right: 1rem'/>"
+        "<h2 style='margin: 0;'>The Hiring Decision Engine</h2>"
+        "</div>",
+        unsafe_allow_html=True
+    )
+
 
     with st.expander("❓ How to Use This Dashboard"):
         st.markdown("""
@@ -239,6 +254,15 @@ import plotly.express as px
 # ----------------- Department Analytics -----------------
 with tab3:
 
+    st.markdown(
+        "<div style='display: flex; align-items: center; margin-bottom: 1rem;'>"
+        "<img src='https://github.com/lamontmcallister/Zashboard/blob/main/zillow_logo_for_upload.png?raw=true' width='120' style='margin-right: 1rem'/>"
+        "<h2 style='margin: 0;'>The Hiring Decision Engine</h2>"
+        "</div>",
+        unsafe_allow_html=True
+    )
+
+
     with st.expander("❓ How to Use This Dashboard"):
         st.markdown("""
         **Welcome to the Department Analytics view!**
@@ -311,6 +335,15 @@ with tab3:
 
 # ----------------- Success Metrics -----------------
 with tab4:
+
+    st.markdown(
+        "<div style='display: flex; align-items: center; margin-bottom: 1rem;'>"
+        "<img src='https://github.com/lamontmcallister/Zashboard/blob/main/zillow_logo_for_upload.png?raw=true' width='120' style='margin-right: 1rem'/>"
+        "<h2 style='margin: 0;'>The Hiring Decision Engine</h2>"
+        "</div>",
+        unsafe_allow_html=True
+    )
+
     st.title("📈 Success Metrics Overview")
     st.markdown("### Previewing Metrics That Reflect Dashboard Impact")
     st.markdown("""
