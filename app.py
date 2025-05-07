@@ -72,27 +72,27 @@ tab1, tab2, tab3, tab4 = st.tabs([
 # ----------------- Landing Page -----------------
 with tab1:
     st.title("Hiring Decision Engine")
-    
-with st.expander("❓ How to Use This Dashboard"):
-    st.markdown("""
-    **Welcome to the Scorecard Decision Engine!**
 
-    This dashboard supports async, structured hiring decisions based on interview scorecards.
+    with st.expander("❓ How to Use This Dashboard"):
+        st.markdown("""
+        **Welcome to the Scorecard Decision Engine!**
 
-    **How to Use:**
-    1. Choose a **Recruiter** to filter candidate data
-    2. Use the **Scorecard Status** filter (Complete, Pending, All)
-    3. Select the **Department(s)** to narrow your view
-    4. Expand rows for details or download summaries
+        This dashboard supports async, structured hiring decisions based on interview scorecards.
 
-    **What the colors mean:**
-    - ✅ Score ≥ 3.5: Recommend for Hiring Manager review
-    - ❌ Score ≤ 3.4: Auto-Reject
-    - ⚠️ Edge case: Needs discussion
-    - 🟡 Not enough scorecards: Awaiting more feedback
+        **How to Use:**
+        1. Choose a **Recruiter** to filter candidate data
+        2. Use the **Scorecard Status** filter (Complete, Pending, All)
+        3. Select the **Department(s)** to narrow your view
+        4. Expand rows for details or download summaries
 
-    > Built to complement BrightHire and eliminate live debriefs with data-driven clarity.
-    """)
+        **What the colors mean:**
+        - ✅ Score ≥ 3.5: Recommend for Hiring Manager review
+        - ❌ Score ≤ 3.4: Auto-Reject
+        - ⚠️ Edge case: Needs discussion
+        - 🟡 Not enough scorecards: Awaiting more feedback
+
+        > Built to complement BrightHire and eliminate live debriefs with data-driven clarity.
+        """)
 
     # Landing page introducing the purpose of this recruiter dashboard.
 
@@ -123,28 +123,6 @@ It can be extended to **integrate with Workday** to automatically sync candidate
 # ----------------- Scorecard Dashboard -----------------
 with tab2:
     st.title("🎯 Scorecard Dashboard")
-    
-with st.expander("❓ How to Use This Dashboard"):
-    st.markdown("""
-    **Welcome to the Scorecard Decision Engine!**
-
-    This dashboard supports async, structured hiring decisions based on interview scorecards.
-
-    **How to Use:**
-    1. Choose a **Recruiter** to filter candidate data
-    2. Use the **Scorecard Status** filter (Complete, Pending, All)
-    3. Select the **Department(s)** to narrow your view
-    4. Expand rows for details or download summaries
-
-    **What the colors mean:**
-    - ✅ Score ≥ 3.5: Recommend for Hiring Manager review
-    - ❌ Score ≤ 3.4: Auto-Reject
-    - ⚠️ Edge case: Needs discussion
-    - 🟡 Not enough scorecards: Awaiting more feedback
-
-    > Built to complement BrightHire and eliminate live debriefs with data-driven clarity.
-    """)
-
     st.caption("Filter by recruiter and department. View candidate scorecards and send reminders.")
 
 
@@ -224,28 +202,6 @@ import plotly.express as px
 # ----------------- Department Analytics -----------------
 with tab3:
     st.title("📊 Department Scorecard Analytics")
-    
-with st.expander("❓ How to Use This Dashboard"):
-    st.markdown("""
-    **Welcome to the Scorecard Decision Engine!**
-
-    This dashboard supports async, structured hiring decisions based on interview scorecards.
-
-    **How to Use:**
-    1. Choose a **Recruiter** to filter candidate data
-    2. Use the **Scorecard Status** filter (Complete, Pending, All)
-    3. Select the **Department(s)** to narrow your view
-    4. Expand rows for details or download summaries
-
-    **What the colors mean:**
-    - ✅ Score ≥ 3.5: Recommend for Hiring Manager review
-    - ❌ Score ≤ 3.4: Auto-Reject
-    - ⚠️ Edge case: Needs discussion
-    - 🟡 Not enough scorecards: Awaiting more feedback
-
-    > Built to complement BrightHire and eliminate live debriefs with data-driven clarity.
-    """)
-
     st.caption("This view shows how well departments and interviewers are keeping up with scorecard submissions, and estimates time saved by removing debrief meetings.")
    
 
@@ -304,28 +260,6 @@ with st.expander("❓ How to Use This Dashboard"):
 # ----------------- Success Metrics -----------------
 with tab4:
     st.title("📈 Success Metrics Overview")
-    
-with st.expander("❓ How to Use This Dashboard"):
-    st.markdown("""
-    **Welcome to the Scorecard Decision Engine!**
-
-    This dashboard supports async, structured hiring decisions based on interview scorecards.
-
-    **How to Use:**
-    1. Choose a **Recruiter** to filter candidate data
-    2. Use the **Scorecard Status** filter (Complete, Pending, All)
-    3. Select the **Department(s)** to narrow your view
-    4. Expand rows for details or download summaries
-
-    **What the colors mean:**
-    - ✅ Score ≥ 3.5: Recommend for Hiring Manager review
-    - ❌ Score ≤ 3.4: Auto-Reject
-    - ⚠️ Edge case: Needs discussion
-    - 🟡 Not enough scorecards: Awaiting more feedback
-
-    > Built to complement BrightHire and eliminate live debriefs with data-driven clarity.
-    """)
-
     st.markdown("### Previewing Metrics That Reflect Dashboard Impact")
     st.markdown("""
     | Metric                         | Example Value        | Target      |
