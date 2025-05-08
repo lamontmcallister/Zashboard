@@ -273,8 +273,13 @@ with tab3:
     x='Completion Rate (%)',
     orientation='h',
     title='Scorecard Completion Rate by Department',
-    color='Department'  # Adds color differentiation by department
-)')
+    color='Department'
+),
+            orientation='h',
+            title='Scorecard Completion Rate by Department',
+            color_discrete_sequence=['#1f77b4']
+        )
+        fig.update_layout(yaxis_title='Department', xaxis_title='Completion Rate (%)')
         st.plotly_chart(fig, use_container_width=True)
 
     with col2:
