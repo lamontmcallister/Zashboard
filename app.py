@@ -269,11 +269,11 @@ with tab3:
     with col1:
         fig = px.bar(
     dept_summary,
-    y='Department',
-    x='Completion Rate (%)',
-    orientation='h',
-    title='Scorecard Completion Rate by Department',
-    color='Department'
+    y="Department",
+    x="Completion Rate (%)",
+    orientation="h",
+    title="Scorecard Completion Rate by Department",
+    color="Department"
 ),
             orientation='h',
             title='Scorecard Completion Rate by Department',
