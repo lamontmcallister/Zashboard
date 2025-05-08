@@ -274,7 +274,7 @@ with tab3:
     orientation='h',
     title='Scorecard Completion Rate by Department',
     color='Department'
-)',
+),
             orientation='h',
             title='Scorecard Completion Rate by Department',
             color_discrete_sequence=['#1f77b4']
