@@ -92,22 +92,6 @@ tab1, tab2, tab3, tab4 = st.tabs([
 # ----------------- Landing Page -----------------
 with tab1:
 
-    st.markdown("""
-        <style>
-            .centered-box {
-                max-width: 800px;
-                margin: auto;
-                padding: 2rem;
-                background-color: #ffffff;
-                border: 2px solid #1f77b4;
-                border-radius: 12px;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            }
-        </style>
-        <div class="centered-box">
-    """, unsafe_allow_html=True)
-
-
     st.markdown("## 🚀 The Hiring Decision Engine")
 
     st.markdown("""
@@ -149,7 +133,6 @@ with tab1:
     st.info("Every tab includes a ‘❓ How to Use’ dropdown to walk you through the dashboard step-by-step.")
     st.warning("⚠️ This version uses dummy data. Workday integration is planned for live candidate tracking.")
 # ----------------- Scorecard Dashboard -----------------
-    st.markdown("</div>", unsafe_allow_html=True)
 with tab2:
 
     with st.expander("❓ How to Use This Dashboard"):
