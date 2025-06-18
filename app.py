@@ -2,7 +2,6 @@
 import streamlit as st
 import pandas as pd
 import gspread
-
 from oauth2client.service_account import ServiceAccountCredentials
 import plotly.express as px
 
@@ -69,8 +68,9 @@ except Exception as e:
     st.error(f"❌ Failed to load data from Google Sheet: {e}")
     st.stop()
 
-# ----------------- Tabs -----------------
 departments = sorted(df['Department'].dropna().unique().tolist())
+
+# ----------------- Tabs -----------------
 tab1, tab2, tab3, tab4 = st.tabs([
     "🔰 Landing Page",
     "Scorecard Dashboard",
@@ -112,8 +112,7 @@ with tab2:
     ).reset_index()
 
     grouped['Decision'] = grouped.apply(make_decision, axis=1)
-    grouped = grouped[(grouped['Recruiter'] == selected_recruiter) &
-                      (grouped['Department'].isin(selected_depts))]
+    grouped = grouped[(grouped['Recruiter'] == selected_recruiter) & (grouped['Department'].isin(selected_depts))]
 
     if toggle_status == "Complete Scorecards":
         grouped = grouped[grouped['Scorecards_Submitted'] == 4]
@@ -123,15 +122,40 @@ with tab2:
     st.subheader(f"📋 Candidate Summary for {selected_recruiter}")
     st.dataframe(grouped[['Candidate Name', 'Department', 'Avg_Interview_Score', 'Scorecards_Submitted', 'Decision']], use_container_width=True)
 
+    st.subheader("🧠 Candidate Details")
+    for _, row in grouped.iterrows():
+        with st.expander(f"{row['Candidate Name']} — {row['Decision']}"):
+            st.markdown(f"**Department:** {row['Department']}")
+            st.markdown(f"**Scorecards Submitted:** {row['Scorecards_Submitted']} / 4")
+            st.markdown("---")
+            st.markdown("### Interviewer Scores")
+
+            candidate_rows = df[df['Candidate Name'] == row['Candidate Name']]
+            for _, r in candidate_rows.iterrows():
+                submitted = str(r['Scorecard submitted']).strip().lower() == 'yes'
+                score = r['Interview Score']
+                interviewer = r['Internal Interviewer']
+                interview_label = r['Interview']
+                if submitted:
+                    st.markdown(f"- **{interviewer}** ({interview_label}): ✅ {score}")
+                else:
+                    st.markdown(f"- **{interviewer}** ({interview_label}): ❌ Not Submitted")
+                    st.button(f"📩 Send Reminder to {interviewer}", key=f"{row['Candidate Name']}-{interviewer}")
+
 # ----------------- Department Analytics -----------------
 with tab3:
     st.title("📊 Department Scorecard Analytics")
+
     dept_summary = df.groupby('Department').agg(
         Total_Interviews=('Interview Score', 'count'),
         Completed=('Scorecard Complete', 'sum'),
         Avg_Score=('Interview Score', 'mean')
     ).reset_index()
     dept_summary['Completion Rate (%)'] = round(100 * dept_summary['Completed'] / dept_summary['Total_Interviews'], 1)
+
+    avg_time_submit = df.groupby('Department')['Time to Submit Scorecard (HRs)'].mean().reset_index()
+    avg_time_submit.columns = ['Department', 'Avg Time to Submit (HRs)']
+    dept_summary = pd.merge(dept_summary, avg_time_submit, on='Department', how='left')
 
     st.subheader("✅ Scorecard Submission Rate by Department")
     fig = px.bar(
@@ -146,81 +170,17 @@ with tab3:
     fig.update_layout(yaxis_title='Department', xaxis_title='Completion Rate (%)')
     st.plotly_chart(fig, use_container_width=True)
 
-avg_time_submit = df.groupby('Department')['Time to Submit Scorecard (HRs)'].mean().reset_index()
-avg_time_submit.columns = ['Department', 'Avg Time to Submit (HRs)']
-dept_summary = pd.merge(dept_summary, avg_time_submit, on='Department', how='left')
-
-st.subheader("⏱ Average Time to Submit by Department")
-
-def highlight_avg_time(val):
-    color = '#c6f6d5' if val <= 24 else '#fed7d7'
-    return f'background-color: {color}; text-align: center'
-
-st.dataframe(
-    dept_summary[['Department', 'Avg Time to Submit (HRs)']]
-        .style
-        .applymap(highlight_avg_time, subset=['Avg Time to Submit (HRs)'])
-        .format({'Avg Time to Submit (HRs)': '{:.1f}'}),
-    use_container_width=True
-)
-avg_time_submit = df.groupby('Department')['Time to Submit Scorecard (HRs)'].mean().reset_index()
-avg_time_submit.columns = ['Department', 'Avg Time to Submit (HRs)']
-dept_summary = pd.merge(dept_summary, avg_time_submit, on='Department', how='left')
-
-st.subheader("⏱ Average Time to Submit by Department")
-
-def highlight_avg_time(val):
-    color = '#c6f6d5' if val <= 24 else '#fed7d7'
-    return f'background-color: {color}; text-align: center'
-
-st.dataframe(
-    dept_summary[['Department', 'Avg Time to Submit (HRs)']]
-        .style
-        .applymap(highlight_avg_time, subset=['Avg Time to Submit (HRs)'])
-        .format({'Avg Time to Submit (HRs)': '{:.1f}'}),
-    use_container_width=True
-)
-
-
-    # Calculate average time to submit by department
-    avg_time_submit = df.groupby('Department')['Time to Submit Scorecard (HRs)'].mean().reset_index()
-    avg_time_submit.columns = ['Department', 'Avg Time to Submit (HRs)']
-    dept_summary = pd.merge(dept_summary, avg_time_submit, on='Department', how='left')
-
     st.subheader("⏱ Average Time to Submit by Department")
-    st.dataframe(dept_summary[['Department', 'Avg Time to Submit (HRs)']], use_container_width=True)
 
-
-    st.subheader("👥 Internal Interviewer Stats")
-    selected_depts = st.multiselect("Filter by Department", departments, default=departments)
-    name_query = st.text_input("Search by Interviewer Name").strip().lower()
-
-    interviewer_df = df[df["Internal Interviewer"].notna() & df["Department"].isin(selected_depts)]
-    if name_query:
-        interviewer_df = interviewer_df[interviewer_df["Internal Interviewer"].str.lower().str.contains(name_query)]
-
-    interviewer_summary = interviewer_df.groupby("Internal Interviewer").agg(
-        Interviews_Conducted=("Interview", "count"),
-        Scorecards_Submitted=("Scorecard Complete", "sum"),
-        Avg_Interview_Score=("Interview Score", "mean"),
-        Avg_Submission_Time_Hours=('Time to Submit Scorecard (HRs)', 'mean'),
-        On_Time_Submissions=('On Time (%)', 'mean')
-    ).reset_index()
-    interviewer_summary['Completion Rate (%)'] = round(100 * interviewer_summary['Scorecards_Submitted'] / interviewer_summary['Interviews_Conducted'], 1)
-
-    def highlight_completion(val):
-        color = '#c6f6d5' if val >= 90 else '#fed7d7'
+    def highlight_avg_time(val):
+        color = '#c6f6d5' if val <= 24 else '#fed7d7'
         return f'background-color: {color}; text-align: center'
 
     st.dataframe(
-        interviewer_summary.style
-            .applymap(highlight_completion, subset=['Completion Rate (%)'])
-            .format({
-                'Avg_Interview_Score': '{:.2f}',
-                'Avg_Submission_Time_Hours': '{:.1f}',
-                'On_Time_Submissions': '{:.0f}%'
-            })
-            .set_properties(**{'text-align': 'center'}),
+        dept_summary[['Department', 'Avg Time to Submit (HRs)']]
+        .style
+        .applymap(highlight_avg_time, subset=['Avg Time to Submit (HRs)'])
+        .format({'Avg Time to Submit (HRs)': '{:.1f}'}),
         use_container_width=True
     )
 
