@@ -145,7 +145,23 @@ with tab3:
     fig.update_layout(yaxis_title='Department', xaxis_title='Completion Rate (%)')
     st.plotly_chart(fig, use_container_width=True)
 
-# Calculate and display Avg Time to Submit
+avg_time_submit = df.groupby('Department')['Time to Submit Scorecard (HRs)'].mean().reset_index()
+avg_time_submit.columns = ['Department', 'Avg Time to Submit (HRs)']
+dept_summary = pd.merge(dept_summary, avg_time_submit, on='Department', how='left')
+
+st.subheader("⏱ Average Time to Submit by Department")
+
+def highlight_avg_time(val):
+    color = '#c6f6d5' if val <= 24 else '#fed7d7'
+    return f'background-color: {color}; text-align: center'
+
+st.dataframe(
+    dept_summary[['Department', 'Avg Time to Submit (HRs)']]
+        .style
+        .applymap(highlight_avg_time, subset=['Avg Time to Submit (HRs)'])
+        .format({'Avg Time to Submit (HRs)': '{:.1f}'}),
+    use_container_width=True
+)
 avg_time_submit = df.groupby('Department')['Time to Submit Scorecard (HRs)'].mean().reset_index()
 avg_time_submit.columns = ['Department', 'Avg Time to Submit (HRs)']
 dept_summary = pd.merge(dept_summary, avg_time_submit, on='Department', how='left')
