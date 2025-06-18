@@ -122,6 +122,25 @@ with tab2:
     st.subheader(f"📋 Candidate Summary for {selected_recruiter}")
     st.dataframe(grouped[['Candidate Name', 'Department', 'Avg_Interview_Score', 'Scorecards_Submitted', 'Decision']], use_container_width=True)
 
+    st.subheader("🧠 Candidate Details")
+    for _, row in grouped.iterrows():
+        with st.expander(f"{row['Candidate Name']} — {row['Decision']}"):
+            st.markdown(f"**Department:** {row['Department']}")
+            st.markdown(f"**Scorecards Submitted:** {row['Scorecards_Submitted']} / 4")
+            st.markdown("---")
+            st.markdown("### Interviewer Scores")
+
+            candidate_rows = df[df['Candidate Name'] == row['Candidate Name']]
+            for _, r in candidate_rows.iterrows():
+                submitted = str(r['Scorecard submitted']).strip().lower() == 'yes'
+                score = r['Interview Score']
+                interviewer = r['Internal Interviewer']
+                interview_label = r['Interview']
+                if submitted:
+                    st.markdown(f"- **{interviewer}** ({interview_label}): ✅ {score}")
+                else:
+                    st.markdown(f"- **{interviewer}** ({interview_label}): ❌ Not Submitted")
+    
 # ----------------- Department Analytics -----------------
 with tab3:
     st.title("📊 Department Scorecard Analytics")
@@ -145,6 +164,25 @@ with tab3:
     fig.update_layout(yaxis_title='Department', xaxis_title='Completion Rate (%)')
     st.plotly_chart(fig, use_container_width=True)
 
+    # Calculate and display Avg Time to Submit
+    avg_time_submit = df.groupby('Department')['Time to Submit Scorecard (HRs)'].mean().reset_index()
+    avg_time_submit.columns = ['Department', 'Avg Time to Submit (HRs)']
+    dept_summary = pd.merge(dept_summary, avg_time_submit, on='Department', how='left')
+
+    st.subheader("⏱ Average Time to Submit by Department")
+
+    def highlight_avg_time(val):
+        color = '#c6f6d5' if val <= 24 else '#fed7d7'
+        return f'background-color: {color}; text-align: center'
+
+    st.dataframe(
+        dept_summary[['Department', 'Avg Time to Submit (HRs)']]
+            .style
+            .applymap(highlight_avg_time, subset=['Avg Time to Submit (HRs)'])
+            .format({'Avg Time to Submit (HRs)': '{:.1f}'}),
+        use_container_width=True
+    )
+    
     # Calculate average time to submit by department
     avg_time_submit = df.groupby('Department')['Time to Submit Scorecard (HRs)'].mean().reset_index()
     avg_time_submit.columns = ['Department', 'Avg Time to Submit (HRs)']
