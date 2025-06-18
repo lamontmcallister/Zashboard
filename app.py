@@ -145,6 +145,15 @@ with tab3:
     fig.update_layout(yaxis_title='Department', xaxis_title='Completion Rate (%)')
     st.plotly_chart(fig, use_container_width=True)
 
+    # Calculate average time to submit by department
+    avg_time_submit = df.groupby('Department')['Time to Submit Scorecard (HRs)'].mean().reset_index()
+    avg_time_submit.columns = ['Department', 'Avg Time to Submit (HRs)']
+    dept_summary = pd.merge(dept_summary, avg_time_submit, on='Department', how='left')
+
+    st.subheader("⏱ Average Time to Submit by Department")
+    st.dataframe(dept_summary[['Department', 'Avg Time to Submit (HRs)']], use_container_width=True)
+
+
     st.subheader("👥 Internal Interviewer Stats")
     selected_depts = st.multiselect("Filter by Department", departments, default=departments)
     name_query = st.text_input("Search by Interviewer Name").strip().lower()
