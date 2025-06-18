@@ -1,4 +1,3 @@
-
 # recruiter_dashboard.py
 import streamlit as st
 import pandas as pd
@@ -12,7 +11,6 @@ st.set_page_config(page_title="Recruiter Platform", layout="wide")
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-
 html, body, [class*="css"]  {
     font-family: 'Inter', sans-serif !important;
     font-size: 16px;
@@ -81,7 +79,7 @@ with tab1:
     st.markdown("""
 BrightHire captures the conversation. This dashboard captures what matters next.
 
-Designed to complement live debriefs not replace them. This tool transforms interviewer scorecards into decision ready insights. It surfaces patterns, flags risks, and helps teams stay calibrated.
+Designed to complement live debriefs not replace them. This tool transforms interviewer scorecards into decision-ready insights. It surfaces patterns, flags risks, and helps teams stay calibrated.
 
 ✅ Accelerates hiring decisions  
 ✅ Reinforces scorecard quality and accountability  
@@ -198,7 +196,46 @@ with tab3:
         use_container_width=True
     )
 
-# (Interviewer stats would follow here…)
+    st.subheader("👥 Internal Interviewer Stats")
+    selected_depts_interviewers = st.multiselect("Filter by Department", departments, default=departments, key="interviewers-dept-filter")
+    name_query = st.text_input("Search by Interviewer Name", key="interviewers-name-filter").strip().lower()
+
+    interviewer_df = df[df["Internal Interviewer"].notna() & df["Department"].isin(selected_depts_interviewers)]
+    if name_query:
+        interviewer_df = interviewer_df[interviewer_df["Internal Interviewer"].str.lower().str.contains(name_query)]
+
+    interviewer_summary = interviewer_df.groupby("Internal Interviewer").agg(
+        Interviews_Conducted=("Interview", "count"),
+        Scorecards_Submitted=("Scorecard Complete", "sum"),
+        Avg_Interview_Score=("Interview Score", "mean"),
+        Avg_Submission_Time_Hours=('Time to Submit Scorecard (HRs)', 'mean'),
+        On_Time_Submissions=('On Time (%)', 'mean')
+    ).reset_index()
+    interviewer_summary['Completion Rate (%)'] = round(
+        100 * interviewer_summary['Scorecards_Submitted'] / interviewer_summary['Interviews_Conducted'], 1
+    )
+    interviewer_summary['Needs Coaching'] = interviewer_summary.apply(
+        lambda row: '✅' if row['Completion Rate (%)'] >= 75 and row['Avg_Submission_Time_Hours'] <= 24 else '⚠️', axis=1
+    )
+
+    def color_completion(val):
+        return f'background-color: {"#c6f6d5" if val >= 90 else "#fed7d7"}; text-align: center'
+
+    def color_coaching(val):
+        return f'background-color: {"#c6f6d5" if val == "✅" else "#ffe4e1"}; text-align: center'
+
+    st.dataframe(
+        interviewer_summary.style
+        .applymap(color_completion, subset=['Completion Rate (%)'])
+        .applymap(color_coaching, subset=['Needs Coaching'])
+        .format({
+            'Avg_Interview_Score': '{:.2f}',
+            'Avg_Submission_Time_Hours': '{:.1f}',
+            'On_Time_Submissions': '{:.0f}%'
+        })
+        .set_properties(**{'text-align': 'center'}),
+        use_container_width=True
+    )
 
 # ----------------- Success Metrics -----------------
 with tab4:
