@@ -80,13 +80,17 @@ tab1, tab2, tab3, tab4 = st.tabs([
 
 # ----------------- Landing Page -----------------
 with tab1:
-    st.markdown("## 🚀 The Hiring Decision Engine")
+    st.markdown("## The Interview Signal Dashboard")
     st.markdown("""
-    BrightHire records your interviews — but what happens next?
+   BrightHire captures the conversation. This dashboard captures what matters next.
 
-    Even with live debriefs, having structured data improves speed and consistency.
+Designed to complement live debriefs not replace them. This tool transforms interviewer scorecards into decision ready insights. It surfaces patterns, flags risks, and helps teams stay calibrated.
 
-    This dashboard **translates interview scorecards into hiring insights**.
+✅ Accelerates hiring decisions
+✅ Reinforces scorecard quality and accountability
+✅ Keeps interviewers and hiring managers aligned
+
+
     """)
     st.success("✅ Supports data-driven hiring alongside live debriefs.")
 
